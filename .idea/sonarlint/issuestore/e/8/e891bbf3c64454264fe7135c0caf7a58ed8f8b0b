@@ -1,0 +1,9 @@
+
+Q	java:S125"<This block of commented-out lines of code should be removed.(ü¸ÇÙ
+V	java:S125"<This block of commented-out lines of code should be removed.(ìŒî×ûÿÿÿÿ
+E	java:S106"+Replace this use of System.out by a logger.(õŞñĞûÿÿÿÿ
+]	java:S125"<This block of commented-out lines of code should be removed.(Çê‚šÿÿÿÿÿ8²¼°¾Ü1
+q
+java:S1128"ORemove this unused import 'com.mariamkatamashvlii.gym.initializer.TrainerInit'.(ÿ»„Ëûÿÿÿÿ8º¼°¾Ü1
+m
+java:S1128"PRemove this unused import 'com.mariamkatamashvlii.gym.initializer.TrainingInit'.(”ÓÎ8º¼°¾Ü1

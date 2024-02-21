@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="9a8988ac-12ea-4552-8d25-788ccafee80b" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/securityhotspotstore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/securityhotspotstore/index.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mariamkatamashvlii/gym/GymFacade.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mariamkatamashvlii/gym/GymFacade.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mariamkatamashvlii/gym/config/StorageConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mariamkatamashvlii/gym/config/StorageConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mariamkatamashvlii/gym/serviceImpl/TraineeServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mariamkatamashvlii/gym/serviceImpl/TraineeServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mariamkatamashvlii/gym/serviceImpl/TrainerServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mariamkatamashvlii/gym/serviceImpl/TrainerServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/mariamkatamashvlii/gym/serviceImpl/TrainingServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mariamkatamashvlii/gym/serviceImpl/TrainingServiceImpl.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2cJKQKpXzcC7Vnqg0ivuqiIIxg6" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;spring__core&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/IThub/Practical Exam&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.mariamkatamashvlii.gym.config" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.mariamkatamashvlii.gym.daoImpl" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Spring Boot.GymApplication">
+    <configuration name="TraineeInitTest.testInitialize" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Gym" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.mariamkatamashvlii.gym.initTests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.mariamkatamashvlii.gym.initTests" />
+      <option name="MAIN_CLASS_NAME" value="com.mariamkatamashvlii.gym.initTests.TraineeInitTest" />
+      <option name="METHOD_NAME" value="testInitialize" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TraineeInitTest.testInitializeAddsTrainee" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Gym" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.mariamkatamashvlii.gym.initTests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.mariamkatamashvlii.gym.initTests" />
+      <option name="MAIN_CLASS_NAME" value="com.mariamkatamashvlii.gym.initTests.TraineeInitTest" />
+      <option name="METHOD_NAME" value="testInitializeAddsTrainee" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TrainerServiceImplTest.testSelectTrainer" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Gym" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.mariamkatamashvlii.gym.serviceImplTests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.mariamkatamashvlii.gym.serviceImplTests" />
+      <option name="MAIN_CLASS_NAME" value="com.mariamkatamashvlii.gym.serviceImplTests.TrainerServiceImplTest" />
+      <option name="METHOD_NAME" value="testSelectTrainer" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TrainingServiceImplTest.testCreateTraining" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Gym" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.mariamkatamashvlii.gym.serviceImplTests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.mariamkatamashvlii.gym.serviceImplTests" />
+      <option name="MAIN_CLASS_NAME" value="com.mariamkatamashvlii.gym.serviceImplTests.TrainingServiceImplTest" />
+      <option name="METHOD_NAME" value="testCreateTraining" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TrainingServiceImplTest.testSelectTraining" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Gym" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.mariamkatamashvlii.gym.serviceImplTests.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.mariamkatamashvlii.gym.serviceImplTests" />
+      <option name="MAIN_CLASS_NAME" value="com.mariamkatamashvlii.gym.serviceImplTests.TrainingServiceImplTest" />
+      <option name="METHOD_NAME" value="testSelectTraining" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GymApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="Gym" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.mariamkatamashvlii.gym.GymApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.TraineeInitTest.testInitializeAddsTrainee" />
+        <item itemvalue="JUnit.TraineeInitTest.testInitialize" />
+        <item itemvalue="JUnit.TrainingServiceImplTest.testSelectTraining" />
+        <item itemvalue="JUnit.TrainingServiceImplTest.testCreateTraining" />
+        <item itemvalue="JUnit.TrainerServiceImplTest.testSelectTrainer" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9a8988ac-12ea-4552-8d25-788ccafee80b" name="Changes" comment="" />
+      <created>1707824226625</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1707824226625</updated>
+      <workItem from="1707824227810" duration="8033000" />
+      <workItem from="1707900222283" duration="19070000" />
+      <workItem from="1707984335390" duration="35518000" />
+      <workItem from="1708422120924" duration="10145000" />
+      <workItem from="1708452418157" duration="1457000" />
+      <workItem from="1708518891038" duration="895000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
