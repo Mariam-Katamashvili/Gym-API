@@ -22,7 +22,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public void create(Trainer trainer) {
-        logger.info("Creating trainer with ID {}", trainer.getUserId());
+        logger.info("Creating trainer with ID {}", trainer.getUser().getUserId());
         trainerDaoImpl.create(trainer);
     }
 

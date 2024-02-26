@@ -15,12 +15,12 @@ public class GymApplication {
         ApplicationContext context = SpringApplication.run(GymApplication.class, args);
 //        TraineeInit init = context.getBean(TraineeInit.class);
         //System.out.println(init.getDataPath());
-        TraineeInit traineeInit = context.getBean(TraineeInit.class);
-        traineeInit.getTraineeMap().values().forEach(System.out::println);
-        TrainerInit trainerInit = context.getBean(TrainerInit.class);
-        trainerInit.getTrainerMap().values().forEach(System.out::println);
-        TrainingInit trainingInit = context.getBean(TrainingInit.class);
-        trainingInit.getTrainingMap().values().forEach(System.out::println);
+//        TraineeInit traineeInit = context.getBean(TraineeInit.class);
+//        traineeInit.getTraineeMap().values().forEach(System.out::println);
+//        TrainerInit trainerInit = context.getBean(TrainerInit.class);
+//        trainerInit.getTrainerMap().values().forEach(System.out::println);
+//        TrainingInit trainingInit = context.getBean(TrainingInit.class);
+//        trainingInit.getTrainingMap().values().forEach(System.out::println);
     }
 
 }

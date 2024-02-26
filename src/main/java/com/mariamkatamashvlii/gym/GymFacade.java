@@ -9,14 +9,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GymFacade {
-    private final TraineeService traineeService;
-    private final TrainerService trainerService;
-    private final TrainingService trainingService;
-
-    @Autowired
-    public GymFacade(@Qualifier("traineeService")TraineeService traineeService, @Qualifier("trainerService")TrainerService trainerService, @Qualifier("trainingService") TrainingService trainingService) {
-        this.traineeService = traineeService;
-        this.trainerService = trainerService;
-        this.trainingService = trainingService;
-    }
+//    private final TraineeService traineeService;
+//    private final TrainerService trainerService;
+//    private final TrainingService trainingService;
+//
+//    @Autowired
+//    public GymFacade(@Qualifier("traineeService")TraineeService traineeService, @Qualifier("trainerService")TrainerService trainerService, @Qualifier("trainingService") TrainingService trainingService) {
+//        this.traineeService = traineeService;
+//        this.trainerService = trainerService;
+//        this.trainingService = trainingService;
+//    }
 }

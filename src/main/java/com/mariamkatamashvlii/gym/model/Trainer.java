@@ -1,36 +1,41 @@
 package com.mariamkatamashvlii.gym.model;
 
-public class Trainer extends User {
-    private String specialization;
-    private long userId;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-    public Trainer(String firstName, String lastName, String username, String password, boolean isActive, String specialization, long userId) {
-        super(firstName, lastName, username, password, isActive);
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "trainer")
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
+public class Trainer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "trainerId")
+    private Long trainerId;
+
+    @ManyToOne
+    @JoinColumn(name = "specialization", referencedColumnName = "trainingTypeId")
+    private TrainingType specialization;
+
+    @OneToOne
+    @JoinColumn(name = "userId", referencedColumnName = "userId", unique = true)
+    private User user;
+
+    @OneToMany(mappedBy = "trainer")
+    private Set<Training> trainingSet = new HashSet<>();
+
+    @ManyToMany(mappedBy = "trainerSet")
+    private Set<Trainee> traineeSet = new HashSet<>();
+
+    public Trainer(TrainingType specialization) {
         this.specialization = specialization;
-        this.userId = userId;
-    }
-
-    public String getSpecialization() {
-        return specialization;
-    }
-
-    public void setSpecialization(String specialization) {
-        this.specialization = specialization;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
-
-    @Override
-    public String toString() {
-        return super.toString() + "Trainer{" +
-                "specialization='" + specialization + '\'' +
-                ", userId=" + userId +
-                '}';
     }
 }

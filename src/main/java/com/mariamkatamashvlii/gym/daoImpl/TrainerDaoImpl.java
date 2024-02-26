@@ -20,7 +20,7 @@ public class TrainerDaoImpl implements TrainerDao {
     }
 
     public void create(Trainer trainer) {
-        long id = trainer.getUserId();
+        long id = trainer.getUser().getUserId();
         if(trainerMap.containsKey(id)) {
             logger.error("Trainer with ID {} already exists!", id);
             return;

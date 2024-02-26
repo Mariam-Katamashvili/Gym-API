@@ -1,80 +1,52 @@
 package com.mariamkatamashvlii.gym.model;
 
-import java.time.LocalDate;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+import java.sql.Date;
+
+@Entity
+@Table(name = "training")
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
 public class Training {
-    private long traineeId;
-    private long trainerId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "trainingId")
+    private Long trainingId;
+
+    @ManyToOne
+    @JoinColumn(name = "traineeId", referencedColumnName = "traineeId")
+    private Trainee trainee;
+
+    @ManyToOne
+    @JoinColumn(name = "trainerId", referencedColumnName = "trainerId")
+    private Trainer trainer;
+
+    @Column(name = "trainingName", nullable = false, unique = true)
     private String trainingName;
+
+    @ManyToOne
+    @JoinColumn(name = "trainingTypeId", referencedColumnName = "trainingTypeId")
     private TrainingType trainingType;
-    private LocalDate trainingDate;
-    private float duration;
 
-    public Training(long traineeId, long trainerId, String trainingName, TrainingType trainingType, LocalDate trainingDate, float duration) {
-        this.traineeId = traineeId;
-        this.trainerId = trainerId;
+    @Column(name = "trainingDate", nullable = false)
+    private Date trainingDate;
+
+    @Column(name = "duration", nullable = false)
+    private Number duration;
+
+    public Training(Trainee trainee, Trainer trainer, String trainingName, TrainingType trainingType, Date trainingDate, Number duration) {
+        this.trainee = trainee;
+        this.trainer = trainer;
         this.trainingName = trainingName;
         this.trainingType = trainingType;
         this.trainingDate = trainingDate;
         this.duration = duration;
-    }
-    public long getTraineeId() {
-        return traineeId;
-    }
-
-    public void setTraineeId(long traineeId) {
-        this.traineeId = traineeId;
-    }
-
-    public long getTrainerId() {
-        return trainerId;
-    }
-
-    public void setTrainerId(long trainerId) {
-        this.trainerId = trainerId;
-    }
-
-    public String getTrainingName() {
-        return trainingName;
-    }
-
-    public void setTrainingName(String trainingName) {
-        this.trainingName = trainingName;
-    }
-
-    public TrainingType getTrainingType() {
-        return trainingType;
-    }
-
-    public void setTrainingType(TrainingType trainingType) {
-        this.trainingType = trainingType;
-    }
-
-    public LocalDate getTrainingDate() {
-        return trainingDate;
-    }
-
-    public void setTrainingDate(LocalDate trainingDate) {
-        this.trainingDate = trainingDate;
-    }
-
-    public float getDuration() {
-        return duration;
-    }
-
-    public void setDuration(float duration) {
-        this.duration = duration;
-    }
-
-    @Override
-    public String toString() {
-        return "Training{" +
-                "traineeId=" + traineeId +
-                ", trainerId=" + trainerId +
-                ", trainingName='" + trainingName + '\'' +
-                ", trainingType=" + trainingType +
-                ", trainingDate=" + trainingDate +
-                ", duration=" + duration +
-                '}';
     }
 }

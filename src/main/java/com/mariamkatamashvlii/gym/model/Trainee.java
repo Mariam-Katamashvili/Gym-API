@@ -1,49 +1,52 @@
 package com.mariamkatamashvlii.gym.model;
 
-import java.time.LocalDate;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
 
-public class Trainee extends User {
-    private LocalDate dob;
+import java.sql.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "trainee")
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
+public class Trainee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "traineeId")
+    private Long traineeId;
+
+    @CreationTimestamp
+    @Column(name = "dob")
+    private Date dob;
+
+    @Column(name = "address")
     private String address;
-    private long userId;
 
-    public Trainee(String firstName, String lastName, String username, String password, boolean isActive, LocalDate dob, String address, long userId) {
-        super(firstName, lastName, username, password, isActive);
+    @OneToOne
+    @JoinColumn(name = "userId", referencedColumnName = "userId", unique = true)
+    private User user;
+
+    @OneToMany(mappedBy = "trainee")
+    private Set<Training> trainingSet = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "trainee_trainer",
+            joinColumns = @JoinColumn(name = "traineeId"),
+            inverseJoinColumns = @JoinColumn(name = "trainerId")
+    )
+    private Set<Trainer> trainerSet = new HashSet<>();
+
+    public Trainee(Date dob, String address) {
         this.dob = dob;
         this.address = address;
-        this.userId = userId;
-    }
-
-    public LocalDate getDob() {
-        return dob;
-    }
-
-    public void setDob(LocalDate dob) {
-        this.dob = dob;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
-
-    @Override
-    public String toString() {
-        return super.toString() + "Trainee{" +
-                "dob=" + dob +
-                ", address='" + address + '\'' +
-                ", userId=" + userId +
-                '}';
     }
 }

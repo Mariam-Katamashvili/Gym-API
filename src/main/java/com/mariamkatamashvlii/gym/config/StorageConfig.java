@@ -34,21 +34,21 @@ public class StorageConfig {
         return new HashMap<>();
     }
 
-    @Bean
-    @Primary
-    public TraineeService traineeService() {
-        return new TraineeServiceImpl();
-    }
-
-    @Bean
-    @Primary
-    public TrainerService trainerService() {
-        return new TrainerServiceImpl();
-    }
-
-    @Bean
-    @Primary
-    public TrainingService trainingService() {
-        return new TrainingServiceImpl();
-    }
+//    @Bean
+//    @Primary
+//    public TraineeService traineeService() {
+//        return new TraineeServiceImpl();
+//    }
+//
+//    @Bean
+//    @Primary
+//    public TrainerService trainerService() {
+//        return new TrainerServiceImpl();
+//    }
+//
+//    @Bean
+//    @Primary
+//    public TrainingService trainingService() {
+//        return new TrainingServiceImpl();
+//    }
 }

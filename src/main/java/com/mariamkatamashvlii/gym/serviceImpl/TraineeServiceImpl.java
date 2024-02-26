@@ -22,7 +22,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public void create(Trainee trainee) {
-        logger.info("Creating trainee with ID {}", trainee.getUserId());
+        logger.info("Creating trainee with ID {}", trainee.getUser().getUserId());
         traineeDaoImpl.create(trainee);
     }
 
