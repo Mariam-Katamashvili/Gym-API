@@ -1,17 +1,16 @@
 package com.mariamkatamashvlii.gym.serviceImpl;
 
-import com.mariamkatamashvlii.gym.dao.TrainerDao;
-import com.mariamkatamashvlii.gym.dao.TrainingTypeDao;
-import com.mariamkatamashvlii.gym.dao.UserDao;
-import com.mariamkatamashvlii.gym.daoImpl.TrainerDaoImpl;
+import com.mariamkatamashvlii.gym.repo.TrainerRepo;
+import com.mariamkatamashvlii.gym.repo.TrainingTypeRepo;
+import com.mariamkatamashvlii.gym.repo.UserRepo;
 import com.mariamkatamashvlii.gym.model.Trainer;
 import com.mariamkatamashvlii.gym.model.TrainingType;
 import com.mariamkatamashvlii.gym.model.User;
 import com.mariamkatamashvlii.gym.service.TrainerService;
+import com.mariamkatamashvlii.gym.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,48 +18,69 @@ import java.util.List;
 @Service
 public class TrainerServiceImpl implements TrainerService {
     private static final Logger logger = LoggerFactory.getLogger(TrainerServiceImpl.class);
-    private TrainerDao trainerDao;
-    private UserDao userDao;
-    private TrainingTypeDao trainingTypeDao;
+    private TrainerRepo trainerRepo;
+    private UserRepo userRepo;
+    private TrainingTypeRepo trainingTypeRepo;
+    private UserService userService;
 
     @Autowired
-    public void setTrainerDao(TrainerDao trainerDao, UserDao userDao, TrainingTypeDao trainingTypeDao) {
-        this.trainerDao = trainerDao;
-        this.userDao = userDao;
-        this.trainingTypeDao = trainingTypeDao;
+    public TrainerServiceImpl(TrainerRepo trainerRepo, UserRepo userRepo, TrainingTypeRepo trainingTypeRepo, UserService userService) {
+        this.trainerRepo = trainerRepo;
+        this.userRepo = userRepo;
+        this.trainingTypeRepo = trainingTypeRepo;
+        this.userService = userService;
     }
-
 
     @Override
     public void create(Trainer trainer) {
-        trainerDao.create(trainer);
+        trainerRepo.create(trainer);
     }
 
     @Override
     public void update(Trainer trainer) {
-        trainerDao.update(trainer);
+        trainerRepo.update(trainer);
     }
 
     @Override
     public void delete(long id) {
-        trainerDao.delete(id);
+        trainerRepo.delete(id);
     }
 
     @Override
     public Trainer select(long id) {
-        return trainerDao.select(id);
+        return trainerRepo.select(id);
+    }
+
+    @Override
+    public Trainer select(String username) {
+        return trainerRepo.select(username);
+    }
+
+    @Override
+    public boolean checkCredentials(String username, String password) {
+        return userService.checkCredentials(username, password);
+    }
+
+    @Override
+    public boolean changePassword(String username, String currPassword, String newPassword) {
+        return userService.changePassword(username, currPassword, newPassword);
+    }
+
+    @Override
+    public void toggleActivation(String username, boolean isActive) {
+        userService.toggleActivation(username, isActive);
     }
 
     @Override
     public List<Trainer> findAll() {
-        return trainerDao.findAll();
+        return trainerRepo.findAll();
     }
 
     public void createTrainerProfile(long trainingType, long user) {
-        TrainingType type = trainingTypeDao.select(trainingType);
-        User usr = userDao.select(user);
+        TrainingType type = trainingTypeRepo.select(trainingType);
+        User usr = userRepo.select(user);
         Trainer trainer = new Trainer(type);
         trainer.setUser(usr);
-        trainerDao.create(trainer);
+        trainerRepo.create(trainer);
     }
 }

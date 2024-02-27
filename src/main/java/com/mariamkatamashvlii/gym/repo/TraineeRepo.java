@@ -1,10 +1,10 @@
-package com.mariamkatamashvlii.gym.service;
+package com.mariamkatamashvlii.gym.repo;
 
 import com.mariamkatamashvlii.gym.model.Trainee;
 
 import java.util.List;
 
-public interface TraineeService {
+public interface TraineeRepo {
     void create(Trainee trainee);
 
     void update(Trainee trainee);
@@ -17,12 +17,5 @@ public interface TraineeService {
 
     Trainee select(String username);
 
-    boolean checkCredentials(String username, String password);
-
-    boolean changePassword(String username, String currPassword, String newPassword);
-
-    void toggleActivation(String username, boolean isActive);
-
     List<Trainee> findAll();
-
 }

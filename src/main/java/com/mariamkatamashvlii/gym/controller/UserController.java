@@ -11,27 +11,35 @@ import java.util.List;
 @RequestMapping("/api")
 public class UserController {
     @Autowired
-    public UserService userService;
+    private UserService userService;
 
     @GetMapping("/user")
     public List<User> findAll() {
         return userService.findAll();
     }
 
-    @PostMapping("/user")
-    public User save(@RequestBody User user) {
-        userService.create(user);
-        return user;
-    }
-
-    @GetMapping("/user/{id}")
-    public User select(@PathVariable long id) {
-        return userService.select(id);
-    }
-
-    @DeleteMapping("/user/{id}")
+    @DeleteMapping("/user/id/{id}")
     public String delete(@PathVariable long id) {
         userService.delete(id);
         return "user " + id + " removed";
+    }
+    @GetMapping("/user/{username:.+}")
+    public User getUserByUsername(@PathVariable String username) {
+        return userService.select(username);
+    }
+    @GetMapping("user/check")
+    public boolean checkCredentials(
+            @RequestParam("username") String username,
+            @RequestParam("password") String password
+    ) {
+        return userService.checkCredentials(username, password);
+    }
+    @PutMapping("user/changePassword")
+    public boolean changePassword(
+            @RequestParam("username") String username,
+            @RequestParam("currPassword") String currPassword,
+            @RequestParam("newPassword") String newPassword
+    ) {
+        return userService.changePassword(username, currPassword, newPassword);
     }
 }

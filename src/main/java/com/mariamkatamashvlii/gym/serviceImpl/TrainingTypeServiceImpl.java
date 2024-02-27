@@ -1,6 +1,6 @@
 package com.mariamkatamashvlii.gym.serviceImpl;
 
-import com.mariamkatamashvlii.gym.dao.TrainingTypeDao;
+import com.mariamkatamashvlii.gym.repo.TrainingTypeRepo;
 import com.mariamkatamashvlii.gym.model.TrainingType;
 import com.mariamkatamashvlii.gym.service.TrainingTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,35 +10,35 @@ import java.util.List;
 
 @Service
 public class TrainingTypeServiceImpl implements TrainingTypeService {
-    private TrainingTypeDao trainingTypeDao;
+    private TrainingTypeRepo trainingTypeRepo;
 
     @Autowired
-    public TrainingTypeServiceImpl(TrainingTypeDao trainingTypeDao) {
-        this.trainingTypeDao = trainingTypeDao;
+    public TrainingTypeServiceImpl(TrainingTypeRepo trainingTypeRepo) {
+        this.trainingTypeRepo = trainingTypeRepo;
     }
 
     @Override
     public void create(TrainingType trainingType) {
-        trainingTypeDao.create(trainingType);
+        trainingTypeRepo.create(trainingType);
     }
 
     @Override
     public void update(TrainingType trainingType) {
-        trainingTypeDao.update(trainingType);
+        trainingTypeRepo.update(trainingType);
     }
 
     @Override
     public void delete(long id) {
-        trainingTypeDao.delete(id);
+        trainingTypeRepo.delete(id);
     }
 
     @Override
     public TrainingType select(long id) {
-        return trainingTypeDao.select(id);
+        return trainingTypeRepo.select(id);
     }
 
     @Override
     public List<TrainingType> findAll() {
-        return trainingTypeDao.findAll();
+        return trainingTypeRepo.findAll();
     }
 }

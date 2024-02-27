@@ -1,6 +1,6 @@
-package com.mariamkatamashvlii.gym.daoImpl;
+package com.mariamkatamashvlii.gym.repoImpl;
 
-import com.mariamkatamashvlii.gym.dao.TrainingDao;
+import com.mariamkatamashvlii.gym.repo.TrainingRepo;
 import com.mariamkatamashvlii.gym.model.Training;
 import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
@@ -9,45 +9,51 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Repository
-public class TrainingDaoImpl implements TrainingDao {
-    private static final Logger logger = LoggerFactory.getLogger(TrainingDaoImpl.class);
-
+public class TrainingRepoImpl implements TrainingRepo {
+    private static final Logger logger = LoggerFactory.getLogger(TrainingRepoImpl.class);
     private EntityManager entityManager;
+
     @Autowired
-    public TrainingDaoImpl(EntityManager entityManager) {
+    public TrainingRepoImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
     @Override
+    @Transactional
     public void create(Training training) {
         Session session = entityManager.unwrap(Session.class);
         session.persist(training);
     }
 
     @Override
+    @Transactional
     public void update(Training training) {
         Session session = entityManager.unwrap(Session.class);
         session.merge(training);
     }
 
     @Override
-    public void delete(long trainingId) {
+    @Transactional
+    public void delete(long id) {
         Session session = entityManager.unwrap(Session.class);
-        Training training = session.get(Training.class, trainingId);
+        Training training = session.get(Training.class, id);
         session.remove(training);
     }
 
     @Override
-    public Training select(long trainingId) {
+    @Transactional
+    public Training select(long id) {
         Session session = entityManager.unwrap(Session.class);
-        return session.get(Training.class, trainingId);
+        return session.get(Training.class, id);
     }
 
     @Override
+    @Transactional
     public List<Training> findAll() {
         Session session = entityManager.unwrap(Session.class);
         Query<Training> query = session.createQuery("from Training ", Training.class);

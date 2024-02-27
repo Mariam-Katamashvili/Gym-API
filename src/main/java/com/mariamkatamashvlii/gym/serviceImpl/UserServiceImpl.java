@@ -1,6 +1,6 @@
 package com.mariamkatamashvlii.gym.serviceImpl;
 
-import com.mariamkatamashvlii.gym.dao.UserDao;
+import com.mariamkatamashvlii.gym.repo.UserRepo;
 import com.mariamkatamashvlii.gym.model.User;
 import com.mariamkatamashvlii.gym.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +13,11 @@ import java.util.Random;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private UserDao userDao;
+    private UserRepo userRepo;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao) {
-        this.userDao = userDao;
+    public UserServiceImpl(UserRepo userRepo) {
+        this.userRepo = userRepo;
     }
 
     @Override
@@ -25,27 +25,63 @@ public class UserServiceImpl implements UserService {
     public void create(User user) {
         user.setUsername(generateUserName(user.getFirstName(), user.getLastName()));
         user.setPassword(generatePassword());
-        userDao.create(user);
+        userRepo.create(user);
     }
+
     @Override
     public void update(User user) {
-        userDao.update(user);
+        userRepo.update(user);
     }
 
     @Override
     @Transactional
     public void delete(long id) {
-        userDao.delete(id);
+        userRepo.delete(id);
+    }
+
+    @Override
+    public void delete(String username) {
+        userRepo.delete(username);
     }
 
     @Override
     public User select(long id) {
-        return userDao.select(id);
+        return userRepo.select(id);
+    }
+
+    @Override
+    public User select(String username) {
+        return userRepo.select(username);
+    }
+
+    @Override
+    public boolean checkCredentials(String username, String password) {
+        User user = select(username);
+        if (user.getPassword().equals(password)) return true;
+        return false;
+    }
+
+    @Override
+    public boolean changePassword(String username, String currentPassword, String newPassword) {
+        User user = select(username);
+        if (checkCredentials(username, currentPassword)) {
+            user.setPassword(newPassword);
+            update(user);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void toggleActivation(String username, boolean isActive) {
+        User user = select(username);
+        user.setActive(isActive);
+        update(user);
     }
 
     @Override
     public List<User> findAll() {
-        return userDao.findAll();
+        return userRepo.findAll();
     }
 
     private String generateUserName(String first, String last) {
@@ -77,6 +113,7 @@ public class UserServiceImpl implements UserService {
         }
         return builder.toString();
     }
+
     private String generatePassword() {
         Random random = new Random();
         StringBuilder builder = new StringBuilder();
