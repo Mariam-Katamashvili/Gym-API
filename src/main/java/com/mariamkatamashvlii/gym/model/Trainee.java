@@ -49,4 +49,5 @@ public class Trainee {
         this.dob = dob;
         this.address = address;
     }
+
 }

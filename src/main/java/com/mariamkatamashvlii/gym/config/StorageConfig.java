@@ -19,36 +19,4 @@ import java.util.Map;
 @Configuration
 public class StorageConfig {
 
-    @Bean
-    public Map<Long, Trainee> trainees() {
-        return new HashMap<>();
-    }
-
-    @Bean
-    public Map<Long, Trainer> trainers() {
-        return new HashMap<>();
-    }
-
-    @Bean
-    public Map<String, Training> trainings() {
-        return new HashMap<>();
-    }
-
-//    @Bean
-//    @Primary
-//    public TraineeService traineeService() {
-//        return new TraineeServiceImpl();
-//    }
-//
-//    @Bean
-//    @Primary
-//    public TrainerService trainerService() {
-//        return new TrainerServiceImpl();
-//    }
-//
-//    @Bean
-//    @Primary
-//    public TrainingService trainingService() {
-//        return new TrainingServiceImpl();
-//    }
 }

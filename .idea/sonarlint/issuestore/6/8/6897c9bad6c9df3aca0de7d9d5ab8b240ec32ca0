@@ -1,0 +1,12 @@
+
+X	java:S125"<This block of commented-out lines of code should be removed.(ŠÒˆŒ8‰Æª±Ş1
+k
+java:S1128"NRemove this unused import 'com.mariamkatamashvlii.gym.service.TraineeService'.(Ä£Îå8‰Æª±Ş1
+k
+java:S1128"NRemove this unused import 'com.mariamkatamashvlii.gym.service.TrainerService'.(å¯·8‰Æª±Ş1
+l
+java:S1128"ORemove this unused import 'com.mariamkatamashvlii.gym.service.TrainingService'.(¦…®Ş8‰Æª±Ş1
+u
+java:S1128"SRemove this unused import 'org.springframework.beans.factory.annotation.Autowired'.(¡¸Îùÿÿÿÿ8‰Æª±Ş1
+u
+java:S1128"SRemove this unused import 'org.springframework.beans.factory.annotation.Qualifier'.(íàÄ®ıÿÿÿÿ8‰Æª±Ş1

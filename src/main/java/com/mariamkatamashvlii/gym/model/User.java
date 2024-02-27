@@ -1,7 +1,6 @@
 package com.mariamkatamashvlii.gym.model;
 
-import com.mariamkatamashvlii.gym.initializer.PasswordGenerator;
-import com.mariamkatamashvlii.gym.initializer.UsernameGenerator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,16 +35,16 @@ public class User {
     private boolean isActive;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Trainee trainee;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Trainer trainer;
 
     public User(String firstName, String lastName, boolean isActive) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.username = UsernameGenerator.usernameGenerator(firstName, lastName);
-        this.password = PasswordGenerator.randomPasswordGenerator();
         this.isActive = isActive;
     }
 

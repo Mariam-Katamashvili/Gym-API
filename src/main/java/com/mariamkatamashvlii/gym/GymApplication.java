@@ -1,8 +1,5 @@
 package com.mariamkatamashvlii.gym;
 
-import com.mariamkatamashvlii.gym.initializer.TraineeInit;
-import com.mariamkatamashvlii.gym.initializer.TrainerInit;
-import com.mariamkatamashvlii.gym.initializer.TrainingInit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -22,5 +19,8 @@ public class GymApplication {
 //        TrainingInit trainingInit = context.getBean(TrainingInit.class);
 //        trainingInit.getTrainingMap().values().forEach(System.out::println);
     }
+    //use logger for printing and remove commented lines todo
+    //Anyway, for calling this run in the project
+    // you'd need to override method run and put there your runtime instructions.
 
 }

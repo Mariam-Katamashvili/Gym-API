@@ -2,9 +2,12 @@ package com.mariamkatamashvlii.gym.service;
 
 import com.mariamkatamashvlii.gym.model.Trainer;
 
+import java.util.List;
+
 public interface TrainerService {
     void create(Trainer trainer);
-    void update(long trainerId, Trainer trainer);
-    Trainer select(long trainerId);
-
+    void update(Trainer trainer);
+    void delete(long id);
+    Trainer select(long id);
+    List<Trainer> findAll();
 }
