@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.mariamkatamashvlii.gym.model.Trainer;
+import com.mariamkatamashvlii.gym.model.TrainingType;
 import com.mariamkatamashvlii.gym.model.User;
 import com.mariamkatamashvlii.gym.repo.TrainerRepo;
 import com.mariamkatamashvlii.gym.repo.UserRepo;
@@ -40,6 +41,8 @@ class TrainerServiceImplTest {
         User user = new User();
         user.setUserId(1L);
         trainer.setUser(user);
+        TrainingType trainingType = new TrainingType();
+        trainer.setSpecialization(trainingType);
 
         when(userRepo.select(user.getUserId())).thenReturn(user);
         doNothing().when(trainerRepo).create(trainer);
@@ -57,6 +60,8 @@ class TrainerServiceImplTest {
         user.setUsername("trainerUser");
         user.setPassword("password");
         trainer.setUser(user);
+        TrainingType trainingType = new TrainingType();
+        trainer.setSpecialization(trainingType);
 
         when(userRepo.select(user.getUserId())).thenReturn(user);
         when(userService.checkCredentials(user.getUsername(), user.getPassword())).thenReturn(true);
