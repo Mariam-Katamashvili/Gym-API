@@ -88,8 +88,6 @@ public class UserServiceImpl implements UserService {
         List<User> users = findAll();
         List<String> userNames = new ArrayList<>();
         users.forEach(user -> userNames.add(user.getUsername()));
-
-        //username generating stage
         int counter = 0;
         StringBuilder builder = new StringBuilder();
         builder.append(first).append(".").append(last);
@@ -123,6 +121,4 @@ public class UserServiceImpl implements UserService {
         }
         return builder.toString();
     }
-
-
 }

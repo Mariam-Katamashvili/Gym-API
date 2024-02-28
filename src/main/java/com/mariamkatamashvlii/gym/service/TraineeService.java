@@ -35,6 +35,6 @@ public interface TraineeService {
                                   Date toDate, String trainerName, TrainingType trainingType);
 
     List<Trainer> getNotAssignedTrainerList(String username, String password);
-    List<Trainee> findAll();
 
+    List<Trainee> findAll();
 }

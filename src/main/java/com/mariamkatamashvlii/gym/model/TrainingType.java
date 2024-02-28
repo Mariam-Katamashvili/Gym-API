@@ -33,5 +33,4 @@ public class TrainingType {
     public TrainingType(String trainingTypeName) {
         this.trainingTypeName = trainingTypeName;
     }
-
 }

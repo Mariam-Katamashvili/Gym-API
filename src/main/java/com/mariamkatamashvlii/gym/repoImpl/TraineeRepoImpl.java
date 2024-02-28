@@ -71,7 +71,6 @@ public class TraineeRepoImpl implements TraineeRepo {
         return user.getTrainee();
     }
 
-
     @Override
     @Transactional
     public List<Trainee> findAll() {

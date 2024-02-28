@@ -14,5 +14,4 @@ public interface TrainingService {
     Training select(long id);
 
     List<Training> findAll();
-
 }
