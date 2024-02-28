@@ -20,11 +20,11 @@ import java.util.Set;
 @Service
 public class TraineeServiceImpl implements TraineeService {
     private static final Logger logger = LoggerFactory.getLogger(TraineeServiceImpl.class);
-    private TraineeRepo traineeRepo;
-    private UserRepo userRepo;
-    private UserService userService;
-    private TrainingService trainingService;
-    private TrainerRepo trainerRepo;
+    private final TraineeRepo traineeRepo;
+    private final UserRepo userRepo;
+    private final UserService userService;
+    private final TrainingService trainingService;
+    private final TrainerRepo trainerRepo;
 
     @Autowired
     public TraineeServiceImpl(TraineeRepo traineeRepo, UserRepo userRepo,
@@ -34,6 +34,7 @@ public class TraineeServiceImpl implements TraineeService {
         this.userService = userService;
         this.trainingService = trainingService;
         this.trainerRepo = trainerRepo;
+        logger.debug("TraineeServiceImpl initialized with TraineeRepo, UserRepo, UserService, TrainingService and TrainerRepo");
     }
 
     @Override
@@ -41,22 +42,23 @@ public class TraineeServiceImpl implements TraineeService {
         User user = userRepo.select(trainee.getUser().getUserId());
         if (trainee.getDob() != null && trainee.getAddress() != null && user != null) {
             traineeRepo.create(trainee);
+            logger.info("Created trainee with id {}", trainee.getTraineeId());
         }
     }
 
     @Override
     public void update(Trainee trainee) {
         User user = userRepo.select(trainee.getUser().getUserId());
-        if (trainee.getDob() != null && trainee.getAddress() != null && user != null) {
-            if (userService.checkCredentials(trainee.getUser().getUsername(), trainee.getUser().getPassword())) {
-                traineeRepo.update(trainee);
-            }
+        if (trainee.getDob() != null && trainee.getAddress() != null && user != null && (userService.checkCredentials(trainee.getUser().getUsername(), trainee.getUser().getPassword()))) {
+            traineeRepo.update(trainee);
+            logger.info("Updated trainee with id {}", trainee.getTraineeId());
         }
     }
 
     @Override
     public void delete(long id) {
         traineeRepo.delete(id);
+        logger.info("Deleted trainee with id {}", id);
     }
 
     @Override
@@ -68,29 +70,35 @@ public class TraineeServiceImpl implements TraineeService {
                 trainingService.delete(t.getTrainingId());
             }
             traineeRepo.delete(username);
+            logger.info("Deleted trainee with username {}", trainee.getUser().getUsername());
         }
     }
 
     @Override
     public Trainee select(long id) {
+        logger.info("Selecting trainee with id {}", id);
         return traineeRepo.select(id);
     }
 
     @Override
     public Trainee select(String username, String password) {
         if (userService.checkCredentials(username, password)) {
+            logger.info("Selecting trainee with username {}", username);
             return traineeRepo.select(username);
         }
+        logger.info("Could not select trainee with username {}", username);
         return null;
     }
 
     @Override
     public boolean checkCredentials(String username, String password) {
+        logger.info("Checking credentials of trainee with username - {}", username);
         return userService.checkCredentials(username, password);
     }
 
     @Override
     public boolean changePassword(String username, String currPassword, String newPassword) {
+        logger.info("Changing password for username - {}", username);
         return userService.changePassword(username, currPassword, newPassword);
     }
 
@@ -98,6 +106,7 @@ public class TraineeServiceImpl implements TraineeService {
     public void toggleActivation(String username, String password, boolean isActive) {
         if (userService.checkCredentials(username, password)) {
             userService.toggleActivation(username, isActive);
+            logger.info("Changed Activation status for trainee with username - {}", username);
         }
     }
 
@@ -109,11 +118,13 @@ public class TraineeServiceImpl implements TraineeService {
             trainee.setTrainerList(trainerList);
             traineeRepo.update(trainee);
             userRepo.update(user);
+            logger.info("Updated trainer list for trainee with username - {}", trainee.getUser().getUsername());
         }
     }
 
     @Override
     public List<Trainee> findAll() {
+        logger.info("Returning all trainees");
         return traineeRepo.findAll();
     }
 
@@ -123,6 +134,7 @@ public class TraineeServiceImpl implements TraineeService {
         User user = userRepo.select(userId);
         trainee.setUser(user);
         create(trainee);
+        logger.info("Created trainee profile with id {}", trainee.getTraineeId());
     }
 
     @Override
@@ -139,6 +151,7 @@ public class TraineeServiceImpl implements TraineeService {
                 }
             }
         }
+        logger.info("Returning training list for trainee {}", username);
         return trainingList;
     }
 
@@ -155,6 +168,7 @@ public class TraineeServiceImpl implements TraineeService {
                 }
             }
         }
+        logger.info("Returning not assigned trainer list for trainee {}", username);
         return notAssignedTrainerList;
     }
 

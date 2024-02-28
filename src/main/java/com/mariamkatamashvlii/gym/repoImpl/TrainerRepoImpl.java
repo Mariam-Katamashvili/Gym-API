@@ -18,13 +18,14 @@ import java.util.List;
 @Repository
 public class TrainerRepoImpl implements TrainerRepo {
     private static final Logger logger = LoggerFactory.getLogger(TrainerRepoImpl.class);
-    private EntityManager entityManager;
-    private UserRepo userRepo;
+    private final EntityManager entityManager;
+    private final UserRepo userRepo;
 
     @Autowired
     public TrainerRepoImpl(EntityManager entityManager, UserRepo userRepo) {
         this.entityManager = entityManager;
         this.userRepo = userRepo;
+        logger.debug("TraineeRepoImpl initialized with EntityManager and UserRepo");
     }
 
     @Override
@@ -49,12 +50,14 @@ public class TrainerRepoImpl implements TrainerRepo {
         Session session = entityManager.unwrap(Session.class);
         Trainer trainer = session.get(Trainer.class, id);
         session.remove(trainer);
+        logger.info("Deleted trainer with id {}", trainer.getTrainerId());
     }
 
     @Override
     @Transactional
     public Trainer select(long id) {
         Session session = entityManager.unwrap(Session.class);
+        logger.info("Selecting trainer with id {}", id);
         return session.get(Trainer.class, id);
     }
 
@@ -62,6 +65,7 @@ public class TrainerRepoImpl implements TrainerRepo {
     @Transactional
     public Trainer select(String username) {
         User user = userRepo.select(username);
+        logger.info("Selecting trainer with username {}", username);
         return user.getTrainer();
     }
 
@@ -70,7 +74,7 @@ public class TrainerRepoImpl implements TrainerRepo {
     public List<Trainer> findAll() {
         Session session = entityManager.unwrap(Session.class);
         Query<Trainer> query = session.createQuery("from Trainer ", Trainer.class);
-        List<Trainer> trainerList = query.getResultList();
-        return trainerList;
+        logger.info("Returning all trainers");
+        return query.getResultList();
     }
 }

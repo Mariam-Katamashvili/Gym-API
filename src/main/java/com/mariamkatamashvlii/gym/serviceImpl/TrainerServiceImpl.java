@@ -22,10 +22,10 @@ import java.util.Set;
 @Service
 public class TrainerServiceImpl implements TrainerService {
     private static final Logger logger = LoggerFactory.getLogger(TrainerServiceImpl.class);
-    private TrainerRepo trainerRepo;
-    private UserRepo userRepo;
-    private TrainingTypeRepo trainingTypeRepo;
-    private UserService userService;
+    private final TrainerRepo trainerRepo;
+    private final UserRepo userRepo;
+    private final TrainingTypeRepo trainingTypeRepo;
+    private final UserService userService;
 
     @Autowired
     public TrainerServiceImpl(TrainerRepo trainerRepo, UserRepo userRepo, TrainingTypeRepo trainingTypeRepo, UserService userService) {
@@ -33,6 +33,7 @@ public class TrainerServiceImpl implements TrainerService {
         this.userRepo = userRepo;
         this.trainingTypeRepo = trainingTypeRepo;
         this.userService = userService;
+        logger.debug("TrainerServiceImpl initialized with TrainerRepo, UserRepo, TrainingTypeRepo and UserService");
     }
 
     @Override
@@ -40,44 +41,51 @@ public class TrainerServiceImpl implements TrainerService {
         User user = userRepo.select(trainer.getUser().getUserId());
         if (trainer.getSpecialization() != null && user != null) {
             trainerRepo.create(trainer);
+            logger.info("Created trainer with id {}", trainer.getTrainerId());
         }
     }
 
     @Override
     public void update(Trainer trainer) {
         User user = userRepo.select(trainer.getUser().getUserId());
-        if (trainer.getSpecialization() != null && user != null) {
-            if (userService.checkCredentials(trainer.getUser().getUsername(), trainer.getUser().getPassword())) {
-                trainerRepo.update(trainer);
-            }
+        if (trainer.getSpecialization() != null && user != null && (userService.checkCredentials(trainer.getUser().getUsername(), trainer.getUser().getPassword()))) {
+            trainerRepo.update(trainer);
+            logger.info("Updated trainer with id {}", trainer.getTrainerId());
+
         }
     }
 
     @Override
     public void delete(long id) {
         trainerRepo.delete(id);
+        logger.info("Deleted trainer with id {}", id);
     }
 
     @Override
     public Trainer select(long id) {
+        logger.info("Selecting trainer with id {}", id);
         return trainerRepo.select(id);
     }
 
     @Override
     public Trainer select(String username, String password) {
         if (userService.checkCredentials(username, password)) {
+            logger.info("Selecting trainer with username - {}", username);
             return trainerRepo.select(username);
         }
+        logger.info("Could not select trainer with username - {}", username);
         return null;
     }
 
     @Override
     public boolean checkCredentials(String username, String password) {
+        logger.info("Checking credentials for trainer {}", username);
         return userService.checkCredentials(username, password);
     }
 
     @Override
     public boolean changePassword(String username, String currPassword, String newPassword) {
+        logger.info("Changing password for trainer {}", username);
         return userService.changePassword(username, currPassword, newPassword);
     }
 
@@ -85,11 +93,13 @@ public class TrainerServiceImpl implements TrainerService {
     public void toggleActivation(String username, String password, boolean isActive) {
         if (userService.checkCredentials(username, password)) {
             userService.toggleActivation(username, isActive);
+            logger.info("Changed activation status for trainer {}", username);
         }
     }
 
     @Override
     public List<Trainer> findAll() {
+        logger.info("Selecting all trainers");
         return trainerRepo.findAll();
     }
 
@@ -100,6 +110,7 @@ public class TrainerServiceImpl implements TrainerService {
         Trainer trainer = new Trainer(type);
         trainer.setUser(usr);
         trainerRepo.create(trainer);
+        logger.info("Created trainer profile with id {}", trainer.getTrainerId());
     }
 
     @Override
@@ -115,6 +126,7 @@ public class TrainerServiceImpl implements TrainerService {
                 }
             }
         }
+        logger.info("Returning training list for trainer {}", username);
         return trainingList;
     }
 

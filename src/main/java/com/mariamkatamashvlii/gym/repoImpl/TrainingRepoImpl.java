@@ -16,11 +16,12 @@ import java.util.List;
 @Repository
 public class TrainingRepoImpl implements TrainingRepo {
     private static final Logger logger = LoggerFactory.getLogger(TrainingRepoImpl.class);
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
     @Autowired
     public TrainingRepoImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
+        logger.debug("TrainingRepoImpl initialized with EntityManager");
     }
 
     @Override
@@ -28,6 +29,7 @@ public class TrainingRepoImpl implements TrainingRepo {
     public void create(Training training) {
         Session session = entityManager.unwrap(Session.class);
         session.persist(training);
+        logger.info("Created training with id {}", training.getTrainingId());
     }
 
     @Override
@@ -35,6 +37,7 @@ public class TrainingRepoImpl implements TrainingRepo {
     public void update(Training training) {
         Session session = entityManager.unwrap(Session.class);
         session.merge(training);
+        logger.info("Updated training with id {}", training.getTrainingId());
     }
 
     @Override
@@ -43,12 +46,14 @@ public class TrainingRepoImpl implements TrainingRepo {
         Session session = entityManager.unwrap(Session.class);
         Training training = session.get(Training.class, id);
         session.remove(training);
+        logger.info("Deleted training with id {}", training.getTrainingId());
     }
 
     @Override
     @Transactional
     public Training select(long id) {
         Session session = entityManager.unwrap(Session.class);
+        logger.info("Selecting training with id {}", id);
         return session.get(Training.class, id);
     }
 
@@ -57,7 +62,7 @@ public class TrainingRepoImpl implements TrainingRepo {
     public List<Training> findAll() {
         Session session = entityManager.unwrap(Session.class);
         Query<Training> query = session.createQuery("from Training ", Training.class);
-        List<Training> trainingList = query.getResultList();
-        return trainingList;
+        logger.info("Returning all trainings");
+        return query.getResultList();
     }
 }

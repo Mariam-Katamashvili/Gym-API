@@ -18,13 +18,14 @@ import java.util.List;
 @Repository
 public class TraineeRepoImpl implements TraineeRepo {
     private static final Logger logger = LoggerFactory.getLogger(TraineeRepoImpl.class);
-    private EntityManager entityManager;
-    private UserRepo userRepo;
+    private final EntityManager entityManager;
+    private final  UserRepo userRepo;
 
     @Autowired
     public TraineeRepoImpl(EntityManager entityManager, UserRepo userRepo) {
         this.entityManager = entityManager;
         this.userRepo = userRepo;
+        logger.debug("TraineeRepoImpl initialized with EntityManager and UserRepo");
     }
 
     @Override
@@ -49,18 +50,21 @@ public class TraineeRepoImpl implements TraineeRepo {
         Session session = entityManager.unwrap(Session.class);
         Trainee trainee = session.get(Trainee.class, id);
         session.remove(trainee);
+        logger.info("Removed trainee with id {}", trainee.getTraineeId());
     }
 
     @Override
     @Transactional
     public void delete(String username) {
         userRepo.delete(username);
+        logger.info("Removed trainee with username {}", username);
     }
 
     @Override
     @Transactional
     public Trainee select(long id) {
         Session session = entityManager.unwrap(Session.class);
+        logger.info("Selecting trainee with id {}", id);
         return session.get(Trainee.class, id);
     }
 
@@ -68,6 +72,7 @@ public class TraineeRepoImpl implements TraineeRepo {
     @Transactional
     public Trainee select(String username) {
         User user = userRepo.select(username);
+        logger.info("Selecting trainee with username {}", username);
         return user.getTrainee();
     }
 
@@ -76,7 +81,7 @@ public class TraineeRepoImpl implements TraineeRepo {
     public List<Trainee> findAll() {
         Session session = entityManager.unwrap(Session.class);
         Query<Trainee> query = session.createQuery("from Trainee", Trainee.class);
-        List<Trainee> traineeList = query.getResultList();
-        return traineeList;
+        logger.info("Returning all trainees");
+        return query.getResultList();
     }
 }

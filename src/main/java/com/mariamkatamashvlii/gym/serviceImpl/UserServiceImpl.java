@@ -3,6 +3,8 @@ package com.mariamkatamashvlii.gym.serviceImpl;
 import com.mariamkatamashvlii.gym.repo.UserRepo;
 import com.mariamkatamashvlii.gym.model.User;
 import com.mariamkatamashvlii.gym.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,11 +15,13 @@ import java.util.Random;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private UserRepo userRepo;
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+    private final UserRepo userRepo;
 
     @Autowired
     public UserServiceImpl(UserRepo userRepo) {
         this.userRepo = userRepo;
+        logger.debug("UserServiceImpl initialized with UserRepo");
     }
 
     @Override
@@ -26,39 +30,46 @@ public class UserServiceImpl implements UserService {
         user.setUsername(generateUserName(user.getFirstName(), user.getLastName()));
         user.setPassword(generatePassword());
         userRepo.create(user);
+        logger.info("Created user with id {}", user.getUserId());
     }
 
     @Override
     public void update(User user) {
         userRepo.update(user);
+        logger.info("Updated user with id {}", user.getUserId());
     }
 
     @Override
     @Transactional
     public void delete(long id) {
         userRepo.delete(id);
+        logger.info("Deleted user with id {}", id);
     }
 
     @Override
     public void delete(String username) {
         userRepo.delete(username);
+        logger.info("Deleted user {}", username);
     }
+
 
     @Override
     public User select(long id) {
+        logger.info("Selecting user with id {}", id);
         return userRepo.select(id);
     }
 
     @Override
     public User select(String username) {
+        logger.info("Selecting user {}", username);
         return userRepo.select(username);
     }
 
     @Override
     public boolean checkCredentials(String username, String password) {
         User user = select(username);
-        if (user.getPassword().equals(password)) return true;
-        return false;
+        logger.info("Checking credentials for user with id {}", user.getUserId());
+        return user.getPassword().equals(password);
     }
 
     @Override
@@ -67,8 +78,10 @@ public class UserServiceImpl implements UserService {
         if (checkCredentials(username, currentPassword)) {
             user.setPassword(newPassword);
             update(user);
+            logger.info("Changed password for user {}", user.getUsername());
             return true;
         }
+        logger.info("Could not change password for user {}", user.getUsername());
         return false;
     }
 
@@ -77,10 +90,12 @@ public class UserServiceImpl implements UserService {
         User user = select(username);
         user.setActive(isActive);
         update(user);
+        logger.info("Changed activation status for user {}", user);
     }
 
     @Override
     public List<User> findAll() {
+        logger.info("Returning all users");
         return userRepo.findAll();
     }
 
@@ -109,6 +124,7 @@ public class UserServiceImpl implements UserService {
                 break;
             }
         }
+        logger.info("Generating username");
         return builder.toString();
     }
 
@@ -119,6 +135,7 @@ public class UserServiceImpl implements UserService {
             char randomChar = (char) random.nextInt(33, 127);
             builder.append(randomChar);
         }
+        logger.info("Generating password");
         return builder.toString();
     }
 }
