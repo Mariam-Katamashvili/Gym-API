@@ -1,5 +1,6 @@
 package com.mariamkatamashvlii.gym.serviceImpl;
 
+import com.mariamkatamashvlii.gym.model.Training;
 import com.mariamkatamashvlii.gym.repo.TrainerRepo;
 import com.mariamkatamashvlii.gym.repo.TrainingTypeRepo;
 import com.mariamkatamashvlii.gym.repo.UserRepo;
@@ -13,7 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TrainerServiceImpl implements TrainerService {
@@ -33,12 +37,20 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public void create(Trainer trainer) {
-        trainerRepo.create(trainer);
+        User user = userRepo.select(trainer.getUser().getUserId());
+        if (trainer.getSpecialization() != null && user != null) {
+            trainerRepo.create(trainer);
+        }
     }
 
     @Override
     public void update(Trainer trainer) {
-        trainerRepo.update(trainer);
+        User user = userRepo.select(trainer.getUser().getUserId());
+        if (trainer.getSpecialization() != null && user != null) {
+            if (userService.checkCredentials(trainer.getUser().getUsername(), trainer.getUser().getPassword())) {
+                trainerRepo.update(trainer);
+            }
+        }
     }
 
     @Override
@@ -52,8 +64,11 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer select(String username) {
-        return trainerRepo.select(username);
+    public Trainer select(String username, String password) {
+        if (userService.checkCredentials(username, password)) {
+            return trainerRepo.select(username);
+        }
+        return null;
     }
 
     @Override
@@ -67,8 +82,10 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public void toggleActivation(String username, boolean isActive) {
-        userService.toggleActivation(username, isActive);
+    public void toggleActivation(String username, String password, boolean isActive) {
+        if (userService.checkCredentials(username, password)) {
+            userService.toggleActivation(username, isActive);
+        }
     }
 
     @Override
@@ -76,11 +93,32 @@ public class TrainerServiceImpl implements TrainerService {
         return trainerRepo.findAll();
     }
 
+    @Override
     public void createTrainerProfile(long trainingType, long user) {
         TrainingType type = trainingTypeRepo.select(trainingType);
         User usr = userRepo.select(user);
         Trainer trainer = new Trainer(type);
         trainer.setUser(usr);
         trainerRepo.create(trainer);
+    }
+
+    @Override
+    public List<Training> getTrainingList(String username, String password, Date fromDate, Date toDate, String traineeName) {
+        List<Training> trainingList = new ArrayList<>();
+        if (userService.checkCredentials(username, password)) {
+            Trainer trainer = trainerRepo.select(username);
+            Set<Training> trainingSet = trainer.getTrainingSet();
+            for (Training t : trainingSet) {
+                if (isBetween(t.getTrainingDate(), fromDate, toDate) &&
+                        t.getTrainee().getUser().getFirstName().equals(traineeName)) {
+                    trainingList.add(t);
+                }
+            }
+        }
+        return trainingList;
+    }
+
+    public boolean isBetween(Date trainingdate, Date fromDate, Date toDate) {
+        return trainingdate.compareTo(fromDate) >= 0 && trainingdate.compareTo(toDate) <= 0;
     }
 }

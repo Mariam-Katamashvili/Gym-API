@@ -1,12 +1,11 @@
 package com.mariamkatamashvlii.gym.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -15,6 +14,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @ToString
+@EqualsAndHashCode
 public class Trainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,8 +32,8 @@ public class Trainer {
     @OneToMany(mappedBy = "trainer")
     private Set<Training> trainingSet = new HashSet<>();
 
-    @ManyToMany(mappedBy = "trainerSet")
-    private Set<Trainee> traineeSet = new HashSet<>();
+    @ManyToMany(mappedBy = "trainerList")
+    private List<Trainee> traineeList = new ArrayList<>();
 
     public Trainer(TrainingType specialization) {
         this.specialization = specialization;

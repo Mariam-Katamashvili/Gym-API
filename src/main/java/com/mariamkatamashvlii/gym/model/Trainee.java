@@ -8,7 +8,9 @@ import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -43,7 +45,7 @@ public class Trainee {
             joinColumns = @JoinColumn(name = "traineeId"),
             inverseJoinColumns = @JoinColumn(name = "trainerId")
     )
-    private Set<Trainer> trainerSet = new HashSet<>();
+    private List<Trainer> trainerList = new ArrayList<>();
 
     public Trainee(Date dob, String address) {
         this.dob = dob;

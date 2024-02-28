@@ -18,21 +18,6 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
     }
 
     @Override
-    public void create(TrainingType trainingType) {
-        trainingTypeRepo.create(trainingType);
-    }
-
-    @Override
-    public void update(TrainingType trainingType) {
-        trainingTypeRepo.update(trainingType);
-    }
-
-    @Override
-    public void delete(long id) {
-        trainingTypeRepo.delete(id);
-    }
-
-    @Override
     public TrainingType select(long id) {
         return trainingTypeRepo.select(id);
     }

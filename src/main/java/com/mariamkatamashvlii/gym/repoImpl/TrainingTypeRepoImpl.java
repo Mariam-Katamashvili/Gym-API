@@ -25,27 +25,6 @@ public class TrainingTypeRepoImpl implements TrainingTypeRepo {
 
     @Override
     @Transactional
-    public void create(TrainingType trainingType) {
-        Session session = entityManager.unwrap(Session.class);
-        session.persist(trainingType);
-    }
-
-    @Override
-    @Transactional
-    public void update(TrainingType trainingType) {
-        Session session = entityManager.unwrap(Session.class);
-        session.merge(trainingType);
-    }
-
-    @Override
-    @Transactional
-    public void delete(long id) {
-        Session session = entityManager.unwrap(Session.class);
-        TrainingType trainingType = session.get(TrainingType.class, id);
-    }
-
-    @Override
-    @Transactional
     public TrainingType select(long id) {
         Session session = entityManager.unwrap(Session.class);
         return session.get(TrainingType.class, id);
