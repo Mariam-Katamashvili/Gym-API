@@ -1,0 +1,205 @@
+package com.mariamkatamashvlii.gym.serviceImpl;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import com.mariamkatamashvlii.gym.model.*;
+import com.mariamkatamashvlii.gym.repo.TraineeRepo;
+import com.mariamkatamashvlii.gym.repo.TrainerRepo;
+import com.mariamkatamashvlii.gym.repo.UserRepo;
+import com.mariamkatamashvlii.gym.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.sql.Date;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+
+class TraineeServiceImplTest {
+
+    @Mock
+    private TraineeRepo traineeRepo;
+    @Mock
+    private UserRepo userRepo;
+    @Mock
+    private UserService userService;
+    @Mock
+    private TrainerRepo trainerRepo;
+
+    @InjectMocks
+    private TraineeServiceImpl traineeService;
+
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void testCreate() {
+        Trainee trainee = new Trainee();
+        User user = new User();
+        user.setUserId(1L);
+        trainee.setUser(user);
+        trainee.setDob(new Date(System.currentTimeMillis()));
+        trainee.setAddress("123 Main St");
+
+        when(userRepo.select(user.getUserId())).thenReturn(user);
+        doNothing().when(traineeRepo).create(trainee);
+
+        traineeService.create(trainee);
+
+        verify(traineeRepo).create(trainee);
+    }
+
+    @Test
+    void testUpdate() {
+        Trainee trainee = new Trainee();
+        User user = new User();
+        user.setUserId(1L);
+        user.setUsername("testUser");
+        user.setPassword("testPass");
+        trainee.setUser(user);
+        trainee.setDob(new Date(System.currentTimeMillis()));
+        trainee.setAddress("123 Main St");
+
+        when(userRepo.select(user.getUserId())).thenReturn(user);
+        when(userService.checkCredentials(user.getUsername(), user.getPassword())).thenReturn(true);
+        doNothing().when(traineeRepo).update(trainee);
+
+        traineeService.update(trainee);
+
+        verify(traineeRepo).update(trainee);
+    }
+
+    @Test
+    void testDeleteById() {
+        long id = 1L;
+
+        doNothing().when(traineeRepo).delete(id);
+
+        traineeService.delete(id);
+
+        verify(traineeRepo).delete(id);
+    }
+
+    @Test
+    void testDeleteByUsernameAndPassword() {
+        String username = "testUser";
+        String password = "testPass";
+        Trainee trainee = new Trainee();
+        User user = new User();
+        user.setUsername(username);
+        trainee.setUser(user);
+        trainee.setTrainingSet(new HashSet<>());
+
+        when(traineeRepo.select(username)).thenReturn(trainee);
+        when(userService.checkCredentials(username, password)).thenReturn(true);
+        doNothing().when(traineeRepo).delete(username);
+
+        traineeService.delete(username, password);
+
+        verify(traineeRepo).delete(username);
+    }
+
+    @Test
+    void testSelectById() {
+        long id = 1L;
+        Trainee expectedTrainee = new Trainee();
+
+        when(traineeRepo.select(id)).thenReturn(expectedTrainee);
+
+        Trainee actualTrainee = traineeService.select(id);
+
+        assertEquals(expectedTrainee, actualTrainee);
+        verify(traineeRepo).select(id);
+    }
+    @Test
+    void testCheckCredentials() {
+        String username = "user";
+        String password = "pass";
+
+        when(userService.checkCredentials(username, password)).thenReturn(true);
+
+        boolean result = traineeService.checkCredentials(username, password);
+
+        assertTrue(result);
+        verify(userService).checkCredentials(username, password);
+    }
+
+    @Test
+    void testChangePassword() {
+        String username = "user";
+        String currentPassword = "pass";
+        String newPassword = "newPass";
+
+        when(userService.changePassword(username, currentPassword, newPassword)).thenReturn(true);
+
+        boolean result = traineeService.changePassword(username, currentPassword, newPassword);
+
+        assertTrue(result);
+        verify(userService).changePassword(username, currentPassword, newPassword);
+    }
+
+    @Test
+    void testToggleActivation() {
+        String username = "user";
+        String password = "pass";
+        boolean isActive = true;
+
+        when(userService.checkCredentials(username, password)).thenReturn(true);
+
+        traineeService.toggleActivation(username, password, isActive);
+
+        verify(userService).toggleActivation(username, isActive);
+    }
+
+    @Test
+    void testFindAll() {
+        List<Trainee> expectedTrainees = Collections.emptyList();
+
+        when(traineeRepo.findAll()).thenReturn(expectedTrainees);
+
+        List<Trainee> result = traineeService.findAll();
+
+        assertEquals(expectedTrainees, result);
+        verify(traineeRepo).findAll();
+    }
+
+    @Test
+    void testCreateTraineeProfile() {
+        Trainee trainee = new Trainee();
+        User user = new User();
+        user.setUserId(1L);
+        trainee.setUser(user);
+        trainee.setDob(new Date(System.currentTimeMillis()));
+        trainee.setAddress("123 Main St");
+
+        when(userRepo.select(user.getUserId())).thenReturn(user);
+        doNothing().when(traineeRepo).create(trainee);
+
+        traineeService.create(trainee);
+
+        verify(traineeRepo).create(trainee);
+    }
+    @Test
+    void testGetNotAssignedTrainerList() {
+        String username = "user";
+        String password = "pass";
+        Trainee trainee = new Trainee();
+        List<Trainer> allTrainers = Collections.emptyList();
+
+        when(userService.checkCredentials(username, password)).thenReturn(true);
+        when(traineeRepo.select(username)).thenReturn(trainee);
+        when(trainerRepo.findAll()).thenReturn(allTrainers);
+
+        List<Trainer> result = traineeService.getNotAssignedTrainerList(username, password);
+
+        assertNotNull(result);
+        verify(trainerRepo).findAll();
+    }
+
+}
