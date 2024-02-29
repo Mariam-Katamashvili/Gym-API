@@ -7,6 +7,7 @@ import com.mariamkatamashvlii.gym.model.User;
 import com.mariamkatamashvlii.gym.repo.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -115,5 +116,59 @@ class UserServiceImplTest {
 
         assertTrue(userService.checkCredentials(username, password));
     }
+
+    @Test
+    void testChangePasswordSuccess() {
+        String username = "johndoe";
+        String currentPassword = "password";
+        String newPassword = "newPassword";
+        User user = new User();
+        user.setUserId(1L);
+        user.setUsername(username);
+        user.setPassword(currentPassword);
+
+        when(userRepo.select(username)).thenReturn(user);
+
+        assertTrue(userService.changePassword(username, currentPassword, newPassword));
+        verify(userRepo).update(userCaptor.capture());
+
+        User updatedUser = userCaptor.getValue();
+        assertEquals(newPassword, updatedUser.getPassword());
+    }
+
+    @Test
+    void testChangePasswordFailure() {
+        String username = "johndoe";
+        String currentPassword = "password";
+        String wrongCurrentPassword = "wrongPassword";
+        String newPassword = "newPassword";
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(currentPassword);
+
+        when(userRepo.select(username)).thenReturn(user);
+
+        assertFalse(userService.changePassword(username, wrongCurrentPassword, newPassword));
+        verify(userRepo, never()).update(any(User.class));
+    }
+
+    @Test
+    void testToggleActivation() {
+        String username = "johndoe";
+        boolean newActiveStatus = true;
+        User user = new User();
+        user.setUsername(username);
+        user.setActive(!newActiveStatus);
+
+        when(userRepo.select(username)).thenReturn(user);
+
+        userService.toggleActivation(username, newActiveStatus);
+        verify(userRepo).update(userCaptor.capture());
+
+        User updatedUser = userCaptor.getValue();
+        assertEquals(newActiveStatus, updatedUser.isActive());
+    }
+
+    private final ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
 
 }

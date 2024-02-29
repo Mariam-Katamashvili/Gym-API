@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.sql.Date;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -118,6 +119,22 @@ class TraineeServiceImplTest {
         verify(traineeRepo).select(id);
     }
     @Test
+    void testSelectByUsernameAndPassword() {
+        String username = "validUser";
+        String password = "validPass";
+        Trainee expectedTrainee = new Trainee();
+
+        when(userService.checkCredentials(username, password)).thenReturn(true);
+        when(traineeRepo.select(username)).thenReturn(expectedTrainee);
+
+        Trainee actualTrainee = traineeService.select(username, password);
+
+        assertEquals(expectedTrainee, actualTrainee);
+        verify(userService).checkCredentials(username, password);
+        verify(traineeRepo).select(username);
+    }
+
+    @Test
     void testCheckCredentials() {
         String username = "user";
         String password = "pass";
@@ -184,6 +201,34 @@ class TraineeServiceImplTest {
         traineeService.create(trainee);
 
         verify(traineeRepo).create(trainee);
+    }
+    @Test
+    void testGeTrainingList() {
+        String username = "validUser";
+        String password = "validPass";
+        Date fromDate = Date.valueOf("2023-01-01");
+        Date toDate = Date.valueOf("2023-01-31");
+        String trainerName = "TrainerName";
+        TrainingType trainingType = new TrainingType("Type1");
+        Training training = new Training();
+        training.setTrainingDate(Date.valueOf("2023-01-15"));
+        Trainer trainer = new Trainer();
+        User trainerUser = new User();
+        trainerUser.setFirstName(trainerName);
+        trainer.setUser(trainerUser);
+        training.setTrainer(trainer);
+        training.setTrainingType(trainingType);
+        Trainee trainee = new Trainee();
+        trainee.setTrainingSet(new HashSet<>(Arrays.asList(training)));
+
+        when(userService.checkCredentials(username, password)).thenReturn(true);
+        when(traineeRepo.select(username)).thenReturn(trainee);
+
+        List<Training> trainingList = traineeService.geTrainingList(username, password, fromDate, toDate, trainerName, trainingType);
+
+        assertFalse(trainingList.isEmpty());
+        assertEquals(1, trainingList.size());
+        verify(userService).checkCredentials(username, password);
     }
     @Test
     void testGetNotAssignedTrainerList() {
