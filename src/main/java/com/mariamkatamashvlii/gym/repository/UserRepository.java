@@ -1,11 +1,11 @@
-package com.mariamkatamashvlii.gym.repo;
+package com.mariamkatamashvlii.gym.repository;
 
-import com.mariamkatamashvlii.gym.model.User;
+import com.mariamkatamashvlii.gym.entity.User;
 
 import java.util.List;
 
-public interface UserRepo {
-    void create(User user);
+public interface UserRepository {
+    User create(User user);
 
     void update(User user);
 

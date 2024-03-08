@@ -1,9 +1,9 @@
 package com.mariamkatamashvlii.gym.service;
 
-import com.mariamkatamashvlii.gym.model.Trainee;
-import com.mariamkatamashvlii.gym.model.Trainer;
-import com.mariamkatamashvlii.gym.model.Training;
-import com.mariamkatamashvlii.gym.model.TrainingType;
+import com.mariamkatamashvlii.gym.entity.Trainee;
+import com.mariamkatamashvlii.gym.entity.Trainer;
+import com.mariamkatamashvlii.gym.entity.Training;
+import com.mariamkatamashvlii.gym.entity.TrainingType;
 
 import java.sql.Date;
 import java.util.List;

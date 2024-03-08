@@ -1,7 +1,6 @@
-package com.mariamkatamashvlii.gym.repoImpl;
+package com.mariamkatamashvlii.gym.repositoryImplementation;
 
-import com.mariamkatamashvlii.gym.repo.UserRepo;
-import com.mariamkatamashvlii.gym.model.User;
+import com.mariamkatamashvlii.gym.entity.User;
 import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -15,13 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Repository
-public class UserRepoImpl implements UserRepo {
-    private static final Logger logger = LoggerFactory.getLogger(UserRepoImpl.class);
+public class UserRepository implements com.mariamkatamashvlii.gym.repository.UserRepository {
+    private static final Logger logger = LoggerFactory.getLogger(UserRepository.class);
     private final ApplicationContext applicationContext;
     private final EntityManager entityManager;
 
     @Autowired
-    public UserRepoImpl(ApplicationContext applicationContext, EntityManager entityManager) {
+    public UserRepository(ApplicationContext applicationContext, EntityManager entityManager) {
         this.applicationContext = applicationContext;
         this.entityManager = entityManager;
         logger.debug("UserRepoImpl initialized with ApplicationContext and EntityManager");
@@ -29,10 +28,11 @@ public class UserRepoImpl implements UserRepo {
 
     @Override
     @Transactional
-    public void create(User user) {
+    public User create(User user) {
         Session session = entityManager.unwrap(Session.class);
-        session.persist(user);
         logger.info("Created user with id {}", user.getUserId());
+        session.persist(user);
+        return user;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class UserRepoImpl implements UserRepo {
     @Transactional
     public void delete(String username) {
         Session session = entityManager.unwrap(Session.class);
-        UserRepoImpl dao = applicationContext.getBean(UserRepoImpl.class);
+        UserRepository dao = applicationContext.getBean(UserRepository.class);
         User user = dao.select(username);
         session.remove(user);
         logger.info("Deleted user with username {}", user.getUsername());

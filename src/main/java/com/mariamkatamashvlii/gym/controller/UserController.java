@@ -1,6 +1,6 @@
 //package com.mariamkatamashvlii.gym.controller;
 //
-//import com.mariamkatamashvlii.gym.model.User;
+//import com.mariamkatamashvlii.gym.entity.User;
 //import com.mariamkatamashvlii.gym.service.UserService;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.web.bind.annotation.*;
@@ -8,11 +8,20 @@
 //import java.util.List;
 //
 //@RestController
-//@RequestMapping("/api")
+//@RequestMapping("/users")
 //public class UserController {
-//    @Autowired
-//    private UserService userService;
+//    private final UserService userService;
 //
+//    @Autowired
+//    public UserController(UserService userService) {
+//        this.userService = userService;
+//    }
+//
+//    @PostMapping("/create")
+//    public User userRegistration(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam(value = "isActive", required = false) boolean isActive) {
+//        User user = new User(firstName, lastName, isActive);
+//        return userService.create(user);
+//    }
 //    @GetMapping("/user")
 //    public List<User> findAll() {
 //        return userService.findAll();

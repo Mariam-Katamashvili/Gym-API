@@ -1,6 +1,6 @@
 package com.mariamkatamashvlii.gym.service;
 
-import com.mariamkatamashvlii.gym.model.Training;
+import com.mariamkatamashvlii.gym.entity.Training;
 
 import java.util.List;
 

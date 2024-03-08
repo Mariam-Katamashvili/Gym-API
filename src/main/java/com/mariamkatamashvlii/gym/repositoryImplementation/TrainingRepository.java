@@ -1,7 +1,6 @@
-package com.mariamkatamashvlii.gym.repoImpl;
+package com.mariamkatamashvlii.gym.repositoryImplementation;
 
-import com.mariamkatamashvlii.gym.repo.TrainingRepo;
-import com.mariamkatamashvlii.gym.model.Training;
+import com.mariamkatamashvlii.gym.entity.Training;
 import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -14,12 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Repository
-public class TrainingRepoImpl implements TrainingRepo {
-    private static final Logger logger = LoggerFactory.getLogger(TrainingRepoImpl.class);
+public class TrainingRepository implements com.mariamkatamashvlii.gym.repository.TrainingRepository {
+    private static final Logger logger = LoggerFactory.getLogger(TrainingRepository.class);
     private final EntityManager entityManager;
 
     @Autowired
-    public TrainingRepoImpl(EntityManager entityManager) {
+    public TrainingRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
         logger.debug("TrainingRepoImpl initialized with EntityManager");
     }

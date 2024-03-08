@@ -1,8 +1,7 @@
-package com.mariamkatamashvlii.gym.serviceImpl;
+package com.mariamkatamashvlii.gym.serviceImplementation;
 
-import com.mariamkatamashvlii.gym.repo.TrainingRepo;
-import com.mariamkatamashvlii.gym.model.Training;
-import com.mariamkatamashvlii.gym.service.TrainingService;
+import com.mariamkatamashvlii.gym.repository.TrainingRepository;
+import com.mariamkatamashvlii.gym.entity.Training;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +10,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class TrainingServiceImpl implements TrainingService {
-    private static final Logger logger = LoggerFactory.getLogger(TrainingServiceImpl.class);
-    private final TrainingRepo trainingRepo;
+public class TrainingService implements com.mariamkatamashvlii.gym.service.TrainingService {
+    private static final Logger logger = LoggerFactory.getLogger(TrainingService.class);
+    private final TrainingRepository trainingRepo;
 
     @Autowired
-    public TrainingServiceImpl(TrainingRepo trainingRepo) {
+    public TrainingService(TrainingRepository trainingRepo) {
         this.trainingRepo = trainingRepo;
         logger.debug("TrainingServiceImpl initialized with TrainingRepo");
     }

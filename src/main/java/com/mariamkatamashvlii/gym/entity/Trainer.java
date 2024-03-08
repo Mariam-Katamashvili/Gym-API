@@ -1,4 +1,4 @@
-package com.mariamkatamashvlii.gym.model;
+package com.mariamkatamashvlii.gym.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

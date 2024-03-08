@@ -1,11 +1,11 @@
 package com.mariamkatamashvlii.gym.service;
 
-import com.mariamkatamashvlii.gym.model.User;
+import com.mariamkatamashvlii.gym.entity.User;
 
 import java.util.List;
 
 public interface UserService {
-    void create(User user);
+    User create(User user);
 
     void update(User user);
 

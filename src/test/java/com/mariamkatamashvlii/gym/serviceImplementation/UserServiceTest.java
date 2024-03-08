@@ -1,10 +1,10 @@
-package com.mariamkatamashvlii.gym.serviceImpl;
+package com.mariamkatamashvlii.gym.serviceImplementation;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.mariamkatamashvlii.gym.model.User;
-import com.mariamkatamashvlii.gym.repo.UserRepo;
+import com.mariamkatamashvlii.gym.entity.User;
+import com.mariamkatamashvlii.gym.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -12,13 +12,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-class UserServiceImplTest {
+class UserServiceTest {
 
     @Mock
-    private UserRepo userRepo;
+    private UserRepository userRepo;
 
     @InjectMocks
-    private UserServiceImpl userService;
+    private UserService userService;
 
     @BeforeEach
     public void setUp() {

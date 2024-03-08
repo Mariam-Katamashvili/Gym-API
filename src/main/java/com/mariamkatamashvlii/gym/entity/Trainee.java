@@ -1,4 +1,4 @@
-package com.mariamkatamashvlii.gym.model;
+package com.mariamkatamashvlii.gym.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -19,7 +19,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @ToString
-public class Trainee {
+public class Trainee{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "traineeId")

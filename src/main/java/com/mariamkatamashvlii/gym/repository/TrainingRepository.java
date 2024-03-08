@@ -1,10 +1,10 @@
-package com.mariamkatamashvlii.gym.repo;
+package com.mariamkatamashvlii.gym.repository;
 
-import com.mariamkatamashvlii.gym.model.Training;
+import com.mariamkatamashvlii.gym.entity.Training;
 
 import java.util.List;
 
-public interface TrainingRepo {
+public interface TrainingRepository {
     void create(Training training);
 
     void update(Training training);

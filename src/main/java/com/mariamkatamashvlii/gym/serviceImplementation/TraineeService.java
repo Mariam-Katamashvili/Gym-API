@@ -1,10 +1,9 @@
-package com.mariamkatamashvlii.gym.serviceImpl;
+package com.mariamkatamashvlii.gym.serviceImplementation;
 
-import com.mariamkatamashvlii.gym.model.*;
-import com.mariamkatamashvlii.gym.repo.TraineeRepo;
-import com.mariamkatamashvlii.gym.repo.TrainerRepo;
-import com.mariamkatamashvlii.gym.repo.UserRepo;
-import com.mariamkatamashvlii.gym.service.TraineeService;
+import com.mariamkatamashvlii.gym.entity.*;
+import com.mariamkatamashvlii.gym.repository.TraineeRepository;
+import com.mariamkatamashvlii.gym.repository.TrainerRepository;
+import com.mariamkatamashvlii.gym.repository.UserRepository;
 import com.mariamkatamashvlii.gym.service.TrainingService;
 import com.mariamkatamashvlii.gym.service.UserService;
 import org.slf4j.Logger;
@@ -18,17 +17,17 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class TraineeServiceImpl implements TraineeService {
-    private static final Logger logger = LoggerFactory.getLogger(TraineeServiceImpl.class);
-    private final TraineeRepo traineeRepo;
-    private final UserRepo userRepo;
+public class TraineeService implements com.mariamkatamashvlii.gym.service.TraineeService {
+    private static final Logger logger = LoggerFactory.getLogger(TraineeService.class);
+    private final TraineeRepository traineeRepo;
+    private final UserRepository userRepo;
     private final UserService userService;
     private final TrainingService trainingService;
-    private final TrainerRepo trainerRepo;
+    private final TrainerRepository trainerRepo;
 
     @Autowired
-    public TraineeServiceImpl(TraineeRepo traineeRepo, UserRepo userRepo,
-                              UserService userService, TrainingService trainingService, TrainerRepo trainerRepo) {
+    public TraineeService(TraineeRepository traineeRepo, UserRepository userRepo,
+                          UserService userService, TrainingService trainingService, TrainerRepository trainerRepo) {
         this.traineeRepo = traineeRepo;
         this.userRepo = userRepo;
         this.userService = userService;

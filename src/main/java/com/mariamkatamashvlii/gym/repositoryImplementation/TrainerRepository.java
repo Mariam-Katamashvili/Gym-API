@@ -1,9 +1,8 @@
-package com.mariamkatamashvlii.gym.repoImpl;
+package com.mariamkatamashvlii.gym.repositoryImplementation;
 
-import com.mariamkatamashvlii.gym.repo.TrainerRepo;
-import com.mariamkatamashvlii.gym.repo.UserRepo;
-import com.mariamkatamashvlii.gym.model.Trainer;
-import com.mariamkatamashvlii.gym.model.User;
+import com.mariamkatamashvlii.gym.repository.UserRepository;
+import com.mariamkatamashvlii.gym.entity.Trainer;
+import com.mariamkatamashvlii.gym.entity.User;
 import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -16,13 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Repository
-public class TrainerRepoImpl implements TrainerRepo {
-    private static final Logger logger = LoggerFactory.getLogger(TrainerRepoImpl.class);
+public class TrainerRepository implements com.mariamkatamashvlii.gym.repository.TrainerRepository {
+    private static final Logger logger = LoggerFactory.getLogger(TrainerRepository.class);
     private final EntityManager entityManager;
-    private final UserRepo userRepo;
+    private final UserRepository userRepo;
 
     @Autowired
-    public TrainerRepoImpl(EntityManager entityManager, UserRepo userRepo) {
+    public TrainerRepository(EntityManager entityManager, UserRepository userRepo) {
         this.entityManager = entityManager;
         this.userRepo = userRepo;
         logger.debug("TraineeRepoImpl initialized with EntityManager and UserRepo");

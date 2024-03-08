@@ -1,8 +1,7 @@
-package com.mariamkatamashvlii.gym.serviceImpl;
+package com.mariamkatamashvlii.gym.serviceImplementation;
 
-import com.mariamkatamashvlii.gym.repo.UserRepo;
-import com.mariamkatamashvlii.gym.model.User;
-import com.mariamkatamashvlii.gym.service.UserService;
+import com.mariamkatamashvlii.gym.repository.UserRepository;
+import com.mariamkatamashvlii.gym.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,23 +13,23 @@ import java.util.List;
 import java.util.Random;
 
 @Service
-public class UserServiceImpl implements UserService {
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-    private final UserRepo userRepo;
+public class UserService implements com.mariamkatamashvlii.gym.service.UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    private final UserRepository userRepo;
 
     @Autowired
-    public UserServiceImpl(UserRepo userRepo) {
+    public UserService(UserRepository userRepo) {
         this.userRepo = userRepo;
         logger.debug("UserServiceImpl initialized with UserRepo");
     }
 
     @Override
     @Transactional
-    public void create(User user) {
+    public User create(User user) {
         user.setUsername(generateUserName(user.getFirstName(), user.getLastName()));
         user.setPassword(generatePassword());
-        userRepo.create(user);
         logger.info("Created user with id {}", user.getUserId());
+        return userRepo.create(user);
     }
 
     @Override

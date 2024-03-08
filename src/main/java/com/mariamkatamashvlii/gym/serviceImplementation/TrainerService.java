@@ -1,13 +1,12 @@
-package com.mariamkatamashvlii.gym.serviceImpl;
+package com.mariamkatamashvlii.gym.serviceImplementation;
 
-import com.mariamkatamashvlii.gym.model.Training;
-import com.mariamkatamashvlii.gym.repo.TrainerRepo;
-import com.mariamkatamashvlii.gym.repo.TrainingTypeRepo;
-import com.mariamkatamashvlii.gym.repo.UserRepo;
-import com.mariamkatamashvlii.gym.model.Trainer;
-import com.mariamkatamashvlii.gym.model.TrainingType;
-import com.mariamkatamashvlii.gym.model.User;
-import com.mariamkatamashvlii.gym.service.TrainerService;
+import com.mariamkatamashvlii.gym.entity.Training;
+import com.mariamkatamashvlii.gym.repository.TrainerRepository;
+import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
+import com.mariamkatamashvlii.gym.repository.UserRepository;
+import com.mariamkatamashvlii.gym.entity.Trainer;
+import com.mariamkatamashvlii.gym.entity.TrainingType;
+import com.mariamkatamashvlii.gym.entity.User;
 import com.mariamkatamashvlii.gym.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,15 +19,15 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class TrainerServiceImpl implements TrainerService {
-    private static final Logger logger = LoggerFactory.getLogger(TrainerServiceImpl.class);
-    private final TrainerRepo trainerRepo;
-    private final UserRepo userRepo;
-    private final TrainingTypeRepo trainingTypeRepo;
+public class TrainerService implements com.mariamkatamashvlii.gym.service.TrainerService {
+    private static final Logger logger = LoggerFactory.getLogger(TrainerService.class);
+    private final TrainerRepository trainerRepo;
+    private final UserRepository userRepo;
+    private final TrainingTypeRepository trainingTypeRepo;
     private final UserService userService;
 
     @Autowired
-    public TrainerServiceImpl(TrainerRepo trainerRepo, UserRepo userRepo, TrainingTypeRepo trainingTypeRepo, UserService userService) {
+    public TrainerService(TrainerRepository trainerRepo, UserRepository userRepo, TrainingTypeRepository trainingTypeRepo, UserService userService) {
         this.trainerRepo = trainerRepo;
         this.userRepo = userRepo;
         this.trainingTypeRepo = trainingTypeRepo;

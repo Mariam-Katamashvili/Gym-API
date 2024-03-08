@@ -1,10 +1,10 @@
-package com.mariamkatamashvlii.gym.serviceImpl;
+package com.mariamkatamashvlii.gym.serviceImplementation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-import com.mariamkatamashvlii.gym.model.TrainingType;
-import com.mariamkatamashvlii.gym.repo.TrainingTypeRepo;
+import com.mariamkatamashvlii.gym.entity.TrainingType;
+import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,13 +13,13 @@ import org.mockito.MockitoAnnotations;
 import java.util.Arrays;
 import java.util.List;
 
-class TrainingTypeServiceImplTest {
+class TrainingTypeServiceTest {
 
     @Mock
-    private TrainingTypeRepo trainingTypeRepo;
+    private TrainingTypeRepository trainingTypeRepo;
 
     @InjectMocks
-    private TrainingTypeServiceImpl trainingTypeService;
+    private TrainingTypeService trainingTypeService;
 
     @BeforeEach
     public void setUp() {

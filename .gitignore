@@ -1,3 +1,14 @@
-.idea/
-target/
+# Intellij template
+.idea
 *.iml
+*.ipr
+*.iws
+
+# IntelliJ
+out/
+
+# Maven template
+target/
+.mvn/
+mvnw
+mvnw.cmd

@@ -1,12 +1,12 @@
-package com.mariamkatamashvlii.gym.serviceImpl;
+package com.mariamkatamashvlii.gym.serviceImplementation;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.mariamkatamashvlii.gym.model.*;
-import com.mariamkatamashvlii.gym.repo.TrainerRepo;
-import com.mariamkatamashvlii.gym.repo.TrainingTypeRepo;
-import com.mariamkatamashvlii.gym.repo.UserRepo;
+import com.mariamkatamashvlii.gym.entity.*;
+import com.mariamkatamashvlii.gym.repository.TrainerRepository;
+import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
+import com.mariamkatamashvlii.gym.repository.UserRepository;
 import com.mariamkatamashvlii.gym.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,19 +20,19 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-class TrainerServiceImplTest {
+class TrainerServiceTest {
 
     @Mock
-    private TrainerRepo trainerRepo;
+    private TrainerRepository trainerRepo;
     @Mock
-    private UserRepo userRepo;
+    private UserRepository userRepo;
     @Mock
-    private TrainingTypeRepo trainingTypeRepo;
+    private TrainingTypeRepository trainingTypeRepo;
     @Mock
     private UserService userService;
 
     @InjectMocks
-    private TrainerServiceImpl trainerService;
+    private TrainerService trainerService;
 
     @BeforeEach
     public void setUp() {
