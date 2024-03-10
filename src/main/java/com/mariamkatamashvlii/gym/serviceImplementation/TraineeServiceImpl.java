@@ -1,6 +1,10 @@
 package com.mariamkatamashvlii.gym.serviceImplementation;
 
-import com.mariamkatamashvlii.gym.entity.*;
+import com.mariamkatamashvlii.gym.entity.Trainee;
+import com.mariamkatamashvlii.gym.entity.Trainer;
+import com.mariamkatamashvlii.gym.entity.Training;
+import com.mariamkatamashvlii.gym.entity.TrainingType;
+import com.mariamkatamashvlii.gym.entity.User;
 import com.mariamkatamashvlii.gym.repository.TraineeRepository;
 import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.UserRepository;

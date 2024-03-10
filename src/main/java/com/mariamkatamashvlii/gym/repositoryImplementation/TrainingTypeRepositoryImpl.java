@@ -37,8 +37,8 @@ public class TrainingTypeRepository implements com.mariamkatamashvlii.gym.reposi
     public List<TrainingType> findAll() {
         Session session = entityManager.unwrap(Session.class);
         Query<TrainingType> query = session.createQuery("from TrainingType ", TrainingType.class);
-        List<TrainingType> trainingTypeList = query.getResultList();
+        List<TrainingType> trainingTypes = query.getResultList();
         logger.info("Returning all trainingTypes");
-        return trainingTypeList;
+        return trainingTypes;
     }
 }

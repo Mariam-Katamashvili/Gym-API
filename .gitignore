@@ -4,11 +4,10 @@
 *.ipr
 *.iws
 
-# IntelliJ
 out/
 
-# Maven template
 target/
 .mvn/
 mvnw
 mvnw.cmd
+README.md

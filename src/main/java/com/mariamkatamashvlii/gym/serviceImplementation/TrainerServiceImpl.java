@@ -1,12 +1,12 @@
 package com.mariamkatamashvlii.gym.serviceImplementation;
 
+import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.Training;
+import com.mariamkatamashvlii.gym.entity.TrainingType;
+import com.mariamkatamashvlii.gym.entity.User;
 import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
-import com.mariamkatamashvlii.gym.entity.Trainer;
-import com.mariamkatamashvlii.gym.entity.TrainingType;
-import com.mariamkatamashvlii.gym.entity.User;
 import com.mariamkatamashvlii.gym.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -85,8 +85,8 @@ public class UserRepository implements com.mariamkatamashvlii.gym.repository.Use
     public List<User> findAll() {
         Session session = entityManager.unwrap(Session.class);
         Query<User> query = session.createQuery("from User ", User.class);
-        List<User> userList = query.getResultList();
+        List<User> users = query.getResultList();
         logger.info("Returning all users");
-        return userList;
+        return users;
     }
 }
