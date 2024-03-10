@@ -9,32 +9,28 @@ import java.sql.Date;
 import java.util.List;
 
 public interface TraineeService {
-    void create(Trainee trainee);
+    Trainee create(Trainee trainee);
 
-    void update(Trainee trainee);
+    Trainee update(Trainee trainee);
 
-    void delete(long id);
+    void delete(String username);
 
-    void delete(String username, String password);
-
-    Trainee select(long id);
-
-    Trainee select(String username, String password);
-
-    boolean checkCredentials(String username, String password);
+    Trainee select(String username);
 
     boolean changePassword(String username, String currPassword, String newPassword);
 
-    void toggleActivation(String username, String password, boolean isActive);
+    void activateTrainee (String username, boolean isActive);
 
-    void updateTrainerList(String username, String password, List<Trainer> trainerList);
+    void deactivateTrainee (String username, boolean isActive);
 
-    void createTraineeProfile(Date dob, String address, long userId);
+    void updateTrainers(String username, List<Trainer> trainers);
 
-    List<Training> geTrainingList(String username, String password, Date fromDate,
-                                  Date toDate, String trainerName, TrainingType trainingType);
+    Trainee createTraineeProfile(Date dob, String address, long userId);
 
-    List<Trainer> getNotAssignedTrainerList(String username, String password);
+    List<Training> getTrainings(String username, Date fromDate,
+                                Date toDate, String trainerName, TrainingType trainingType);
+
+    List<Trainer> getNotAssignedTrainers(String username);
 
     List<Trainee> findAll();
 }

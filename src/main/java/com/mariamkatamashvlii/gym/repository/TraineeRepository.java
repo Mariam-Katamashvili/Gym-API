@@ -5,11 +5,9 @@ import com.mariamkatamashvlii.gym.entity.Trainee;
 import java.util.List;
 
 public interface TraineeRepository {
-    void create(Trainee trainee);
+    Trainee create(Trainee trainee);
 
-    void update(Trainee trainee);
-
-    void delete(long id);
+    Trainee update(Trainee trainee);
 
     void delete(String username);
 

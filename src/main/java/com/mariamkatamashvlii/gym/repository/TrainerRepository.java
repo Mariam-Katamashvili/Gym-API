@@ -5,11 +5,9 @@ import com.mariamkatamashvlii.gym.entity.Trainer;
 import java.util.List;
 
 public interface TrainerRepository {
-    void create(Trainer trainer);
+    Trainer create(Trainer trainer);
 
-    void update(Trainer trainer);
-
-    void delete(long id);
+    Trainer update(Trainer trainer);
 
     Trainer select(long id);
 

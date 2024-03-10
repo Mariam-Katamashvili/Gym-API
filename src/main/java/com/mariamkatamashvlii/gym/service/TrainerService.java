@@ -7,26 +7,22 @@ import java.sql.Date;
 import java.util.List;
 
 public interface TrainerService {
-    void create(Trainer trainer);
+    Trainer create(Trainer trainer);
 
-    void update(Trainer trainer);
+    Trainer update(Trainer trainer);
 
-    void delete(long id);
-
-    Trainer select(long id);
-
-    Trainer select(String username, String password);
-
-    boolean checkCredentials(String username, String password);
+    Trainer select(String username);
 
     boolean changePassword(String username, String currPassword, String newPassword);
 
-    void toggleActivation(String username, String password, boolean isActive);
+    void activateTrainer (String username, boolean isActive);
 
-    void createTrainerProfile(long trainingType, long user);
+    void deactivateTrainer (String username, boolean isActive);
 
-    List<Training> getTrainingList(String username, String password, Date fromDate,
-                                   Date toDate, String traineeName);
+    Trainer createTrainerProfile(long trainingTypeId, long userId);
+
+    List<Training> getTrainings(String username, String password, Date fromDate,
+                                Date toDate, String traineeName);
 
     List<Trainer> findAll();
 }

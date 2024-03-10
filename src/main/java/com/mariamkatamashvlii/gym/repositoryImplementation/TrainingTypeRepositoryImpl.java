@@ -1,33 +1,28 @@
 package com.mariamkatamashvlii.gym.repositoryImplementation;
 
 import com.mariamkatamashvlii.gym.entity.TrainingType;
+import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
+@RequiredArgsConstructor
 @Repository
-public class TrainingTypeRepository implements com.mariamkatamashvlii.gym.repository.TrainingTypeRepository {
-    private static final Logger logger = LoggerFactory.getLogger(TrainingTypeRepository.class);
+public class TrainingTypeRepositoryImpl implements TrainingTypeRepository {
     private final EntityManager entityManager;
-
-    @Autowired
-    public TrainingTypeRepository(EntityManager entityManager) {
-        this.entityManager = entityManager;
-        logger.debug("TrainingTypeRepoImpl initialized with EntityManager");
-    }
 
     @Override
     @Transactional
     public TrainingType select(long id) {
         Session session = entityManager.unwrap(Session.class);
-        logger.info("Selecting training type with id {}", id);
+        log.info("Selecting training type with id {}", id);
         return session.get(TrainingType.class, id);
 
     }
@@ -38,7 +33,7 @@ public class TrainingTypeRepository implements com.mariamkatamashvlii.gym.reposi
         Session session = entityManager.unwrap(Session.class);
         Query<TrainingType> query = session.createQuery("from TrainingType ", TrainingType.class);
         List<TrainingType> trainingTypes = query.getResultList();
-        logger.info("Returning all trainingTypes");
+        log.info("Returning all trainingTypes");
         return trainingTypes;
     }
 }

@@ -5,9 +5,9 @@ import com.mariamkatamashvlii.gym.entity.Training;
 import java.util.List;
 
 public interface TrainingRepository {
-    void create(Training training);
+    Training create(Training training);
 
-    void update(Training training);
+    Training update(Training training);
 
     void delete(long id);
 

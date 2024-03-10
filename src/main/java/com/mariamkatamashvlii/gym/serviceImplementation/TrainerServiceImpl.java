@@ -1,5 +1,6 @@
 package com.mariamkatamashvlii.gym.serviceImplementation;
 
+import com.mariamkatamashvlii.gym.auth.Validation;
 import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.Training;
 import com.mariamkatamashvlii.gym.entity.TrainingType;
@@ -7,126 +8,117 @@ import com.mariamkatamashvlii.gym.entity.User;
 import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
-import com.mariamkatamashvlii.gym.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.mariamkatamashvlii.gym.service.TrainerService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
-public class TrainerService implements com.mariamkatamashvlii.gym.service.TrainerService {
-    private static final Logger logger = LoggerFactory.getLogger(TrainerService.class);
+public class TrainerServiceImpl implements TrainerService {
     private final TrainerRepository trainerRepo;
     private final UserRepository userRepo;
     private final TrainingTypeRepository trainingTypeRepo;
-    private final UserService userService;
+    private final Validation validation;
 
-    @Autowired
-    public TrainerService(TrainerRepository trainerRepo, UserRepository userRepo, TrainingTypeRepository trainingTypeRepo, UserService userService) {
-        this.trainerRepo = trainerRepo;
-        this.userRepo = userRepo;
-        this.trainingTypeRepo = trainingTypeRepo;
-        this.userService = userService;
-        logger.debug("TrainerServiceImpl initialized with TrainerRepo, UserRepo, TrainingTypeRepo and UserService");
+    @Override
+    public Trainer create(Trainer trainer) {
+        User user = userRepo.select(trainer.getUser().getUserId());
+        validation.validateTrainer(trainer, user);
+        log.info("Created trainer with username: {}", trainer.getUser().getUsername());
+        return trainerRepo.create(trainer);
     }
 
     @Override
-    public void create(Trainer trainer) {
+    public Trainer update(Trainer trainer) {
         User user = userRepo.select(trainer.getUser().getUserId());
         if (trainer.getSpecialization() != null && user != null) {
-            trainerRepo.create(trainer);
-            logger.info("Created trainer with id {}", trainer.getTrainerId());
+            log.info("Created trainer with username: {}", trainer.getUser().getUsername());
+            return trainerRepo.update(trainer);
         }
-    }
-
-    @Override
-    public void update(Trainer trainer) {
-        User user = userRepo.select(trainer.getUser().getUserId());
-        if (trainer.getSpecialization() != null && user != null && (userService.checkCredentials(trainer.getUser().getUsername(), trainer.getUser().getPassword()))) {
-            trainerRepo.update(trainer);
-            logger.info("Updated trainer with id {}", trainer.getTrainerId());
-
-        }
-    }
-
-    @Override
-    public void delete(long id) {
-        trainerRepo.delete(id);
-        logger.info("Deleted trainer with id {}", id);
-    }
-
-    @Override
-    public Trainer select(long id) {
-        logger.info("Selecting trainer with id {}", id);
-        return trainerRepo.select(id);
-    }
-
-    @Override
-    public Trainer select(String username, String password) {
-        if (userService.checkCredentials(username, password)) {
-            logger.info("Selecting trainer with username - {}", username);
-            return trainerRepo.select(username);
-        }
-        logger.info("Could not select trainer with username - {}", username);
         return null;
     }
 
     @Override
-    public boolean checkCredentials(String username, String password) {
-        logger.info("Checking credentials for trainer {}", username);
-        return userService.checkCredentials(username, password);
-    }
-
-    @Override
-    public boolean changePassword(String username, String currPassword, String newPassword) {
-        logger.info("Changing password for trainer {}", username);
-        return userService.changePassword(username, currPassword, newPassword);
-    }
-
-    @Override
-    public void toggleActivation(String username, String password, boolean isActive) {
-        if (userService.checkCredentials(username, password)) {
-            userService.toggleActivation(username, isActive);
-            logger.info("Changed activation status for trainer {}", username);
+    public Trainer select(String username) {
+        Trainer trainer = trainerRepo.select(username);
+        if (trainer != null) {
+            log.info("Selecting trainer - {}", username);
+            return trainer;
+        } else {
+            log.info("Could not select trainer - {}", username);
+            return null;
         }
+    }
+
+    @Override
+    public boolean changePassword(String username, String currentPassword, String newPassword) {
+        Trainer trainer = trainerRepo.select(username);
+        if (trainer != null && trainer.getUser().getPassword().equals(currentPassword)) {
+            User user = trainer.getUser();
+            user.setPassword(newPassword);
+            userRepo.update(user);
+            log.info("Changed password for - {}", username);
+            return true;
+        } else {
+            log.info("Could not change password for - {}", username);
+            return false;
+        }
+    }
+
+    @Override
+    public void activateTrainer(String username, boolean isActive) {
+        toggleActivation(username, isActive);
+        log.info("Set activation to true for - {}", username);
+    }
+
+    @Override
+    public void deactivateTrainer(String username, boolean isActive) {
+        toggleActivation(username, isActive);
+        log.info("Set activation to false for - {}", username);
+    }
+
+    private void toggleActivation(String username, boolean isActive) {
+        User user = userRepo.select(username);
+        user.setActive(isActive);
+        userRepo.update(user);
     }
 
     @Override
     public List<Trainer> findAll() {
-        logger.info("Selecting all trainers");
+        log.info("Selecting all trainers");
         return trainerRepo.findAll();
     }
 
     @Override
-    public void createTrainerProfile(long trainingType, long user) {
-        TrainingType type = trainingTypeRepo.select(trainingType);
-        User usr = userRepo.select(user);
-        Trainer trainer = new Trainer(type);
-        trainer.setUser(usr);
-        trainerRepo.create(trainer);
-        logger.info("Created trainer profile with id {}", trainer.getTrainerId());
+    public Trainer createTrainerProfile(long trainingTypeId, long userId) {
+        TrainingType type = trainingTypeRepo.select(trainingTypeId);
+        User user = userRepo.select(userId);
+        Trainer trainer = Trainer.builder()
+                .specialization(type)
+                .user(user)
+                .build();
+        trainer.setUser(user);
+        log.info("Creating trainer profile for - {}", trainer.getUser().getUsername());
+        return trainerRepo.create(trainer);
     }
 
     @Override
-    public List<Training> getTrainingList(String username, String password, Date fromDate, Date toDate, String traineeName) {
-        List<Training> trainingList = new ArrayList<>();
-        if (userService.checkCredentials(username, password)) {
-            Trainer trainer = trainerRepo.select(username);
-            Set<Training> trainingSet = trainer.getTrainingSet();
-            for (Training t : trainingSet) {
-                if (isBetween(t.getTrainingDate(), fromDate, toDate) &&
-                        t.getTrainee().getUser().getFirstName().equals(traineeName)) {
-                    trainingList.add(t);
-                }
-            }
+    public List<Training> getTrainings(String username, String password, Date fromDate, Date toDate, String traineeName) {
+        Trainer trainer = trainerRepo.select(username);
+        if (trainer == null || trainer.getTrainings() == null) {
+            log.info("No trainings found or trainer does not exist for username: {}", username);
+            return List.of();
         }
-        logger.info("Returning training list for trainer {}", username);
-        return trainingList;
+        return trainer.getTrainings().stream()
+                .filter(t -> isBetween(t.getTrainingDate(), fromDate, toDate))
+                .filter(t -> t.getTrainee().getUser().getFirstName().equals(traineeName))
+                .toList();
+
     }
 
     public boolean isBetween(Date trainingdate, Date fromDate, Date toDate) {

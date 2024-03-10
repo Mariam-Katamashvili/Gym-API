@@ -7,21 +7,13 @@ import java.util.List;
 public interface UserService {
     User create(User user);
 
-    void update(User user);
+    User update(User user);
 
-    void delete(long id);
-
-    void delete(String username);
+    void delete(User user);
 
     User select(long id);
 
     User select(String username);
-
-    boolean checkCredentials(String username, String password);
-
-    boolean changePassword(String username, String currentPassword, String newPassword);
-
-    void toggleActivation(String username, boolean isActive);
 
     List<User> findAll();
 }
