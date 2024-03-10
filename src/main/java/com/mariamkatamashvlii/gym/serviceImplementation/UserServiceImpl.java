@@ -31,9 +31,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user) {
-        userRepo.update(user);
+        User newUser = userRepo.update(user);
         log.info("Updated user - {}", user.getUsername());
-        return userRepo.update(user);
+        return newUser;
     }
 
     @Override
