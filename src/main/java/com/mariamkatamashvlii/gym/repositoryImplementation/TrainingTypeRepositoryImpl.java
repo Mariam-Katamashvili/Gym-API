@@ -1,5 +1,6 @@
 package com.mariamkatamashvlii.gym.repositoryImplementation;
 
+import com.mariamkatamashvlii.gym.dto.TrainingTypeDTO;
 import com.mariamkatamashvlii.gym.entity.TrainingType;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import jakarta.persistence.EntityManager;
@@ -29,11 +30,14 @@ public class TrainingTypeRepositoryImpl implements TrainingTypeRepository {
 
     @Override
     @Transactional
-    public List<TrainingType> findAll() {
+    public List<TrainingTypeDTO> findAll() {
         Session session = entityManager.unwrap(Session.class);
         Query<TrainingType> query = session.createQuery("from TrainingType ", TrainingType.class);
         List<TrainingType> trainingTypes = query.getResultList();
         log.info("Returning all trainingTypes");
-        return trainingTypes;
+
+        return trainingTypes.stream()
+                .map(trainingType -> new TrainingTypeDTO(trainingType.getTrainingTypeId(), trainingType.getTrainingTypeName()))
+                .toList();
     }
 }

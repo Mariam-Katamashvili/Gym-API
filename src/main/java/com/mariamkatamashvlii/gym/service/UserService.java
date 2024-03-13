@@ -15,5 +15,8 @@ public interface UserService {
 
     User select(String username);
 
+    boolean login(String username, String password);
+    void passChange(String username, String currPassword, String newPassword);
+
     List<User> findAll();
 }

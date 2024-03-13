@@ -1,5 +1,6 @@
 package com.mariamkatamashvlii.gym.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,7 +16,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -35,7 +35,6 @@ public class Trainee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long traineeId;
 
-    @CreationTimestamp
     private Date birthday;
 
     private String address;
@@ -44,7 +43,7 @@ public class Trainee {
     @JoinColumn(name = "userId", referencedColumnName = "userId", unique = true)
     private User user;
 
-    @OneToMany(mappedBy = "trainee")
+    @OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Training> trainings = new HashSet<>();
 
     @ManyToMany

@@ -26,7 +26,7 @@ import java.sql.Date;
 public class Training {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long trainingId;
 
     @ManyToOne
     @JoinColumn(name = "traineeId", referencedColumnName = "traineeId")

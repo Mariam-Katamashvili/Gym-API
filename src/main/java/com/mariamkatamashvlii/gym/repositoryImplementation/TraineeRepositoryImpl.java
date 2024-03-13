@@ -43,9 +43,9 @@ public class TraineeRepositoryImpl implements TraineeRepository {
     @Transactional
     public void delete(String username) {
         Session session = entityManager.unwrap(Session.class);
-        Trainee trainee = session.get(Trainee.class, username);
+        Trainee trainee = select(username);
         session.remove(trainee);
-        log.info("Removed trainee - {}", username);
+        log.info("Removed trainee - {}", trainee.getUser().getUsername());
     }
 
     @Override

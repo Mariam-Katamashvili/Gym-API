@@ -1,6 +1,7 @@
 package com.mariamkatamashvlii.gym.serviceImplementation;
 
 import com.mariamkatamashvlii.gym.auth.Validation;
+import com.mariamkatamashvlii.gym.dto.TrainingDTO;
 import com.mariamkatamashvlii.gym.entity.Trainee;
 import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.Training;
@@ -38,6 +39,8 @@ class TrainerServiceImplTest {
     private TrainingTypeRepository trainingTypeRepo;
     @Mock
     private Validation validation;
+    @Mock
+    private TrainingDTO trainingDTO;
     @InjectMocks
     private TrainerServiceImpl trainerService;
 
@@ -191,7 +194,6 @@ class TrainerServiceImplTest {
     @Test
     void testGetTrainingList() {
         String username = "trainerUsername";
-        String password = "validPassword";
         Date fromDate = Date.valueOf("2023-01-01");
         Date toDate = Date.valueOf("2023-01-31");
         String traineeName = "TraineeName";
@@ -207,7 +209,7 @@ class TrainerServiceImplTest {
 
         when(trainerRepo.select(username)).thenReturn(trainer);
 
-        List<Training> result = trainerService.getTrainings(username, password, fromDate, toDate, traineeName);
+        List<TrainingDTO> result = trainerService.getTrainings(username, fromDate, toDate, traineeName);
 
         assertNotNull(result);
         assertFalse(result.isEmpty());

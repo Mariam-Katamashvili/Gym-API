@@ -1,5 +1,6 @@
 package com.mariamkatamashvlii.gym.serviceImplementation;
 
+import com.mariamkatamashvlii.gym.dto.TrainingTypeDTO;
 import com.mariamkatamashvlii.gym.entity.TrainingType;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import com.mariamkatamashvlii.gym.service.TrainingTypeService;
@@ -22,7 +23,7 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
     }
 
     @Override
-    public List<TrainingType> findAll() {
+    public List<TrainingTypeDTO> findAll() {
         log.info("Returning all TrainingTypes");
         return trainingTypeRepo.findAll();
     }

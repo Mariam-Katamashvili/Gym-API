@@ -1,8 +1,12 @@
 package com.mariamkatamashvlii.gym.service;
 
+import com.mariamkatamashvlii.gym.dto.RegistrationDTO;
+import com.mariamkatamashvlii.gym.dto.TraineeProfileDTO;
+import com.mariamkatamashvlii.gym.dto.TrainerDTO;
+import com.mariamkatamashvlii.gym.dto.TrainerUsenameDTO;
+import com.mariamkatamashvlii.gym.dto.TrainingDTO;
+import com.mariamkatamashvlii.gym.dto.UpdateTraineeDTO;
 import com.mariamkatamashvlii.gym.entity.Trainee;
-import com.mariamkatamashvlii.gym.entity.Trainer;
-import com.mariamkatamashvlii.gym.entity.Training;
 import com.mariamkatamashvlii.gym.entity.TrainingType;
 
 import java.sql.Date;
@@ -23,14 +27,20 @@ public interface TraineeService {
 
     void deactivateTrainee (String username, boolean isActive);
 
-    void updateTrainers(String username, List<Trainer> trainers);
+    List<TrainerDTO> updateTrainers(String username, List<TrainerUsenameDTO> trainers);
 
     Trainee createTraineeProfile(Date dob, String address, long userId);
 
-    List<Training> getTrainings(String username, Date fromDate,
-                                Date toDate, String trainerName, TrainingType trainingType);
+    List<TrainingDTO> getTrainings(String username, Date fromDate,
+                                   Date toDate, String trainerName, TrainingType trainingType);
 
-    List<Trainer> getNotAssignedTrainers(String username);
+    List<TrainerDTO> getNotAssignedTrainers(String username);
+
+    RegistrationDTO registerTrainee (String firstName, String lastName, Date birthday, String address);
+
+    TraineeProfileDTO traineeProfile(String username);
+
+    UpdateTraineeDTO updateProfile(String username, String firstName, String lastName, Date birthday, String address, boolean isActive);
 
     List<Trainee> findAll();
 }

@@ -23,7 +23,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     public Training create(Training training) {
         Session session = entityManager.unwrap(Session.class);
         session.persist(training);
-        log.info("Created training with id {}", training.getId());
+        log.info("Created training with id {}", training.getTrainingId());
         return training;
     }
 
@@ -32,7 +32,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     public Training update(Training training) {
         Session session = entityManager.unwrap(Session.class);
         session.merge(training);
-        log.info("Updated training with id {}", training.getId());
+        log.info("Updated training with id {}", training.getTrainingId());
         return training;
     }
 
@@ -42,7 +42,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
         Session session = entityManager.unwrap(Session.class);
         Training training = session.get(Training.class, id);
         session.remove(training);
-        log.info("Deleted training with id {}", training.getId());
+        log.info("Deleted training with id {}", training.getTrainingId());
     }
 
     @Override

@@ -1,7 +1,11 @@
 package com.mariamkatamashvlii.gym.service;
 
+import com.mariamkatamashvlii.gym.dto.RegistrationDTO;
+import com.mariamkatamashvlii.gym.dto.TrainerProfileDTO;
+import com.mariamkatamashvlii.gym.dto.TrainingDTO;
+import com.mariamkatamashvlii.gym.dto.TrainingTypeDTO;
+import com.mariamkatamashvlii.gym.dto.UpdateTrainerDTO;
 import com.mariamkatamashvlii.gym.entity.Trainer;
-import com.mariamkatamashvlii.gym.entity.Training;
 
 import java.sql.Date;
 import java.util.List;
@@ -21,8 +25,11 @@ public interface TrainerService {
 
     Trainer createTrainerProfile(long trainingTypeId, long userId);
 
-    List<Training> getTrainings(String username, String password, Date fromDate,
-                                Date toDate, String traineeName);
+    List<TrainingDTO> getTrainings(String username, Date fromDate,
+                                   Date toDate, String traineeName);
 
+    RegistrationDTO registerTrainer(String firstName, String lastName, Long trainingTypeId);
+    TrainerProfileDTO trainerProfile(String username);
+    UpdateTrainerDTO updateProfile(String username, String firstName, String lastName, TrainingTypeDTO specialization, boolean isActive);
     List<Trainer> findAll();
 }

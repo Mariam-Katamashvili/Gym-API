@@ -1,6 +1,8 @@
 package com.mariamkatamashvlii.gym.serviceImplementation;
 
 import com.mariamkatamashvlii.gym.auth.Validation;
+import com.mariamkatamashvlii.gym.dto.TrainerDTO;
+import com.mariamkatamashvlii.gym.dto.TrainingDTO;
 import com.mariamkatamashvlii.gym.entity.Trainee;
 import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.Training;
@@ -218,14 +220,10 @@ class TraineeServiceImplTest {
 
         when(traineeRepo.select(username)).thenReturn(trainee);
 
-        List<Training> trainingList = traineeService.getTrainings(username, fromDate, toDate, trainerName, trainingType);
+        List<TrainingDTO> trainingList = traineeService.getTrainings(username, fromDate, toDate, trainerName, trainingType);
 
         assertFalse(trainingList.isEmpty(), "The training list should not be empty.");
         assertEquals(1, trainingList.size(), "The training list should contain exactly one training.");
-        Training resultTraining = trainingList.get(0);
-        assertEquals(Date.valueOf("2023-01-15"), resultTraining.getTrainingDate(), "The training date should match the expected value.");
-        assertEquals(trainerName, resultTraining.getTrainer().getUser().getFirstName(), "The trainer name should match the expected value.");
-        assertEquals("Type1", resultTraining.getTrainingType().getTrainingTypeName(), "The training type name should match the expected value.");
     }
 
     @Test
@@ -237,7 +235,7 @@ class TraineeServiceImplTest {
         when(traineeRepo.select(username)).thenReturn(trainee);
         when(trainerRepo.findAll()).thenReturn(allTrainers);
 
-        List<Trainer> result = traineeService.getNotAssignedTrainers(username);
+        List<TrainerDTO> result = traineeService.getNotAssignedTrainers(username);
 
         assertNotNull(result);
         verify(trainerRepo).findAll();

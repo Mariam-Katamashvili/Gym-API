@@ -25,6 +25,7 @@ public class UserServiceImpl implements UserService {
     public User create(User user) {
         user.setUsername(usernameGenerator.generateUsername(user.getFirstName(), user.getLastName()));
         user.setPassword(passwordGenerator.generatePassword());
+        user.setActive(true);
         log.info("Created user - {}", user.getUsername());
         return userRepo.create(user);
     }
@@ -53,6 +54,30 @@ public class UserServiceImpl implements UserService {
     public User select(String username) {
         log.info("Selecting user - {}", username);
         return userRepo.select(username);
+    }
+
+    @Override
+    public boolean login(String username, String password) {
+        if (userRepo.select(username) == null) {
+            log.info("Username does not exist");
+            return false;
+        }
+        User user = userRepo.select(username);
+        if (user.getPassword().equals(password)) {
+            log.info("User {} logged in successfully", username);
+            return true;
+        } else {
+            log.info("Password is incorrect");
+            return false;
+        }
+    }
+
+    @Override
+    public void passChange(String username, String currPassword, String newPassword) {
+        User user = userRepo.select(username);
+        user.setPassword(newPassword);
+        userRepo.update(user);
+        log.info("Password changed successfully");
     }
 
     @Override

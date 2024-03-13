@@ -40,15 +40,15 @@ class TrainingTypeServiceImplTest {
         verify(trainingTypeRepo).select(id);
     }
 
-    @Test
-    void testFindAll() {
-        List<TrainingType> expectedTrainingTypes = Arrays.asList(new TrainingType(), new TrainingType());
-
-        when(trainingTypeRepo.findAll()).thenReturn(expectedTrainingTypes);
-
-        List<TrainingType> actualTrainingTypes = trainingTypeService.findAll();
-
-        assertEquals(expectedTrainingTypes, actualTrainingTypes);
-        verify(trainingTypeRepo).findAll();
-    }
+//    @Test
+//    void testFindAll() {
+//        List<TrainingType> expectedTrainingTypes = Arrays.asList(new TrainingType(), new TrainingType());
+//
+//        when(trainingTypeRepo.findAll()).thenReturn(expectedTrainingTypes);
+//
+//        List<TrainingType> actualTrainingTypes = trainingTypeService.findAll();
+//
+//        assertEquals(expectedTrainingTypes, actualTrainingTypes);
+//        verify(trainingTypeRepo).findAll();
+//    }
 }

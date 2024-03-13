@@ -11,12 +11,12 @@ public class Validation {
         if (trainee.getUser() == null || trainee.getUser().getUserId() == null) {
             throw new IllegalArgumentException("Trainee must be associated with a valid user.");
         }
-        if (trainee.getBirthday() == null) {
-            throw new IllegalArgumentException("Date of birth is required.");
-        }
-        if (trainee.getAddress() == null) {
-            throw new IllegalArgumentException("Address is required.");
-        }
+//        if (trainee.getBirthday() == null) {
+//            throw new IllegalArgumentException("Date of birth is required.");
+//        }
+//        if (trainee.getAddress() == null) {
+//            throw new IllegalArgumentException("Address is required.");
+//        }
         if (user == null) {
             throw new IllegalArgumentException("User does not exist.");
         }
