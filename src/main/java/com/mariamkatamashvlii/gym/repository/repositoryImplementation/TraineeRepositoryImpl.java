@@ -48,13 +48,6 @@ public class TraineeRepositoryImpl implements TraineeRepository {
         log.info("Removed trainee - {}", trainee.getUser().getUsername());
     }
 
-    @Override
-    @Transactional
-    public Trainee select(long id) {
-        Session session = entityManager.unwrap(Session.class);
-        log.info("Selecting trainee with id {}", id);
-        return session.get(Trainee.class, id);
-    }
 
     @Override
     @Transactional

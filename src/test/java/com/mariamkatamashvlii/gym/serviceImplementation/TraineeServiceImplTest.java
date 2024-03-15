@@ -45,42 +45,8 @@ class TraineeServiceImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void testCreate() {
-        Trainee trainee = new Trainee();
-        User user = new User();
-        user.setId(1L);
-        trainee.setUser(user);
-        trainee.setBirthday(new Date(System.currentTimeMillis()));
-        trainee.setAddress("123 Main St");
 
-        when(userRepo.select(user.getId())).thenReturn(user);
-        when(traineeRepo.create(any(Trainee.class))).thenReturn(trainee);
 
-        Trainee createdTrainee = traineeService.create(trainee);
-
-        assertNotNull(createdTrainee);
-        verify(validation).validateTrainee(any(Trainee.class), any(User.class));
-        verify(traineeRepo).create(trainee);
-    }
-
-    @Test
-    void testUpdate() {
-        Trainee trainee = new Trainee();
-        User user = new User();
-        user.setId(1L);
-        trainee.setUser(user);
-        trainee.setBirthday(new Date(System.currentTimeMillis()));
-        trainee.setAddress("123 Main St");
-
-        when(userRepo.select(user.getId())).thenReturn(user);
-        when(traineeRepo.update(any(Trainee.class))).thenReturn(trainee);
-
-        Trainee updatedTrainee = traineeService.update(trainee);
-
-        assertNotNull(updatedTrainee);
-        verify(traineeRepo).update(trainee);
-    }
 
     @Test
     void testDelete() {
@@ -95,18 +61,7 @@ class TraineeServiceImplTest {
         verify(traineeRepo).delete(username);
     }
 
-    @Test
-    void testSelect() {
-        String username = "testUser";
-        Trainee expectedTrainee = new Trainee();
 
-        when(traineeRepo.select(username)).thenReturn(expectedTrainee);
-
-        Trainee actualTrainee = traineeService.select(username);
-
-        assertEquals(expectedTrainee, actualTrainee);
-        verify(traineeRepo).select(username);
-    }
 
     @Test
     void testActivateTrainee() {
@@ -138,59 +93,9 @@ class TraineeServiceImplTest {
         verify(userRepo).update(user);
     }
 
-    @Test
-    void testChangePassword() {
-        String username = "user";
-        String currentPassword = "pass";
-        String newPassword = "newPass";
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(currentPassword);
 
-        Trainee trainee = new Trainee();
-        trainee.setUser(user);
 
-        when(userRepo.select(username)).thenReturn(user);
-        when(traineeRepo.select(username)).thenReturn(trainee);
 
-        boolean result = traineeService.changePassword(username, currentPassword, newPassword);
-
-        assertTrue(result);
-        verify(userRepo).update(userCaptor.capture());
-
-        User updatedUser = userCaptor.getValue();
-        assertEquals(newPassword, updatedUser.getPassword());
-    }
-
-    @Test
-    void testFindAll() {
-        List<Trainee> expectedTrainees = Collections.emptyList();
-
-        when(traineeRepo.findAll()).thenReturn(expectedTrainees);
-
-        List<Trainee> result = traineeService.findAll();
-
-        assertEquals(expectedTrainees, result);
-        verify(traineeRepo).findAll();
-    }
-
-    @Test
-    void testCreateTraineeProfile() {
-        Trainee trainee = new Trainee();
-        User user = new User();
-        user.setId(1L);
-        trainee.setUser(user);
-        trainee.setBirthday(new Date(System.currentTimeMillis()));
-        trainee.setAddress("123 Main St");
-
-        when(userRepo.select(user.getId())).thenReturn(user);
-        when(traineeRepo.create(any(Trainee.class))).thenReturn(trainee);
-
-        Trainee createdTrainee = traineeService.create(trainee);
-
-        assertNotNull(createdTrainee, "The created trainee should not be null.");
-        verify(traineeRepo).create(trainee);
-    }
 
 //    @Test
 //    void testGetTrainingList() {

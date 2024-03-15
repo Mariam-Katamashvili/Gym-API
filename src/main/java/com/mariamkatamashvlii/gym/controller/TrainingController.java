@@ -1,6 +1,5 @@
 package com.mariamkatamashvlii.gym.controller;
 
-import com.mariamkatamashvlii.gym.entity.Training;
 import com.mariamkatamashvlii.gym.service.TrainingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,14 +17,14 @@ public class TrainingController {
     private final TrainingService trainingService;
 
     @PostMapping("/addTraining")
-    public ResponseEntity<Training> addTraining(
+    public ResponseEntity<Void> addTraining(
             @RequestParam String traineeUsername,
             @RequestParam String trainerUsername,
             @RequestParam String trainingName,
             @RequestParam Date date,
             @RequestParam Number duration
     ) {
-        Training addTraining = trainingService.create(traineeUsername, trainerUsername, trainingName, date, duration);
-        return ResponseEntity.ok(addTraining);
+        trainingService.create(traineeUsername, trainerUsername, trainingName, date, duration);
+        return ResponseEntity.ok().build();
     }
 }

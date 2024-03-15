@@ -34,44 +34,6 @@ class UserServiceImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void testCreate() {
-        User user = new User();
-        user.setFirstName("John");
-        user.setLastName("Doe");
-
-        String generatedUsername = "john.doe";
-        String generatedPassword = "securepassword";
-
-        when(usernameGenerator.generateUsername(user.getFirstName(), user.getLastName())).thenReturn(generatedUsername);
-        when(passwordGenerator.generatePassword()).thenReturn(generatedPassword);
-        when(userRepo.create(any(User.class))).thenReturn(user);
-
-        User createdUser = userService.create(user);
-
-        assertEquals(generatedUsername, createdUser.getUsername());
-        assertEquals(generatedPassword, createdUser.getPassword());
-        verify(userRepo).create(user);
-        verify(usernameGenerator).generateUsername(user.getFirstName(), user.getLastName());
-        verify(passwordGenerator).generatePassword();
-    }
-
-    @Test
-    void testUpdate() {
-        User user = new User();
-        user.setId(1L);
-        user.setUsername("johndoe");
-        user.setPassword("password");
-
-        when(userRepo.update(any(User.class))).thenReturn(user);
-
-        User updatedUser = userService.update(user);
-
-        assertNotNull(updatedUser, "The updated user should not be null.");
-        verify(userRepo).update(userCaptor.capture());
-        assertEquals(user.getUsername(), updatedUser.getUsername(), "The username should match the expected value.");
-        assertEquals(user.getPassword(), updatedUser.getPassword(), "The password should match the expected value.");
-    }
 
     @Test
     void testDelete() {
@@ -84,20 +46,6 @@ class UserServiceImplTest {
         userService.delete(user);
 
         verify(userRepo).delete(user);
-    }
-
-    @Test
-    void testSelectByUsername() {
-        String username = "johndoe";
-        User expectedUser = new User();
-        expectedUser.setUsername(username);
-
-        when(userRepo.select(username)).thenReturn(expectedUser);
-
-        User actualUser = userService.select(username);
-
-        assertEquals(expectedUser, actualUser);
-        verify(userRepo).select(username);
     }
 
     private final ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);

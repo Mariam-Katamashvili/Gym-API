@@ -40,10 +40,4 @@ public class TrainingServiceImpl implements TrainingService {
         return trainingRepo.create(training);
     }
 
-    @Override
-    public Training select(Long id) {
-        log.info("Selecting training with id {}", id);
-        return trainingRepo.select(id);
-    }
-
 }

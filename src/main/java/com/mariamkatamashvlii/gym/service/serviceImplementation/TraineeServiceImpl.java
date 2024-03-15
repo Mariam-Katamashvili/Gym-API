@@ -44,182 +44,6 @@ public class TraineeServiceImpl implements TraineeService {
     private final PasswordGenerator passwordGenerator;
 
     @Override
-    public Trainee create(Trainee trainee) {
-        User user = userRepo.select(trainee.getUser().getId());
-        validation.validateTrainee(trainee, user);
-        log.info("Created trainee - {}", trainee.getUser().getUsername());
-        return traineeRepo.create(trainee);
-    }
-
-    @Override
-    public Trainee update(Trainee trainee) {
-        User user = userRepo.select(trainee.getUser().getId());
-        if (user != null && trainee.getBirthday() != null && trainee.getAddress() != null) {
-            log.info("Updated trainee - {}", trainee.getUser().getUsername());
-            return traineeRepo.update(trainee);
-        }
-        return null;
-    }
-
-    @Override
-    @Transactional
-    public void delete(String username) {
-        Trainee trainee = traineeRepo.select(username);
-        if (trainee == null) {
-            log.info("Trainee does not exist for username: {}", username);
-            return;
-        }
-        Set<Training> trainings = trainee.getTrainings();
-        for (Training t : trainings) {
-            trainingRepository.delete(t.getId());
-        }
-        traineeRepo.delete(username);
-        log.info("Deleted trainee with username {}", username);
-    }
-
-    @Override
-    public Trainee select(String username) {
-        Trainee trainee = traineeRepo.select(username);
-        if (trainee != null) {
-            log.info("Selecting trainee - {}", username);
-            return trainee;
-        } else {
-            log.info("Could not select trainee - {}", username);
-            return null;
-        }
-    }
-
-    @Override
-    public boolean changePassword(String username, String currentPassword, String newPassword) {
-        Trainee trainee = traineeRepo.select(username);
-        if (trainee != null && trainee.getUser().getPassword().equals(currentPassword)) {
-            User user = trainee.getUser();
-            user.setPassword(newPassword);
-            userRepo.update(user);
-            log.info("Changed password for - {}", username);
-            return true;
-        } else {
-            log.info("Could not change password for - {}", username);
-            return false;
-        }
-    }
-
-    @Override
-    public void activateTrainee(String username, Boolean isActive) {
-        toggleActivation(username, true);
-        log.info("Set activation to true for - {}", username);
-    }
-
-    @Override
-    public void deactivateTrainee(String username, Boolean isActive) {
-        toggleActivation(username, false);
-        log.info("Set activation to false for - {}", username);
-    }
-
-    private void toggleActivation(String username, Boolean isActive) {
-        User user = userRepo.select(username);
-        user.setIsActive(isActive);
-        userRepo.update(user);
-    }
-
-    @Override
-    public List<TrainerDTO> updateTrainers(String username, List<TrainerUsenameDTO> trainers) {
-        Trainee trainee = traineeRepo.select(username);
-        List<TrainerDTO> newTrainers = new ArrayList<>();
-        if (trainee != null) {
-            List<Trainer> updatedTrainers = trainers.stream()
-                    .map(TrainerUsenameDTO::getUsername)
-                    .map(trainerRepo::select)
-                    .toList();
-            trainee.setTrainers(updatedTrainers);
-            traineeRepo.update(trainee);
-            log.info("Updated trainer list for trainee - {}", username);
-            updatedTrainers.forEach(trainer -> {
-                TrainerDTO dto = new TrainerDTO();
-                dto.setUsername(trainer.getUser().getUsername());
-                dto.setFirstName(trainer.getUser().getFirstName());
-                dto.setLastName(trainer.getUser().getLastName());
-                TrainingTypeDTO specializationDTO = new TrainingTypeDTO(
-                        trainer.getSpecialization().getId(),
-                        trainer.getSpecialization().getTrainingTypeName()
-                );
-                dto.setSpecialization(specializationDTO);
-                newTrainers.add(dto);
-            });
-
-            log.info("Updated trainer list for trainee - {}", username);
-        }
-        return newTrainers;
-    }
-
-    @Override
-    public List<Trainee> findAll() {
-        log.info("Returning all trainees");
-        return traineeRepo.findAll();
-    }
-
-    @Override
-    public Trainee createTraineeProfile(Date birthday, String address, Long userId) {
-        User user = userRepo.select(userId);
-        Trainee trainee = Trainee.builder()
-                .birthday(birthday)
-                .address(address)
-                .user(user)
-                .build();
-        log.info("Creating trainee profile for - {}", trainee.getUser().getUsername());
-        return create(trainee);
-    }
-
-    @Override
-    public List<TrainingDTO> getTrainings(String username, Date fromDate, Date toDate, String trainerName, TrainingType trainingType) {
-        Trainee trainee = traineeRepo.select(username);
-        if (trainee == null || trainee.getTrainings() == null) {
-            log.info("No trainings found or trainee does not exist for username: {}", username);
-            return List.of();
-        }
-
-        return trainee.getTrainings().stream()
-                .filter(t -> (fromDate == null || !t.getTrainingDate().before(fromDate)) && (toDate == null || !t.getTrainingDate().after(toDate)))
-                .filter(t -> trainerName == null || t.getTrainer().getUser().getUsername().equalsIgnoreCase(trainerName))
-                .filter(t -> trainingType == null || t.getTrainingType().equals(trainingType))
-                .map(t -> {
-                    TrainingDTO dto = new TrainingDTO();
-                    dto.setTrainingName(t.getTrainingName());
-                    dto.setDate(t.getTrainingDate());
-                    dto.setTrainingType(t.getTrainingType());
-                    dto.setDuration(t.getDuration());
-                    dto.setName(t.getTrainer().getUser().getUsername());
-                    return dto;
-                }).toList();
-    }
-
-    @Override
-    public List<TrainerDTO> getNotAssignedTrainers(String username) {
-        List<TrainerDTO> notAssignedTrainers = new ArrayList<>();
-        Trainee trainee = traineeRepo.select(username);
-        if (trainee != null) {
-            List<Trainer> traineeTrainers = trainee.getTrainers();
-            List<Trainer> allTrainers = trainerRepo.findAll();
-            for (Trainer t : allTrainers) {
-                if (!traineeTrainers.contains(t)) {
-                    TrainerDTO dto = new TrainerDTO();
-                    dto.setUsername(t.getUser().getUsername());
-                    dto.setFirstName(t.getUser().getFirstName());
-                    dto.setLastName(t.getUser().getLastName());
-                    TrainingTypeDTO specializationDTO = new TrainingTypeDTO(
-                            t.getSpecialization().getId(),
-                            t.getSpecialization().getTrainingTypeName()
-                    );
-                    dto.setSpecialization(specializationDTO);
-                    notAssignedTrainers.add(dto);
-                }
-            }
-        }
-        log.info("Returning not assigned trainer list for trainee {}", username);
-        return notAssignedTrainers;
-    }
-
-    @Override
     @Transactional
     public RegistrationDTO registerTrainee(String firstName, String lastName, Date birthday, String address) {
         User user = User.builder()
@@ -230,12 +54,20 @@ public class TraineeServiceImpl implements TraineeService {
                 .isActive(true)
                 .build();
         userRepo.create(user);
-        createTraineeProfile(birthday, address, user.getId());
+
+        Trainee trainee = Trainee.builder()
+                .birthday(birthday)
+                .address(address)
+                .user(user)
+                .build();
+        traineeRepo.create(trainee);
+        validation.validateTrainee(trainee, user);
+        log.info("Registered new trainee with username: {}", user.getUsername());
         return new RegistrationDTO(user.getUsername(), user.getPassword());
     }
 
     @Override
-    public TraineeProfileDTO traineeProfile(String username) {
+    public TraineeProfileDTO getTraineeProfile(String username) {
         User user = userRepo.select(username);
         Trainee trainee = traineeRepo.select(username);
         List<TrainerDTO> trainers = trainee.getTrainers().stream().map(trainer -> {
@@ -301,4 +133,116 @@ public class TraineeServiceImpl implements TraineeService {
         );
     }
 
+    @Override
+    @Transactional
+    public void delete(String username) {
+        Trainee trainee = traineeRepo.select(username);
+        if (trainee == null) {
+            log.info("Trainee does not exist for username: {}", username);
+            return;
+        }
+        Set<Training> trainings = trainee.getTrainings();
+        for (Training t : trainings) {
+            trainingRepository.delete(t.getId());
+        }
+        traineeRepo.delete(username);
+        log.info("Deleted trainee with username {}", username);
+    }
+
+    @Override
+    public List<TrainerDTO> getNotAssignedTrainers(String username) {
+        List<TrainerDTO> notAssignedTrainers = new ArrayList<>();
+        Trainee trainee = traineeRepo.select(username);
+        if (trainee != null) {
+            List<Trainer> traineeTrainers = trainee.getTrainers();
+            List<Trainer> allTrainers = trainerRepo.findAll();
+            for (Trainer t : allTrainers) {
+                if (!traineeTrainers.contains(t)) {
+                    TrainerDTO dto = new TrainerDTO();
+                    dto.setUsername(t.getUser().getUsername());
+                    dto.setFirstName(t.getUser().getFirstName());
+                    dto.setLastName(t.getUser().getLastName());
+                    TrainingTypeDTO specializationDTO = new TrainingTypeDTO(
+                            t.getSpecialization().getId(),
+                            t.getSpecialization().getTrainingTypeName()
+                    );
+                    dto.setSpecialization(specializationDTO);
+                    notAssignedTrainers.add(dto);
+                }
+            }
+        }
+        log.info("Returning not assigned trainer list for trainee {}", username);
+        return notAssignedTrainers;
+    }
+
+    @Override
+    public List<TrainingDTO> getTrainings(String username, Date fromDate, Date toDate, String trainerName, TrainingType trainingType) {
+        Trainee trainee = traineeRepo.select(username);
+        if (trainee == null || trainee.getTrainings() == null) {
+            log.info("No trainings found or trainee does not exist for username: {}", username);
+            return List.of();
+        }
+
+        return trainee.getTrainings().stream()
+                .filter(t -> (fromDate == null || !t.getTrainingDate().before(fromDate)) && (toDate == null || !t.getTrainingDate().after(toDate)))
+                .filter(t -> trainerName == null || t.getTrainer().getUser().getUsername().equalsIgnoreCase(trainerName))
+                .filter(t -> trainingType == null || t.getTrainingType().equals(trainingType))
+                .map(t -> {
+                    TrainingDTO dto = new TrainingDTO();
+                    dto.setTrainingName(t.getTrainingName());
+                    dto.setDate(t.getTrainingDate());
+                    dto.setTrainingType(t.getTrainingType());
+                    dto.setDuration(t.getDuration());
+                    dto.setName(t.getTrainer().getUser().getUsername());
+                    return dto;
+                }).toList();
+    }
+
+    @Override
+    public List<TrainerDTO> updateTrainers(String username, List<TrainerUsenameDTO> trainers) {
+        Trainee trainee = traineeRepo.select(username);
+        List<TrainerDTO> newTrainers = new ArrayList<>();
+        if (trainee != null) {
+            List<Trainer> updatedTrainers = trainers.stream()
+                    .map(TrainerUsenameDTO::getUsername)
+                    .map(trainerRepo::select)
+                    .toList();
+            trainee.setTrainers(updatedTrainers);
+            traineeRepo.update(trainee);
+            log.info("Updated trainer list for trainee - {}", username);
+            updatedTrainers.forEach(trainer -> {
+                TrainerDTO dto = new TrainerDTO();
+                dto.setUsername(trainer.getUser().getUsername());
+                dto.setFirstName(trainer.getUser().getFirstName());
+                dto.setLastName(trainer.getUser().getLastName());
+                TrainingTypeDTO specializationDTO = new TrainingTypeDTO(
+                        trainer.getSpecialization().getId(),
+                        trainer.getSpecialization().getTrainingTypeName()
+                );
+                dto.setSpecialization(specializationDTO);
+                newTrainers.add(dto);
+            });
+
+            log.info("Updated trainer list for trainee - {}", username);
+        }
+        return newTrainers;
+    }
+
+    @Override
+    public void activateTrainee(String username, Boolean isActive) {
+        toggleActivation(username, true);
+        log.info("Set activation to true for - {}", username);
+    }
+
+    @Override
+    public void deactivateTrainee(String username, Boolean isActive) {
+        toggleActivation(username, false);
+        log.info("Set activation to false for - {}", username);
+    }
+
+    private void toggleActivation(String username, Boolean isActive) {
+        User user = userRepo.select(username);
+        user.setIsActive(isActive);
+        userRepo.update(user);
+    }
 }

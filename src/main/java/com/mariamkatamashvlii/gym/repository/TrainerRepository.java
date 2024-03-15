@@ -9,8 +9,6 @@ public interface TrainerRepository {
 
     Trainer update(Trainer trainer);
 
-    Trainer select(long id);
-
     Trainer select(String username);
 
     List<Trainer> findAll();

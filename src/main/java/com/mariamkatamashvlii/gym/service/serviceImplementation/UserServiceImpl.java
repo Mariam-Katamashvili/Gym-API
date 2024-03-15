@@ -22,33 +22,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User create(User user) {
-        user.setUsername(usernameGenerator.generateUsername(user.getFirstName(), user.getLastName()));
-        user.setPassword(passwordGenerator.generatePassword());
-        user.setIsActive(true);
-        log.info("Created user - {}", user.getUsername());
-        return userRepo.create(user);
-    }
-
-    @Override
-    public User update(User user) {
-        User newUser = userRepo.update(user);
-        log.info("Updated user - {}", user.getUsername());
-        return newUser;
-    }
-
-    @Override
-    @Transactional
     public void delete(User user) {
         userRepo.delete(user);
         log.info("Deleted user - {}", user.getUsername());
-    }
-
-
-    @Override
-    public User select(String username) {
-        log.info("Selecting user - {}", username);
-        return userRepo.select(username);
     }
 
     @Override

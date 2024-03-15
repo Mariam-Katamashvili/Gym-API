@@ -40,15 +40,13 @@ public class TraineeController {
     }
 
     @GetMapping("/getProfile/{username:.+}")
-
     public ResponseEntity<TraineeProfileDTO> getTraineeProfile(
             @PathVariable String username) {
-        TraineeProfileDTO profile = traineeService.traineeProfile(username);
+        TraineeProfileDTO profile = traineeService.getTraineeProfile(username);
         return ResponseEntity.ok(profile);
     }
 
     @PutMapping("/updateProfile")
-
     public ResponseEntity<UpdateTraineeDTO> updateTrainee(
             @RequestParam String username,
             @RequestParam String firstname,

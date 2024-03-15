@@ -11,8 +11,6 @@ public interface TraineeRepository {
 
     void delete(String username);
 
-    Trainee select(long id);
-
     Trainee select(String username);
 
     List<Trainee> findAll();

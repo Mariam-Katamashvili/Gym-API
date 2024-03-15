@@ -6,11 +6,8 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,15 +21,6 @@ public class TrainingRepositoryImpl implements TrainingRepository {
         Session session = entityManager.unwrap(Session.class);
         session.persist(training);
         log.info("Created training with id {}", training.getId());
-        return training;
-    }
-
-    @Override
-    @Transactional
-    public Training update(Training training) {
-        Session session = entityManager.unwrap(Session.class);
-        session.merge(training);
-        log.info("Updated training with id {}", training.getId());
         return training;
     }
 
@@ -53,12 +41,4 @@ public class TrainingRepositoryImpl implements TrainingRepository {
         return session.get(Training.class, id);
     }
 
-    @Override
-    @Transactional
-    public List<Training> findAll() {
-        Session session = entityManager.unwrap(Session.class);
-        Query<Training> query = session.createQuery("from Training ", Training.class);
-        log.info("Returning all trainings");
-        return query.getResultList();
-    }
 }

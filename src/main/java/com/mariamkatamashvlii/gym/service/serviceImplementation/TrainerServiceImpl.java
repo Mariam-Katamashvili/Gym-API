@@ -36,94 +36,6 @@ public class TrainerServiceImpl implements TrainerService {
     private final PasswordGenerator passwordGenerator;
 
     @Override
-    public Trainer create(Trainer trainer) {
-        User user = userRepo.select(trainer.getUser().getId());
-        validation.validateTrainer(trainer, user);
-        log.info("Created trainer with username: {}", trainer.getUser().getUsername());
-        return trainerRepo.create(trainer);
-    }
-
-    @Override
-    public Trainer update(Trainer trainer) {
-        User user = userRepo.select(trainer.getUser().getId());
-        if (trainer.getSpecialization() != null && user != null) {
-            log.info("Created trainer with username: {}", trainer.getUser().getUsername());
-            return trainerRepo.update(trainer);
-        }
-        return null;
-    }
-
-    @Override
-    public Trainer select(String username) {
-        Trainer trainer = trainerRepo.select(username);
-        if (trainer != null) {
-            log.info("Selecting trainer - {}", username);
-            return trainer;
-        } else {
-            log.info("Could not select trainer - {}", username);
-            return null;
-        }
-    }
-
-    @Override
-    public void activateTrainer(String username, Boolean isActive) {
-        toggleActivation(username, isActive);
-        log.info("Set activation to true for - {}", username);
-    }
-
-    @Override
-    public void deactivateTrainer(String username, Boolean isActive) {
-        toggleActivation(username, isActive);
-        log.info("Set activation to false for - {}", username);
-    }
-
-    private void toggleActivation(String username, boolean isActive) {
-        User user = userRepo.select(username);
-        user.setIsActive(isActive);
-        userRepo.update(user);
-    }
-
-    @Override
-    public List<Trainer> findAll() {
-        log.info("Selecting all trainers");
-        return trainerRepo.findAll();
-    }
-
-    @Override
-    public Trainer createTrainerProfile(Long trainingTypeId, Long userId) {
-        TrainingType type = trainingTypeRepo.select(trainingTypeId);
-        User user = userRepo.select(userId);
-        Trainer trainer = Trainer.builder()
-                .specialization(type)
-                .user(user)
-                .build();
-        trainer.setUser(user);
-        log.info("Creating trainer profile for - {}", trainer.getUser().getUsername());
-        return trainerRepo.create(trainer);
-    }
-
-    @Override
-    public List<TrainingDTO> getTrainings(String username, Date fromDate, Date toDate, String traineeName) {
-        Trainer trainer = trainerRepo.select(username);
-        if (trainer == null || trainer.getTrainings() == null) {
-            log.info("No trainings found or trainer does not exist for username: {}", username);
-            return List.of();
-        }
-        return trainer.getTrainings().stream()
-                .filter(t -> (fromDate == null || !t.getTrainingDate().before(fromDate)) && (toDate == null || !t.getTrainingDate().after(toDate)))
-                .filter(t -> traineeName == null || t.getTrainee().getUser().getUsername().equalsIgnoreCase(traineeName))
-                .map(t -> {
-                    TrainingDTO dto = new TrainingDTO();
-                    dto.setTrainingName(t.getTrainingName());
-                    dto.setDate(t.getTrainingDate());
-                    dto.setTrainingType(t.getTrainingType());
-                    dto.setDuration(t.getDuration());
-                    dto.setName(t.getTrainer().getUser().getUsername());
-                    return dto;
-                }).toList();
-    }
-
-    @Override
     public RegistrationDTO registerTrainer(String firstName, String lastName, Long trainingTypeId) {
         User user = User.builder()
                 .firstName(firstName)
@@ -133,7 +45,13 @@ public class TrainerServiceImpl implements TrainerService {
                 .isActive(true)
                 .build();
         userRepo.create(user);
-        createTrainerProfile(trainingTypeId, user.getId());
+        TrainingType type = trainingTypeRepo.select(trainingTypeId);
+        Trainer trainer = Trainer.builder()
+                .specialization(type)
+                .user(user)
+                .build();
+        trainerRepo.create(trainer);
+        validation.validateTrainer(trainer, user);
         return new RegistrationDTO(user.getUsername(), user.getPassword());
     }
 
@@ -188,5 +106,44 @@ public class TrainerServiceImpl implements TrainerService {
                 user.getIsActive(),
                 trainees
         );
+    }
+
+    @Override
+    public List<TrainingDTO> getTrainings(String username, Date fromDate, Date toDate, String traineeName) {
+        Trainer trainer = trainerRepo.select(username);
+        if (trainer == null || trainer.getTrainings() == null) {
+            log.info("No trainings found or trainer does not exist for username: {}", username);
+            return List.of();
+        }
+        return trainer.getTrainings().stream()
+                .filter(t -> (fromDate == null || !t.getTrainingDate().before(fromDate)) && (toDate == null || !t.getTrainingDate().after(toDate)))
+                .filter(t -> traineeName == null || t.getTrainee().getUser().getUsername().equalsIgnoreCase(traineeName))
+                .map(t -> {
+                    TrainingDTO dto = new TrainingDTO();
+                    dto.setTrainingName(t.getTrainingName());
+                    dto.setDate(t.getTrainingDate());
+                    dto.setTrainingType(t.getTrainingType());
+                    dto.setDuration(t.getDuration());
+                    dto.setName(t.getTrainer().getUser().getUsername());
+                    return dto;
+                }).toList();
+    }
+
+    @Override
+    public void activateTrainer(String username, Boolean isActive) {
+        toggleActivation(username, isActive);
+        log.info("Set activation to true for - {}", username);
+    }
+
+    @Override
+    public void deactivateTrainer(String username, Boolean isActive) {
+        toggleActivation(username, isActive);
+        log.info("Set activation to false for - {}", username);
+    }
+
+    private void toggleActivation(String username, boolean isActive) {
+        User user = userRepo.select(username);
+        user.setIsActive(isActive);
+        userRepo.update(user);
     }
 }

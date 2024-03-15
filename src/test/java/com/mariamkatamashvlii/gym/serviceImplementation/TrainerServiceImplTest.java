@@ -46,57 +46,6 @@ class TrainerServiceImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void testCreate() {
-        Trainer trainer = new Trainer();
-        User user = new User();
-        user.setId(1L);
-        trainer.setUser(user);
-        TrainingType trainingType = new TrainingType();
-        trainer.setSpecialization(trainingType);
-
-        when(userRepo.select(user.getId())).thenReturn(user);
-        when(trainerRepo.create(any(Trainer.class))).thenReturn(trainer);
-
-        Trainer createdTrainer = trainerService.create(trainer);
-
-        assertNotNull(createdTrainer);
-        verify(validation).validateTrainer(trainer, user);
-        verify(trainerRepo).create(trainer);
-    }
-
-    @Test
-    void testUpdate() {
-        Trainer trainer = new Trainer();
-        User user = new User();
-        user.setId(1L);
-        user.setUsername("trainerUser");
-        user.setPassword("password");
-        trainer.setUser(user);
-        TrainingType trainingType = new TrainingType();
-        trainer.setSpecialization(trainingType);
-
-        when(userRepo.select(user.getId())).thenReturn(user);
-        when(trainerRepo.update(any(Trainer.class))).thenReturn(trainer);
-
-        Trainer updatedTrainer = trainerService.update(trainer);
-
-        assertNotNull(updatedTrainer);
-        verify(trainerRepo).update(trainer);
-    }
-
-    @Test
-    void testSelect() {
-        String username = "testUser";
-        Trainer expectedTrainer = new Trainer();
-
-        when(trainerRepo.select(username)).thenReturn(expectedTrainer);
-
-        Trainer actualTrainer = trainerService.select(username);
-
-        assertEquals(expectedTrainer, actualTrainer);
-        verify(trainerRepo).select(username);
-    }
 
     @Test
     void testActivateTrainer() {
@@ -128,65 +77,9 @@ class TrainerServiceImplTest {
         verify(userRepo).update(user);
     }
 
-    @Test
-    void testChangePassword() {
-        String username = "trainer";
-        String currentPassword = "pass";
-        String newPassword = "newPass";
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(currentPassword);
 
-        Trainer trainer = new Trainer();
-        trainer.setUser(user);
 
-        when(userRepo.select(username)).thenReturn(user);
-        when(trainerRepo.select(username)).thenReturn(trainer);
 
-        boolean result = trainerService.changePassword(username, currentPassword, newPassword);
-
-        assertTrue(result, "Password should have been changed successfully.");
-        verify(userRepo).update(userCaptor.capture());
-
-        User updatedUser = userCaptor.getValue();
-        assertEquals(newPassword, updatedUser.getPassword(), "The new password should match the expected value.");
-    }
-
-    @Test
-    void testFindAll() {
-        List<Trainer> expectedTrainers = new ArrayList<>();
-
-        when(trainerRepo.findAll()).thenReturn(expectedTrainers);
-
-        List<Trainer> actualTrainers = trainerService.findAll();
-
-        assertEquals(expectedTrainers, actualTrainers);
-        verify(trainerRepo).findAll();
-    }
-
-    @Test
-    void testCreateTrainerProfile() {
-        long trainingTypeId = 1L;
-        long userId = 1L;
-        TrainingType trainingType = new TrainingType();
-        User user = new User();
-        Trainer expectedTrainer = new Trainer();
-        expectedTrainer.setSpecialization(trainingType);
-        expectedTrainer.setUser(user);
-
-        when(trainingTypeRepo.select(trainingTypeId)).thenReturn(trainingType);
-        when(userRepo.select(userId)).thenReturn(user);
-        when(trainerRepo.create(any(Trainer.class))).thenReturn(expectedTrainer);
-
-        Trainer createdTrainer = trainerService.createTrainerProfile(trainingTypeId, userId);
-
-        assertNotNull(createdTrainer, "The created trainer should not be null.");
-        assertEquals(user, createdTrainer.getUser(), "The user of the created trainer should match the expected user.");
-        assertEquals(trainingType, createdTrainer.getSpecialization(), "The specialization of the created trainer should match the expected training type.");
-        verify(trainingTypeRepo).select(trainingTypeId);
-        verify(userRepo).select(userId);
-        verify(trainerRepo).create(any(Trainer.class));
-    }
 
 //    @Test
 //    void testGetTrainingList() {

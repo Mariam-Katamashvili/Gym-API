@@ -41,14 +41,6 @@ public class TrainerRepositoryImpl implements TrainerRepository {
 
     @Override
     @Transactional
-    public Trainer select(long id) {
-        Session session = entityManager.unwrap(Session.class);
-        log.info("Selecting trainer with id {}", id);
-        return session.get(Trainer.class, id);
-    }
-
-    @Override
-    @Transactional
     public Trainer select(String username) {
         User user = userRepo.select(username);
         log.info("Selecting trainer - {}", username);

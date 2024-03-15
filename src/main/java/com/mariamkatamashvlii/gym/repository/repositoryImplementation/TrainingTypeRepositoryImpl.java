@@ -35,9 +35,9 @@ public class TrainingTypeRepositoryImpl implements TrainingTypeRepository {
         Query<TrainingType> query = session.createQuery("from TrainingType ", TrainingType.class);
         List<TrainingType> trainingTypes = query.getResultList();
         log.info("Returning all trainingTypes");
-
         return trainingTypes.stream()
                 .map(trainingType -> new TrainingTypeDTO(trainingType.getId(), trainingType.getTrainingTypeName()))
                 .toList();
+
     }
 }
