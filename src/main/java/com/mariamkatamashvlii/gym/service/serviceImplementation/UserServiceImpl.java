@@ -1,4 +1,4 @@
-package com.mariamkatamashvlii.gym.serviceImplementation;
+package com.mariamkatamashvlii.gym.service.serviceImplementation;
 
 import com.mariamkatamashvlii.gym.entity.User;
 import com.mariamkatamashvlii.gym.generator.PasswordGenerator;
@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
     public User create(User user) {
         user.setUsername(usernameGenerator.generateUsername(user.getFirstName(), user.getLastName()));
         user.setPassword(passwordGenerator.generatePassword());
-        user.setActive(true);
+        user.setIsActive(true);
         log.info("Created user - {}", user.getUsername());
         return userRepo.create(user);
     }
@@ -44,11 +44,6 @@ public class UserServiceImpl implements UserService {
         log.info("Deleted user - {}", user.getUsername());
     }
 
-    @Override
-    public User select(long id) {
-        log.info("Selecting user with id {}", id);
-        return userRepo.select(id);
-    }
 
     @Override
     public User select(String username) {

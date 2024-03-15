@@ -23,13 +23,13 @@ public interface TraineeService {
 
     boolean changePassword(String username, String currPassword, String newPassword);
 
-    void activateTrainee (String username, boolean isActive);
+    void activateTrainee (String username, Boolean isActive);
 
-    void deactivateTrainee (String username, boolean isActive);
+    void deactivateTrainee (String username, Boolean isActive);
 
     List<TrainerDTO> updateTrainers(String username, List<TrainerUsenameDTO> trainers);
 
-    Trainee createTraineeProfile(Date dob, String address, long userId);
+    Trainee createTraineeProfile(Date dob, String address, Long userId);
 
     List<TrainingDTO> getTrainings(String username, Date fromDate,
                                    Date toDate, String trainerName, TrainingType trainingType);
@@ -40,7 +40,7 @@ public interface TraineeService {
 
     TraineeProfileDTO traineeProfile(String username);
 
-    UpdateTraineeDTO updateProfile(String username, String firstName, String lastName, Date birthday, String address, boolean isActive);
+    UpdateTraineeDTO updateProfile(String username, String firstName, String lastName, Date birthday, String address, Boolean isActive);
 
     List<Trainee> findAll();
 }

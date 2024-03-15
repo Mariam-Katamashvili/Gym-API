@@ -33,25 +33,27 @@ import java.util.Set;
 public class Trainee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long traineeId;
+    private Long id;
 
     private Date birthday;
 
     private String address;
 
     @OneToOne
-    @JoinColumn(name = "userId", referencedColumnName = "userId", unique = true)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
     private User user;
 
     @OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<Training> trainings = new HashSet<>();
 
     @ManyToMany
     @JoinTable(
             name = "trainee_trainer",
-            joinColumns = @JoinColumn(name = "traineeId"),
-            inverseJoinColumns = @JoinColumn(name = "trainerId")
+            joinColumns = @JoinColumn(name = "trainee_id"),
+            inverseJoinColumns = @JoinColumn(name = "trainer_id")
     )
+    @Builder.Default
     private List<Trainer> trainers = new ArrayList<>();
 
 }

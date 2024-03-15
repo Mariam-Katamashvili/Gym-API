@@ -1,16 +1,13 @@
 package com.mariamkatamashvlii.gym.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Data
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class TrainingTypeDTO {
     private Long trainingTypeId;
     private String trainingTypeName;
-
-    public TrainingTypeDTO(Long trainingTypeId, String trainingTypeName) {
-        this.trainingTypeId = trainingTypeId;
-        this.trainingTypeName = trainingTypeName;
-    }
 }

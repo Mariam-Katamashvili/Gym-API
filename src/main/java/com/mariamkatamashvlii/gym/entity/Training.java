@@ -26,24 +26,24 @@ import java.sql.Date;
 public class Training {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long trainingId;
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "traineeId", referencedColumnName = "traineeId")
+    @JoinColumn(name = "trainee_id", referencedColumnName = "id")
     private Trainee trainee;
 
     @ManyToOne
-    @JoinColumn(name = "trainerId", referencedColumnName = "trainerId")
+    @JoinColumn(name = "trainer_id", referencedColumnName = "id")
     private Trainer trainer;
 
     @Column(nullable = false, unique = true)
     private String trainingName;
 
     @ManyToOne
-    @JoinColumn(name = "training_typeId", referencedColumnName = "training_typeId")
+    @JoinColumn(name = "training_type_id", referencedColumnName = "id")
     private TrainingType trainingType;
 
-    @Column( nullable = false)
+    @Column(nullable = false)
     private Date trainingDate;
 
     @Column(nullable = false)

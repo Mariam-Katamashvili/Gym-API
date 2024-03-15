@@ -1,4 +1,4 @@
-package com.mariamkatamashvlii.gym.serviceImplementation;
+package com.mariamkatamashvlii.gym.service.serviceImplementation;
 
 import com.mariamkatamashvlii.gym.auth.Validation;
 import com.mariamkatamashvlii.gym.dto.RegistrationDTO;
@@ -37,7 +37,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Trainer create(Trainer trainer) {
-        User user = userRepo.select(trainer.getUser().getUserId());
+        User user = userRepo.select(trainer.getUser().getId());
         validation.validateTrainer(trainer, user);
         log.info("Created trainer with username: {}", trainer.getUser().getUsername());
         return trainerRepo.create(trainer);
@@ -45,7 +45,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public Trainer update(Trainer trainer) {
-        User user = userRepo.select(trainer.getUser().getUserId());
+        User user = userRepo.select(trainer.getUser().getId());
         if (trainer.getSpecialization() != null && user != null) {
             log.info("Created trainer with username: {}", trainer.getUser().getUsername());
             return trainerRepo.update(trainer);
@@ -66,35 +66,20 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public boolean changePassword(String username, String currentPassword, String newPassword) {
-        Trainer trainer = trainerRepo.select(username);
-        if (trainer != null && trainer.getUser().getPassword().equals(currentPassword)) {
-            User user = trainer.getUser();
-            user.setPassword(newPassword);
-            userRepo.update(user);
-            log.info("Changed password for - {}", username);
-            return true;
-        } else {
-            log.info("Could not change password for - {}", username);
-            return false;
-        }
-    }
-
-    @Override
-    public void activateTrainer(String username, boolean isActive) {
+    public void activateTrainer(String username, Boolean isActive) {
         toggleActivation(username, isActive);
         log.info("Set activation to true for - {}", username);
     }
 
     @Override
-    public void deactivateTrainer(String username, boolean isActive) {
+    public void deactivateTrainer(String username, Boolean isActive) {
         toggleActivation(username, isActive);
         log.info("Set activation to false for - {}", username);
     }
 
     private void toggleActivation(String username, boolean isActive) {
         User user = userRepo.select(username);
-        user.setActive(isActive);
+        user.setIsActive(isActive);
         userRepo.update(user);
     }
 
@@ -105,7 +90,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public Trainer createTrainerProfile(long trainingTypeId, long userId) {
+    public Trainer createTrainerProfile(Long trainingTypeId, Long userId) {
         TrainingType type = trainingTypeRepo.select(trainingTypeId);
         User user = userRepo.select(userId);
         Trainer trainer = Trainer.builder()
@@ -148,7 +133,7 @@ public class TrainerServiceImpl implements TrainerService {
                 .isActive(true)
                 .build();
         userRepo.create(user);
-        createTrainerProfile(trainingTypeId, user.getUserId());
+        createTrainerProfile(trainingTypeId, user.getId());
         return new RegistrationDTO(user.getUsername(), user.getPassword());
     }
 
@@ -159,7 +144,7 @@ public class TrainerServiceImpl implements TrainerService {
             throw new EntityNotFoundException("Trainer not found with username - " + username);
         }
         TrainingTypeDTO specialization = new TrainingTypeDTO(
-                trainer.getSpecialization().getTrainingTypeId(),
+                trainer.getSpecialization().getId(),
                 trainer.getSpecialization().getTrainingTypeName()
         );
         List<TraineeDTO> trainees = trainer.getTrainees().stream().map(trainee -> new TraineeDTO(
@@ -171,20 +156,20 @@ public class TrainerServiceImpl implements TrainerService {
                 trainer.getUser().getFirstName(),
                 trainer.getUser().getLastName(),
                 specialization,
-                trainer.getUser().isActive(),
+                trainer.getUser().getIsActive(),
                 trainees
         );
     }
 
     @Override
-    public UpdateTrainerDTO updateProfile(String username, String firstName, String lastName, TrainingTypeDTO specialization, boolean isActive) {
+    public UpdateTrainerDTO updateProfile(String username, String firstName, String lastName, TrainingTypeDTO specialization, Boolean isActive) {
         User user = userRepo.select(username);
         if (user == null) {
             throw new EntityNotFoundException("User not found");
         }
         user.setFirstName(firstName);
         user.setLastName(lastName);
-        user.setActive(isActive);
+        user.setIsActive(isActive);
         userRepo.update(user);
         Trainer trainer = trainerRepo.select(username);
         if (trainer == null) {
@@ -200,12 +185,8 @@ public class TrainerServiceImpl implements TrainerService {
                 user.getFirstName(),
                 user.getLastName(),
                 specialization,
-                user.isActive(),
+                user.getIsActive(),
                 trainees
         );
-    }
-
-    public boolean isBetween(Date trainingdate, Date fromDate, Date toDate) {
-        return trainingdate.compareTo(fromDate) >= 0 && trainingdate.compareTo(toDate) <= 0;
     }
 }

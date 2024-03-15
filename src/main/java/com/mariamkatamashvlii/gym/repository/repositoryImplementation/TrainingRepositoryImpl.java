@@ -1,4 +1,4 @@
-package com.mariamkatamashvlii.gym.repositoryImplementation;
+package com.mariamkatamashvlii.gym.repository.repositoryImplementation;
 
 import com.mariamkatamashvlii.gym.entity.Training;
 import com.mariamkatamashvlii.gym.repository.TrainingRepository;
@@ -23,7 +23,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     public Training create(Training training) {
         Session session = entityManager.unwrap(Session.class);
         session.persist(training);
-        log.info("Created training with id {}", training.getTrainingId());
+        log.info("Created training with id {}", training.getId());
         return training;
     }
 
@@ -32,7 +32,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     public Training update(Training training) {
         Session session = entityManager.unwrap(Session.class);
         session.merge(training);
-        log.info("Updated training with id {}", training.getTrainingId());
+        log.info("Updated training with id {}", training.getId());
         return training;
     }
 
@@ -42,7 +42,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
         Session session = entityManager.unwrap(Session.class);
         Training training = session.get(Training.class, id);
         session.remove(training);
-        log.info("Deleted training with id {}", training.getTrainingId());
+        log.info("Deleted training with id {}", training.getId());
     }
 
     @Override

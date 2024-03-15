@@ -1,4 +1,4 @@
-package com.mariamkatamashvlii.gym.serviceImplementation;
+package com.mariamkatamashvlii.gym.service.serviceImplementation;
 
 import com.mariamkatamashvlii.gym.entity.Trainee;
 import com.mariamkatamashvlii.gym.entity.Trainer;
@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,26 +41,9 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Override
-    public Training update(Training training) {
-        log.info("Updated training - {}", training.getTrainingName());
-        return trainingRepo.update(training);
-    }
-
-    @Override
-    public void delete(long id) {
-        trainingRepo.delete(id);
-        log.info("Deleted training with id {}", id);
-    }
-
-    @Override
-    public Training select(long id) {
+    public Training select(Long id) {
         log.info("Selecting training with id {}", id);
         return trainingRepo.select(id);
     }
 
-    @Override
-    public List<Training> findAll() {
-        log.info("Returning all trainings");
-        return trainingRepo.findAll();
-    }
 }

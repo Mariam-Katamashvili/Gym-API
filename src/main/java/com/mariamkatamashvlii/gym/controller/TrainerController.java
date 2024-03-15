@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,9 +35,9 @@ public class TrainerController {
         return ResponseEntity.ok(registrationDTO);
     }
 
-    @GetMapping("/getProfile")
+    @GetMapping("/getProfile/{username:.+}")
     public ResponseEntity<TrainerProfileDTO> getTraineeProfile(
-            @RequestParam String username) {
+            @PathVariable String username) {
         TrainerProfileDTO profile = trainerService.trainerProfile(username);
         return ResponseEntity.ok(profile);
     }
@@ -47,13 +48,13 @@ public class TrainerController {
             @RequestParam String firstname,
             @RequestParam String lastname,
             @RequestParam TrainingTypeDTO specialization,
-            @RequestParam boolean isActive) {
+            @RequestParam Boolean isActive) {
         UpdateTrainerDTO updateTrainerDTO = trainerService.updateProfile(username, firstname, lastname, specialization, isActive);
         return ResponseEntity.ok(updateTrainerDTO);
     }
 
     @GetMapping("/trainerTrainings")
-    private ResponseEntity<List<TrainingDTO>> trainerTrainings (
+    public ResponseEntity<List<TrainingDTO>> trainerTrainings (
             @RequestParam String username,
             @RequestParam(required = false) Date from,
             @RequestParam(required = false) Date to,
@@ -65,7 +66,7 @@ public class TrainerController {
     @PatchMapping("/activation")
     public ResponseEntity<Void> activateTrainee(
             @RequestParam String username,
-            @RequestParam boolean isActive) {
+            @RequestParam Boolean isActive) {
         trainerService.activateTrainer(username, isActive);
         return ResponseEntity.ok().build();
     }
@@ -73,7 +74,7 @@ public class TrainerController {
     @PatchMapping("/deactivation")
     public ResponseEntity<Void> deactivateTrainee(
             @RequestParam String username,
-            @RequestParam boolean isActive) {
+            @RequestParam Boolean isActive) {
         trainerService.deactivateTrainer(username, isActive);
         return ResponseEntity.ok().build();
     }

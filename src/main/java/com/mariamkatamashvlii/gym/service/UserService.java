@@ -11,11 +11,10 @@ public interface UserService {
 
     void delete(User user);
 
-    User select(long id);
-
     User select(String username);
 
     boolean login(String username, String password);
+
     void passChange(String username, String currPassword, String newPassword);
 
     List<User> findAll();

@@ -17,19 +17,17 @@ public interface TrainerService {
 
     Trainer select(String username);
 
-    boolean changePassword(String username, String currPassword, String newPassword);
+    void activateTrainer (String username, Boolean isActive);
 
-    void activateTrainer (String username, boolean isActive);
+    void deactivateTrainer (String username, Boolean isActive);
 
-    void deactivateTrainer (String username, boolean isActive);
-
-    Trainer createTrainerProfile(long trainingTypeId, long userId);
+    Trainer createTrainerProfile(Long trainingTypeId, Long userId);
 
     List<TrainingDTO> getTrainings(String username, Date fromDate,
                                    Date toDate, String traineeName);
 
     RegistrationDTO registerTrainer(String firstName, String lastName, Long trainingTypeId);
     TrainerProfileDTO trainerProfile(String username);
-    UpdateTrainerDTO updateProfile(String username, String firstName, String lastName, TrainingTypeDTO specialization, boolean isActive);
+    UpdateTrainerDTO updateProfile(String username, String firstName, String lastName, TrainingTypeDTO specialization, Boolean isActive);
     List<Trainer> findAll();
 }

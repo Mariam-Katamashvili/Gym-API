@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +20,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+@Table(name = "training_type")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -26,16 +28,17 @@ import java.util.Set;
 public class TrainingType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "training_typeId")
-    private Long trainingTypeId;
+    private Long id;
 
     @Column(nullable = false, unique = true)
     private String trainingTypeName;
 
     @OneToMany(mappedBy = "trainingType")
+    @Builder.Default
     private Set<Training> trainings = new HashSet<>();
 
     @OneToMany(mappedBy = "specialization")
+    @Builder.Default
     private Set<Trainer> trainers = new HashSet<>();
 
 }

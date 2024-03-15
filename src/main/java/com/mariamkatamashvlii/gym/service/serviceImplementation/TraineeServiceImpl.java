@@ -1,4 +1,4 @@
-package com.mariamkatamashvlii.gym.serviceImplementation;
+package com.mariamkatamashvlii.gym.service.serviceImplementation;
 
 import com.mariamkatamashvlii.gym.auth.Validation;
 import com.mariamkatamashvlii.gym.dto.RegistrationDTO;
@@ -30,7 +30,6 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -46,7 +45,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Trainee create(Trainee trainee) {
-        User user = userRepo.select(trainee.getUser().getUserId());
+        User user = userRepo.select(trainee.getUser().getId());
         validation.validateTrainee(trainee, user);
         log.info("Created trainee - {}", trainee.getUser().getUsername());
         return traineeRepo.create(trainee);
@@ -54,7 +53,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public Trainee update(Trainee trainee) {
-        User user = userRepo.select(trainee.getUser().getUserId());
+        User user = userRepo.select(trainee.getUser().getId());
         if (user != null && trainee.getBirthday() != null && trainee.getAddress() != null) {
             log.info("Updated trainee - {}", trainee.getUser().getUsername());
             return traineeRepo.update(trainee);
@@ -72,7 +71,7 @@ public class TraineeServiceImpl implements TraineeService {
         }
         Set<Training> trainings = trainee.getTrainings();
         for (Training t : trainings) {
-            trainingRepository.delete(t.getTrainingId());
+            trainingRepository.delete(t.getId());
         }
         traineeRepo.delete(username);
         log.info("Deleted trainee with username {}", username);
@@ -106,20 +105,20 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public void activateTrainee(String username, boolean isActive) {
+    public void activateTrainee(String username, Boolean isActive) {
         toggleActivation(username, true);
         log.info("Set activation to true for - {}", username);
     }
 
     @Override
-    public void deactivateTrainee(String username, boolean isActive) {
+    public void deactivateTrainee(String username, Boolean isActive) {
         toggleActivation(username, false);
         log.info("Set activation to false for - {}", username);
     }
 
-    private void toggleActivation(String username, boolean isActive) {
+    private void toggleActivation(String username, Boolean isActive) {
         User user = userRepo.select(username);
-        user.setActive(isActive);
+        user.setIsActive(isActive);
         userRepo.update(user);
     }
 
@@ -141,7 +140,7 @@ public class TraineeServiceImpl implements TraineeService {
                 dto.setFirstName(trainer.getUser().getFirstName());
                 dto.setLastName(trainer.getUser().getLastName());
                 TrainingTypeDTO specializationDTO = new TrainingTypeDTO(
-                        trainer.getSpecialization().getTrainingTypeId(),
+                        trainer.getSpecialization().getId(),
                         trainer.getSpecialization().getTrainingTypeName()
                 );
                 dto.setSpecialization(specializationDTO);
@@ -160,7 +159,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public Trainee createTraineeProfile(Date birthday, String address, long userId) {
+    public Trainee createTraineeProfile(Date birthday, String address, Long userId) {
         User user = userRepo.select(userId);
         Trainee trainee = Trainee.builder()
                 .birthday(birthday)
@@ -191,8 +190,7 @@ public class TraineeServiceImpl implements TraineeService {
                     dto.setDuration(t.getDuration());
                     dto.setName(t.getTrainer().getUser().getUsername());
                     return dto;
-                })
-                .collect(Collectors.toList());
+                }).toList();
     }
 
     @Override
@@ -209,7 +207,7 @@ public class TraineeServiceImpl implements TraineeService {
                     dto.setFirstName(t.getUser().getFirstName());
                     dto.setLastName(t.getUser().getLastName());
                     TrainingTypeDTO specializationDTO = new TrainingTypeDTO(
-                            t.getSpecialization().getTrainingTypeId(),
+                            t.getSpecialization().getId(),
                             t.getSpecialization().getTrainingTypeName()
                     );
                     dto.setSpecialization(specializationDTO);
@@ -232,7 +230,7 @@ public class TraineeServiceImpl implements TraineeService {
                 .isActive(true)
                 .build();
         userRepo.create(user);
-        createTraineeProfile(birthday, address, user.getUserId());
+        createTraineeProfile(birthday, address, user.getId());
         return new RegistrationDTO(user.getUsername(), user.getPassword());
     }
 
@@ -246,7 +244,7 @@ public class TraineeServiceImpl implements TraineeService {
             dto.setFirstName(trainer.getUser().getFirstName());
             dto.setLastName(trainer.getUser().getLastName());
             TrainingTypeDTO specializationDTO = new TrainingTypeDTO(
-                    trainer.getSpecialization().getTrainingTypeId(),
+                    trainer.getSpecialization().getId(),
                     trainer.getSpecialization().getTrainingTypeName()
             );
             dto.setSpecialization(specializationDTO);
@@ -257,21 +255,21 @@ public class TraineeServiceImpl implements TraineeService {
                 user.getLastName(),
                 trainee.getBirthday(),
                 trainee.getAddress(),
-                user.isActive(),
+                user.getIsActive(),
                 trainers
         );
     }
 
     @Override
     @Transactional
-    public UpdateTraineeDTO updateProfile(String username, String firstName, String lastName, Date birthday, String address, boolean isActive) {
+    public UpdateTraineeDTO updateProfile(String username, String firstName, String lastName, Date birthday, String address, Boolean isActive) {
         User user = userRepo.select(username);
         if (user == null) {
             throw new EntityNotFoundException("User not found");
         }
         user.setFirstName(firstName);
         user.setLastName(lastName);
-        user.setActive(isActive);
+        user.setIsActive(isActive);
         userRepo.update(user);
         Trainee trainee = traineeRepo.select(username);
         if (trainee == null) {
@@ -286,25 +284,21 @@ public class TraineeServiceImpl implements TraineeService {
             dto.setFirstName(trainer.getUser().getFirstName());
             dto.setLastName(trainer.getUser().getLastName());
             TrainingTypeDTO specializationDTO = new TrainingTypeDTO(
-                    trainer.getSpecialization().getTrainingTypeId(),
+                    trainer.getSpecialization().getId(),
                     trainer.getSpecialization().getTrainingTypeName()
             );
             dto.setSpecialization(specializationDTO);
             return dto;
-        }).collect(Collectors.toList());
+        }).toList();
         return new UpdateTraineeDTO(
                 user.getUsername(),
                 user.getFirstName(),
                 user.getLastName(),
                 trainee.getBirthday(),
                 trainee.getAddress(),
-                user.isActive(),
+                user.getIsActive(),
                 trainers
         );
-    }
-
-    public boolean isBetween(Date trainingdate, Date fromDate, Date toDate) {
-        return trainingdate.compareTo(fromDate) >= 0 && trainingdate.compareTo(toDate) <= 0;
     }
 
 }

@@ -25,7 +25,7 @@ import lombok.ToString;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long id;
 
     @Column(nullable = false)
     private String firstName;
@@ -40,7 +40,7 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    private boolean isActive;
+    private Boolean isActive;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore

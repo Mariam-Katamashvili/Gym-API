@@ -2,6 +2,7 @@ package com.mariamkatamashvlii.gym.serviceImplementation;
 
 import com.mariamkatamashvlii.gym.entity.Training;
 import com.mariamkatamashvlii.gym.repository.TrainingRepository;
+import com.mariamkatamashvlii.gym.service.serviceImplementation.TrainingServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -31,10 +32,10 @@ class TrainingServiceImplTest {
 //    @Test
 //    void create() {
 //        Training training = new Training();
-//        training.setTrainingId(1L);
+//        training.setId(1L);
 //        when(trainingRepo.create(training)).thenReturn(training);
 //
-//        Training createdTraining = trainingService.create(training);
+//        Training createdTraining = trainingService.create();
 //
 //        assertNotNull(createdTraining, "The created training should not be null.");
 //        verify(trainingRepo).create(training);
@@ -43,7 +44,7 @@ class TrainingServiceImplTest {
     @Test
     void update() {
         Training training = new Training();
-        training.setTrainingId(1L);
+        training.setId(1L);
         when(trainingRepo.update(training)).thenReturn(training);
 
         Training updatedTraining = trainingService.update(training);

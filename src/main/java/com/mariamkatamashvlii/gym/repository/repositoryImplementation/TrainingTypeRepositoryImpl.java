@@ -1,4 +1,4 @@
-package com.mariamkatamashvlii.gym.repositoryImplementation;
+package com.mariamkatamashvlii.gym.repository.repositoryImplementation;
 
 import com.mariamkatamashvlii.gym.dto.TrainingTypeDTO;
 import com.mariamkatamashvlii.gym.entity.TrainingType;
@@ -37,7 +37,7 @@ public class TrainingTypeRepositoryImpl implements TrainingTypeRepository {
         log.info("Returning all trainingTypes");
 
         return trainingTypes.stream()
-                .map(trainingType -> new TrainingTypeDTO(trainingType.getTrainingTypeId(), trainingType.getTrainingTypeName()))
+                .map(trainingType -> new TrainingTypeDTO(trainingType.getId(), trainingType.getTrainingTypeName()))
                 .toList();
     }
 }

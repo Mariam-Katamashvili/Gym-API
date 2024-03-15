@@ -1,7 +1,6 @@
-package com.mariamkatamashvlii.gym.serviceImplementation;
+package com.mariamkatamashvlii.gym.service.serviceImplementation;
 
 import com.mariamkatamashvlii.gym.dto.TrainingTypeDTO;
-import com.mariamkatamashvlii.gym.entity.TrainingType;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import com.mariamkatamashvlii.gym.service.TrainingTypeService;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +14,6 @@ import java.util.List;
 @Service
 public class TrainingTypeServiceImpl implements TrainingTypeService {
     private final TrainingTypeRepository trainingTypeRepo;
-
-    @Override
-    public TrainingType select(long id) {
-        log.info("Selecting TrainingType with id {}", id);
-        return trainingTypeRepo.select(id);
-    }
 
     @Override
     public List<TrainingTypeDTO> findAll() {

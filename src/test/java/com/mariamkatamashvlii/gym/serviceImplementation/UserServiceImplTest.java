@@ -4,6 +4,7 @@ import com.mariamkatamashvlii.gym.entity.User;
 import com.mariamkatamashvlii.gym.generator.PasswordGenerator;
 import com.mariamkatamashvlii.gym.generator.UsernameGenerator;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
+import com.mariamkatamashvlii.gym.service.serviceImplementation.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -58,7 +59,7 @@ class UserServiceImplTest {
     @Test
     void testUpdate() {
         User user = new User();
-        user.setUserId(1L);
+        user.setId(1L);
         user.setUsername("johndoe");
         user.setPassword("password");
 
@@ -75,7 +76,7 @@ class UserServiceImplTest {
     @Test
     void testDelete() {
         User user = new User();
-        user.setUserId(1L);
+        user.setId(1L);
         user.setUsername("johndoe");
 
         doNothing().when(userRepo).delete(any(User.class));
@@ -83,20 +84,6 @@ class UserServiceImplTest {
         userService.delete(user);
 
         verify(userRepo).delete(user);
-    }
-
-    @Test
-    void testSelectById() {
-        long id = 1L;
-        User expectedUser = new User();
-        expectedUser.setUserId(id);
-
-        when(userRepo.select(id)).thenReturn(expectedUser);
-
-        User actualUser = userService.select(id);
-
-        assertEquals(expectedUser, actualUser);
-        verify(userRepo).select(id);
     }
 
     @Test

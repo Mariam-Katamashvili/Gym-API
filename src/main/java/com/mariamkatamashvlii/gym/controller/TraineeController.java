@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,35 +39,37 @@ public class TraineeController {
         return ResponseEntity.ok(registrationDTO);
     }
 
-    @GetMapping("/getProfile")
+    @GetMapping("/getProfile/{username:.+}")
+
     public ResponseEntity<TraineeProfileDTO> getTraineeProfile(
-            @RequestParam String username) {
+            @PathVariable String username) {
         TraineeProfileDTO profile = traineeService.traineeProfile(username);
         return ResponseEntity.ok(profile);
     }
 
     @PutMapping("/updateProfile")
+
     public ResponseEntity<UpdateTraineeDTO> updateTrainee(
             @RequestParam String username,
             @RequestParam String firstname,
             @RequestParam String lastname,
             @RequestParam(required = false) Date birthday,
             @RequestParam(required = false) String address,
-            @RequestParam boolean isActive) {
+            @RequestParam Boolean isActive) {
         UpdateTraineeDTO updateTraineeDTO = traineeService.updateProfile(username, firstname, lastname, birthday, address, isActive);
         return ResponseEntity.ok(updateTraineeDTO);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/{username:.+}")
     public ResponseEntity<Void> deleteTrainee(
-            @RequestParam String username) {
+            @PathVariable String username) {
         traineeService.delete(username);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/notAssigned")
+    @GetMapping("/notAssigned/{username:.+}")
     public ResponseEntity<List<TrainerDTO>> getNotAssigned(
-            @RequestParam String username) {
+            @PathVariable String username) {
         List<TrainerDTO> trainerDTO = traineeService.getNotAssignedTrainers(username);
         return ResponseEntity.ok(trainerDTO);
     }
@@ -90,10 +93,11 @@ public class TraineeController {
         return ResponseEntity.ok(trainerDTO);
     }
 
+
     @PatchMapping("/activation")
     public ResponseEntity<Void> activateTrainee(
             @RequestParam String username,
-            @RequestParam boolean isActive) {
+            @RequestParam Boolean isActive) {
         traineeService.activateTrainee(username, isActive);
         return ResponseEntity.ok().build();
     }
@@ -101,7 +105,7 @@ public class TraineeController {
     @PatchMapping("/deactivation")
     public ResponseEntity<Void> deactivateTrainee(
             @RequestParam String username,
-            @RequestParam boolean isActive) {
+            @RequestParam Boolean isActive) {
         traineeService.deactivateTrainee(username, isActive);
         return ResponseEntity.ok().build();
     }

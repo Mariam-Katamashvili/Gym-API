@@ -1,4 +1,4 @@
-package com.mariamkatamashvlii.gym.repositoryImplementation;
+package com.mariamkatamashvlii.gym.repository.repositoryImplementation;
 
 import com.mariamkatamashvlii.gym.entity.User;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
