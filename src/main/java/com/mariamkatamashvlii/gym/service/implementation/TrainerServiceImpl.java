@@ -1,6 +1,6 @@
-package com.mariamkatamashvlii.gym.service.serviceImplementation;
+package com.mariamkatamashvlii.gym.service.implementation;
 
-import com.mariamkatamashvlii.gym.auth.Validation;
+import com.mariamkatamashvlii.gym.auth.Validator;
 import com.mariamkatamashvlii.gym.dto.RegistrationDTO;
 import com.mariamkatamashvlii.gym.dto.TraineeDTO;
 import com.mariamkatamashvlii.gym.dto.TrainerProfileDTO;
@@ -31,7 +31,7 @@ public class TrainerServiceImpl implements TrainerService {
     private final TrainerRepository trainerRepo;
     private final UserRepository userRepo;
     private final TrainingTypeRepository trainingTypeRepo;
-    private final Validation validation;
+    private final Validator validation;
     private final UsernameGenerator usernameGenerator;
     private final PasswordGenerator passwordGenerator;
 

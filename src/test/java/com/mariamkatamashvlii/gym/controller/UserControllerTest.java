@@ -1,6 +1,5 @@
 package com.mariamkatamashvlii.gym.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mariamkatamashvlii.gym.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ class UserControllerTest {
     @MockBean
     private UserService userService;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void testLoginSuccess() throws Exception {

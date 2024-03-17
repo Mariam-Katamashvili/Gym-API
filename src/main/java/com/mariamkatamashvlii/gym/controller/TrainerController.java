@@ -22,7 +22,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/trainers")
+@RequestMapping("/trainerProfile")
 public class TrainerController {
     private final TrainerService trainerService;
 
@@ -35,7 +35,7 @@ public class TrainerController {
         return ResponseEntity.ok(registrationDTO);
     }
 
-    @GetMapping("/getProfile/{username:.+}")
+    @GetMapping("/getProfile/{username}")
     public ResponseEntity<TrainerProfileDTO> getTraineeProfile(
             @PathVariable String username) {
         TrainerProfileDTO profile = trainerService.trainerProfile(username);

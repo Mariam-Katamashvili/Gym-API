@@ -6,7 +6,7 @@ import com.mariamkatamashvlii.gym.entity.User;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Validation {
+public class Validator {
     public void validateTrainee(Trainee trainee, User user) {
         if (trainee.getUser() == null || trainee.getUser().getId() == null) {
             throw new IllegalArgumentException("Trainee must be associated with a valid user.");

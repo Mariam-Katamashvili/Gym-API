@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,6 +31,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @ToString
+@Generated
 public class Trainee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

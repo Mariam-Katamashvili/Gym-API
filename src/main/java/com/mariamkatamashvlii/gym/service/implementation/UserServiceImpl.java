@@ -1,4 +1,4 @@
-package com.mariamkatamashvlii.gym.service.serviceImplementation;
+package com.mariamkatamashvlii.gym.service.implementation;
 
 import com.mariamkatamashvlii.gym.entity.User;
 import com.mariamkatamashvlii.gym.generator.PasswordGenerator;

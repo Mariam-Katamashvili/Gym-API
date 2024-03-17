@@ -1,6 +1,5 @@
-package com.mariamkatamashvlii.gym.service.serviceImplementation;
+package com.mariamkatamashvlii.gym.service.implementation;
 
-import com.mariamkatamashvlii.gym.auth.Validation;
 import com.mariamkatamashvlii.gym.dto.RegistrationDTO;
 import com.mariamkatamashvlii.gym.dto.TraineeProfileDTO;
 import com.mariamkatamashvlii.gym.dto.TrainerDTO;
@@ -13,6 +12,7 @@ import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.Training;
 import com.mariamkatamashvlii.gym.entity.TrainingType;
 import com.mariamkatamashvlii.gym.entity.User;
+import com.mariamkatamashvlii.gym.exception.UserNotCreatedException;
 import com.mariamkatamashvlii.gym.generator.PasswordGenerator;
 import com.mariamkatamashvlii.gym.generator.UsernameGenerator;
 import com.mariamkatamashvlii.gym.repository.TraineeRepository;
@@ -39,37 +39,41 @@ public class TraineeServiceImpl implements TraineeService {
     private final UserRepository userRepo;
     private final TrainerRepository trainerRepo;
     private final TrainingRepository trainingRepository;
-    private final Validation validation;
     private final UsernameGenerator usernameGenerator;
     private final PasswordGenerator passwordGenerator;
 
     @Override
     @Transactional
-    public RegistrationDTO registerTrainee(String firstName, String lastName, Date birthday, String address) {
-        User user = User.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .username(usernameGenerator.generateUsername(firstName, lastName))
-                .password(passwordGenerator.generatePassword())
-                .isActive(true)
-                .build();
-        userRepo.create(user);
+    public RegistrationDTO registerTrainee(TraineeProfileDTO traineeProfileDTO) {
+        try {
+            String firstName = traineeProfileDTO.getFirstName();
+            String lastName = traineeProfileDTO.getLastName();
+            User user = User.builder()
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .username(usernameGenerator.generateUsername(firstName, lastName))
+                    .password(passwordGenerator.generatePassword())
+                    .isActive(true)
+                    .build();
+            userRepo.create(user);
 
-        Trainee trainee = Trainee.builder()
-                .birthday(birthday)
-                .address(address)
-                .user(user)
-                .build();
-        traineeRepo.create(trainee);
-        validation.validateTrainee(trainee, user);
-        log.info("Registered new trainee with username: {}", user.getUsername());
-        return new RegistrationDTO(user.getUsername(), user.getPassword());
+            Trainee trainee = Trainee.builder()
+                    .birthday(traineeProfileDTO.getBirthday())
+                    .address(traineeProfileDTO.getAddress())
+                    .user(user)
+                    .build();
+            traineeRepo.save(trainee);
+            log.info("Registered new trainee with username: {}", user.getUsername());
+            return new RegistrationDTO(user.getUsername(), user.getPassword());
+        } catch (Exception e) {
+            throw new UserNotCreatedException("Could not create trainee");
+        }
     }
 
     @Override
     public TraineeProfileDTO getTraineeProfile(String username) {
         User user = userRepo.select(username);
-        Trainee trainee = traineeRepo.select(username);
+        Trainee trainee = traineeRepo.findByUsername(username);
         List<TrainerDTO> trainers = trainee.getTrainers().stream().map(trainer -> {
             TrainerDTO dto = new TrainerDTO();
             dto.setUsername(trainer.getUser().getUsername());
@@ -103,13 +107,13 @@ public class TraineeServiceImpl implements TraineeService {
         user.setLastName(lastName);
         user.setIsActive(isActive);
         userRepo.update(user);
-        Trainee trainee = traineeRepo.select(username);
+        Trainee trainee = traineeRepo.findByUsername(username);
         if (trainee == null) {
             throw new EntityNotFoundException("Trainee not found");
         }
         trainee.setBirthday(birthday);
         trainee.setAddress(address);
-        traineeRepo.update(trainee);
+        traineeRepo.save(trainee);
         List<TrainerDTO> trainers = trainee.getTrainers().stream().map(trainer -> {
             TrainerDTO dto = new TrainerDTO();
             dto.setUsername(trainer.getUser().getUsername());
@@ -136,7 +140,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @Transactional
     public void delete(String username) {
-        Trainee trainee = traineeRepo.select(username);
+        Trainee trainee = traineeRepo.findByUsername(username);
         if (trainee == null) {
             log.info("Trainee does not exist for username: {}", username);
             return;
@@ -145,14 +149,14 @@ public class TraineeServiceImpl implements TraineeService {
         for (Training t : trainings) {
             trainingRepository.delete(t.getId());
         }
-        traineeRepo.delete(username);
+        traineeRepo.delete(trainee);
         log.info("Deleted trainee with username {}", username);
     }
 
     @Override
     public List<TrainerDTO> getNotAssignedTrainers(String username) {
         List<TrainerDTO> notAssignedTrainers = new ArrayList<>();
-        Trainee trainee = traineeRepo.select(username);
+        Trainee trainee = traineeRepo.findByUsername(username);
         if (trainee != null) {
             List<Trainer> traineeTrainers = trainee.getTrainers();
             List<Trainer> allTrainers = trainerRepo.findAll();
@@ -177,7 +181,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public List<TrainingDTO> getTrainings(String username, Date fromDate, Date toDate, String trainerName, TrainingType trainingType) {
-        Trainee trainee = traineeRepo.select(username);
+        Trainee trainee = traineeRepo.findByUsername(username);
         if (trainee == null || trainee.getTrainings() == null) {
             log.info("No trainings found or trainee does not exist for username: {}", username);
             return List.of();
@@ -200,7 +204,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public List<TrainerDTO> updateTrainers(String username, List<TrainerUsenameDTO> trainers) {
-        Trainee trainee = traineeRepo.select(username);
+        Trainee trainee = traineeRepo.findByUsername(username);
         List<TrainerDTO> newTrainers = new ArrayList<>();
         if (trainee != null) {
             List<Trainer> updatedTrainers = trainers.stream()
@@ -208,7 +212,7 @@ public class TraineeServiceImpl implements TraineeService {
                     .map(trainerRepo::select)
                     .toList();
             trainee.setTrainers(updatedTrainers);
-            traineeRepo.update(trainee);
+            traineeRepo.save(trainee);
             log.info("Updated trainer list for trainee - {}", username);
             updatedTrainers.forEach(trainer -> {
                 TrainerDTO dto = new TrainerDTO();

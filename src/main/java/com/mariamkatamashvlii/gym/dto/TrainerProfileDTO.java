@@ -3,6 +3,7 @@ package com.mariamkatamashvlii.gym.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Generated
 public class TrainerProfileDTO {
     private String firstName;
     private String lastName;

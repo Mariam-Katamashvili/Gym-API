@@ -1,9 +1,11 @@
 package com.mariamkatamashvlii.gym.repository;
 
 import com.mariamkatamashvlii.gym.entity.User;
+import lombok.Generated;
 
 import java.util.List;
 
+@Generated
 public interface UserRepository {
     User create(User user);
 

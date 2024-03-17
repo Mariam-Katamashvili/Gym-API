@@ -1,4 +1,4 @@
-package com.mariamkatamashvlii.gym.service.serviceImplementation;
+package com.mariamkatamashvlii.gym.service.implementation;
 
 import com.mariamkatamashvlii.gym.dto.TrainingTypeDTO;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;

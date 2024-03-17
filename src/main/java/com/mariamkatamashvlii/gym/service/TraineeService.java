@@ -12,8 +12,7 @@ import java.sql.Date;
 import java.util.List;
 
 public interface TraineeService {
-    RegistrationDTO registerTrainee(String firstName, String lastName, Date birthday, String address);
-
+    RegistrationDTO registerTrainee(TraineeProfileDTO traineeProfileDTO);
     TraineeProfileDTO getTraineeProfile(String username);
 
     UpdateTraineeDTO updateProfile(String username, String firstName, String lastName, Date birthday, String address, Boolean isActive);

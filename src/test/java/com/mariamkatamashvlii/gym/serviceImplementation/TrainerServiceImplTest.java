@@ -1,29 +1,20 @@
 package com.mariamkatamashvlii.gym.serviceImplementation;
 
-import com.mariamkatamashvlii.gym.auth.Validation;
+import com.mariamkatamashvlii.gym.auth.Validator;
 import com.mariamkatamashvlii.gym.dto.TrainingDTO;
-import com.mariamkatamashvlii.gym.entity.Trainer;
-import com.mariamkatamashvlii.gym.entity.TrainingType;
 import com.mariamkatamashvlii.gym.entity.User;
 import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
-import com.mariamkatamashvlii.gym.service.serviceImplementation.TrainerServiceImpl;
+import com.mariamkatamashvlii.gym.service.implementation.TrainerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,7 +26,7 @@ class TrainerServiceImplTest {
     @Mock
     private TrainingTypeRepository trainingTypeRepo;
     @Mock
-    private Validation validation;
+    private Validator validation;
     @Mock
     private TrainingDTO trainingDTO;
     @InjectMocks
@@ -77,35 +68,4 @@ class TrainerServiceImplTest {
         verify(userRepo).update(user);
     }
 
-
-
-
-
-//    @Test
-//    void testGetTrainingList() {
-//        String username = "trainerUsername";
-//        Date fromDate = Date.valueOf("2023-01-01");
-//        Date toDate = Date.valueOf("2023-01-31");
-//        String traineeName = "TraineeName";
-//        Trainer trainer = new Trainer();
-//        Training training = new Training();
-//        Trainee trainee = new Trainee();
-//        User traineeUser = new User();
-//        traineeUser.setFirstName(traineeName);
-//        trainee.setUser(traineeUser);
-//        training.setTrainee(trainee);
-//        training.setTrainingDate(Date.valueOf("2023-01-15"));
-//        trainer.setTrainings(new HashSet<>(List.of(training)));
-//
-//        when(trainerRepo.select(username)).thenReturn(trainer);
-//
-//        List<TrainingDTO> result = trainerService.getTrainings(username, fromDate, toDate, traineeName);
-//
-//        assertNotNull(result);
-//        assertFalse(result.isEmpty());
-//        assertEquals(1, result.size());
-//        verify(trainerRepo).select(username);
-//    }
-
-    private final ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
 }

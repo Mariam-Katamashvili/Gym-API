@@ -12,14 +12,14 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ValidationTest {
-    private Validation validation;
+    private Validator validation;
     private User validUser;
     private Trainee validTrainee;
     private Trainer validTrainer;
 
     @BeforeEach
     void setUp() {
-        validation = new Validation();
+        validation = new Validator();
         validUser = new User();
         validUser.setId(1L);
 
@@ -42,18 +42,6 @@ class ValidationTest {
         validTrainee.setUser(null);
         assertThrows(IllegalArgumentException.class, () -> validation.validateTrainee(validTrainee, null));
     }
-
-//    @Test
-//    void validateTrainee_NullBirthday() {
-//        validTrainee.setBirthday(null);
-//        assertThrows(IllegalArgumentException.class, () -> validation.validateTrainee(validTrainee, validUser));
-//    }
-//
-//    @Test
-//    void validateTrainee_NullAddress() {
-//        validTrainee.setAddress(null);
-//        assertThrows(IllegalArgumentException.class, () -> validation.validateTrainee(validTrainee, validUser));
-//    }
 
     @Test
     void validateTrainer_NullUser() {

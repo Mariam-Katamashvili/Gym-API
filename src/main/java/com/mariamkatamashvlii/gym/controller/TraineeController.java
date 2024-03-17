@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,28 +26,25 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/trainees")
+@RequestMapping("/traineeProfile")
 public class TraineeController {
     private final TraineeService traineeService;
 
     @PostMapping("/registration")
-    public ResponseEntity<RegistrationDTO> traineeRegistration(
-            @RequestParam String firstname,
-            @RequestParam String lastname,
-            @RequestParam(required = false) Date birthday,
-            @RequestParam(required = false) String address) {
-        RegistrationDTO registrationDTO = traineeService.registerTrainee(firstname, lastname, birthday, address);
+    public ResponseEntity<RegistrationDTO> registration(
+            @RequestBody TraineeProfileDTO traineeProfileDTO) {
+        RegistrationDTO registrationDTO = traineeService.registerTrainee(traineeProfileDTO);
         return ResponseEntity.ok(registrationDTO);
     }
 
-    @GetMapping("/getProfile/{username:.+}")
+    @GetMapping("/{username}")
     public ResponseEntity<TraineeProfileDTO> getTraineeProfile(
             @PathVariable String username) {
         TraineeProfileDTO profile = traineeService.getTraineeProfile(username);
         return ResponseEntity.ok(profile);
     }
 
-    @PutMapping("/updateProfile")
+    @PutMapping("/update")
     public ResponseEntity<UpdateTraineeDTO> updateTrainee(
             @RequestParam String username,
             @RequestParam String firstname,
@@ -58,21 +56,21 @@ public class TraineeController {
         return ResponseEntity.ok(updateTraineeDTO);
     }
 
-    @DeleteMapping("/delete/{username:.+}")
+    @DeleteMapping("/{username}/delete")
     public ResponseEntity<Void> deleteTrainee(
             @PathVariable String username) {
         traineeService.delete(username);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/notAssigned/{username:.+}")
+    @GetMapping("/{username}/unassigned")
     public ResponseEntity<List<TrainerDTO>> getNotAssigned(
             @PathVariable String username) {
         List<TrainerDTO> trainerDTO = traineeService.getNotAssignedTrainers(username);
         return ResponseEntity.ok(trainerDTO);
     }
 
-    @GetMapping("/traineeTrainings")
+    @GetMapping("/Trainings")
     public ResponseEntity<List<TrainingDTO>> traineeTrainings(
             @RequestParam String username,
             @RequestParam(required = false) Date from,

@@ -16,7 +16,7 @@ import java.sql.Date;
 public class TrainingController {
     private final TrainingService trainingService;
 
-    @PostMapping("/addTraining")
+    @PostMapping("/add")
     public ResponseEntity<Void> addTraining(
             @RequestParam String traineeUsername,
             @RequestParam String trainerUsername,

@@ -1,4 +1,4 @@
-package com.mariamkatamashvlii.gym.service.serviceImplementation;
+package com.mariamkatamashvlii.gym.service.implementation;
 
 import com.mariamkatamashvlii.gym.entity.Trainee;
 import com.mariamkatamashvlii.gym.entity.Trainer;
@@ -23,7 +23,7 @@ public class TrainingServiceImpl implements TrainingService {
 
     @Override
     public Training create(String traineeUsername, String trainerUsername, String trainingName, Date date, Number duration) {
-        Trainee trainee = traineeRepo.select(traineeUsername);
+        Trainee trainee = traineeRepo.findByUsername(traineeUsername);
         Trainer trainer = trainerRepo.select(trainerUsername);
         if (trainee == null) {
             throw new IllegalArgumentException("Trainee with username " + traineeUsername + " does not exist");
