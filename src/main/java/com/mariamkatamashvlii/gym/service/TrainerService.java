@@ -3,7 +3,7 @@ package com.mariamkatamashvlii.gym.service;
 import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.TrainerProfileDTO;
 import com.mariamkatamashvlii.gym.dto.TrainingDTO;
-import com.mariamkatamashvlii.gym.dto.TrainingTypeDTO;
+import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
 import com.mariamkatamashvlii.gym.dto.UpdateTrainerDTO;
 
 import java.sql.Date;

@@ -3,7 +3,7 @@ package com.mariamkatamashvlii.gym.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mariamkatamashvlii.gym.dto.userDto.LoginDTO;
 import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordDTO;
-import com.mariamkatamashvlii.gym.service.implementation.UserServiceImpl;
+import com.mariamkatamashvlii.gym.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerTest {
 
     @Mock
-    private UserServiceImpl userServiceImpl;
+    private UserService userService;
 
     @InjectMocks
     private UserController userController;
@@ -43,7 +43,7 @@ class UserControllerTest {
     @Test
     void login_Successful() throws Exception {
         LoginDTO loginDTO = new LoginDTO("user", "password");
-        when(userServiceImpl.login(loginDTO)).thenReturn(true);
+        when(userService.login(loginDTO)).thenReturn(true);
 
         mockMvc.perform(get("/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -51,13 +51,13 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Logged in successfully"));
 
-        verify(userServiceImpl).login(loginDTO);
+        verify(userService).login(loginDTO);
     }
 
     @Test
     void login_Unauthorized() throws Exception {
         LoginDTO loginDTO = new LoginDTO("user", "wrongPassword");
-        when(userServiceImpl.login(loginDTO)).thenReturn(false);
+        when(userService.login(loginDTO)).thenReturn(false);
 
         mockMvc.perform(get("/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -65,14 +65,14 @@ class UserControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Invalid username or password"));
 
-        verify(userServiceImpl).login(loginDTO);
+        verify(userService).login(loginDTO);
     }
 
     @Test
     void passChange_AuthorizedAndChanged() throws Exception {
         NewPasswordDTO newPasswordDTO = new NewPasswordDTO("user", "currentPass", "newPass");
         LoginDTO loginDTO = LoginDTO.builder().username("user").password("currentPass").build();
-        when(userServiceImpl.login(loginDTO)).thenReturn(true);
+        when(userService.login(loginDTO)).thenReturn(true);
 
         mockMvc.perform(put("/users/updatePassword")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -80,14 +80,14 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Password Changed Successfully"));
 
-        verify(userServiceImpl).changePassword(newPasswordDTO);
+        verify(userService).changePassword(newPasswordDTO);
     }
 
     @Test
     void passChange_Unauthorized() throws Exception {
         NewPasswordDTO newPasswordDTO = new NewPasswordDTO("user", "wrongPass", "newPass");
         LoginDTO loginDTO = LoginDTO.builder().username("user").password("wrongPass").build();
-        when(userServiceImpl.login(loginDTO)).thenReturn(false);
+        when(userService.login(loginDTO)).thenReturn(false);
 
         mockMvc.perform(put("/users/updatePassword")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -95,6 +95,6 @@ class UserControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Invalid username or password"));
 
-        verify(userServiceImpl, never()).changePassword(newPasswordDTO);
+        verify(userService, never()).changePassword(newPasswordDTO);
     }
 }

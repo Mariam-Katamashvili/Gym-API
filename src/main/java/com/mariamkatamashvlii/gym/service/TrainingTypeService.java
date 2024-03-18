@@ -1,6 +1,6 @@
 package com.mariamkatamashvlii.gym.service;
 
-import com.mariamkatamashvlii.gym.dto.TrainingTypeDTO;
+import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
 
 import java.util.List;
 

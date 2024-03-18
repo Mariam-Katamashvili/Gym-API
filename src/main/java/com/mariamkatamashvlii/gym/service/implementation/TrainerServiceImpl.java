@@ -5,7 +5,7 @@ import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.TraineeDTO;
 import com.mariamkatamashvlii.gym.dto.TrainerProfileDTO;
 import com.mariamkatamashvlii.gym.dto.TrainingDTO;
-import com.mariamkatamashvlii.gym.dto.TrainingTypeDTO;
+import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
 import com.mariamkatamashvlii.gym.dto.UpdateTrainerDTO;
 import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.TrainingType;
@@ -45,7 +45,7 @@ public class TrainerServiceImpl implements TrainerService {
                 .isActive(true)
                 .build();
         userRepo.save(user);
-        TrainingType type = trainingTypeRepo.select(trainingTypeId);
+        TrainingType type = trainingTypeRepo.findById(trainingTypeId).orElseThrow(() -> new EntityNotFoundException("TrainingType not found for id: " + trainingTypeId));
         Trainer trainer = Trainer.builder()
                 .specialization(type)
                 .user(user)

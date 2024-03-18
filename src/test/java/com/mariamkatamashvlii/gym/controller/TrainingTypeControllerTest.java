@@ -1,25 +1,30 @@
 package com.mariamkatamashvlii.gym.controller;
 
-import com.mariamkatamashvlii.gym.dto.TrainingTypeDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
 import com.mariamkatamashvlii.gym.service.TrainingTypeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(TrainingTypeController.class)
+@ExtendWith(MockitoExtension.class)
 class TrainingTypeControllerTest {
-
-    @MockBean
+    @Mock
     private TrainingTypeService trainingTypeService;
 
     @InjectMocks
@@ -28,19 +33,19 @@ class TrainingTypeControllerTest {
     private MockMvc mockMvc;
 
     @BeforeEach
-    public void setup() {
-        MockitoAnnotations.openMocks(this);
+    void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(trainingTypeController).build();
     }
 
     @Test
-    void getAllTrainingTypes_ShouldReturnTrainingTypes() throws Exception {
-        TrainingTypeDTO trainingType1 = new TrainingTypeDTO(1L, "Yoga");
-        TrainingTypeDTO trainingType2 = new TrainingTypeDTO(2L, "Pilates");
+    void testGetAllTrainingTypes() throws Exception {
+        List<TrainingTypeDTO> trainingTypeDTOs = Arrays.asList(new TrainingTypeDTO(), new TrainingTypeDTO());
+        when(trainingTypeService.findAll()).thenReturn(trainingTypeDTOs);
 
-        List<TrainingTypeDTO> allTrainingTypes = Arrays.asList(trainingType1, trainingType2);
+        this.mockMvc.perform(get("/trainingTypes/getAll").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(trainingTypeDTOs.size()));
 
-        given(trainingTypeService.findAll()).willReturn(allTrainingTypes);
-
+        verify(trainingTypeService).findAll();
     }
 }

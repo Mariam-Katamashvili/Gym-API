@@ -1,14 +1,9 @@
 package com.mariamkatamashvlii.gym.repository;
 
-import com.mariamkatamashvlii.gym.dto.TrainingTypeDTO;
 import com.mariamkatamashvlii.gym.entity.TrainingType;
 import lombok.Generated;
-
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 @Generated
-public interface TrainingTypeRepository {
-    TrainingType select(long id);
-
-    List<TrainingTypeDTO> findAll();
+public interface TrainingTypeRepository extends JpaRepository<TrainingType, Long> {
 }

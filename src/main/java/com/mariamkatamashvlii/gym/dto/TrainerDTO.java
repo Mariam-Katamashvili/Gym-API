@@ -1,5 +1,6 @@
 package com.mariamkatamashvlii.gym.dto;
 
+import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Generated;

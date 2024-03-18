@@ -5,7 +5,7 @@ import com.mariamkatamashvlii.gym.dto.TraineeProfileDTO;
 import com.mariamkatamashvlii.gym.dto.TrainerDTO;
 import com.mariamkatamashvlii.gym.dto.TrainerUsenameDTO;
 import com.mariamkatamashvlii.gym.dto.TrainingDTO;
-import com.mariamkatamashvlii.gym.dto.TrainingTypeDTO;
+import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
 import com.mariamkatamashvlii.gym.dto.UpdateTraineeDTO;
 import com.mariamkatamashvlii.gym.entity.Trainee;
 import com.mariamkatamashvlii.gym.entity.Trainer;

@@ -1,5 +1,6 @@
 package com.mariamkatamashvlii.gym.controller;
 
+import com.mariamkatamashvlii.gym.exception.TrainingTypeFetchException;
 import com.mariamkatamashvlii.gym.exception.UserNotCreatedException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,4 +13,8 @@ public class RestExceptionHandler {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
+    @ExceptionHandler(TrainingTypeFetchException.class)
+    public ResponseEntity<String> trainingTypeFetchException(TrainingTypeFetchException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
 }
