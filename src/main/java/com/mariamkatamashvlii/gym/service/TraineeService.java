@@ -1,6 +1,6 @@
 package com.mariamkatamashvlii.gym.service;
 
-import com.mariamkatamashvlii.gym.dto.RegistrationDTO;
+import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.TraineeProfileDTO;
 import com.mariamkatamashvlii.gym.dto.TrainerDTO;
 import com.mariamkatamashvlii.gym.dto.TrainerUsenameDTO;
@@ -12,7 +12,7 @@ import java.sql.Date;
 import java.util.List;
 
 public interface TraineeService {
-    RegistrationDTO registerTrainee(TraineeProfileDTO traineeProfileDTO);
+    RegistrationResponseDTO registerTrainee(TraineeProfileDTO traineeProfileDTO);
     TraineeProfileDTO getTraineeProfile(String username);
 
     UpdateTraineeDTO updateProfile(String username, String firstName, String lastName, Date birthday, String address, Boolean isActive);

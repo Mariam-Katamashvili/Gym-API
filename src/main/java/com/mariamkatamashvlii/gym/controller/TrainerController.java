@@ -1,6 +1,6 @@
 package com.mariamkatamashvlii.gym.controller;
 
-import com.mariamkatamashvlii.gym.dto.RegistrationDTO;
+import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.TrainerProfileDTO;
 import com.mariamkatamashvlii.gym.dto.TrainingDTO;
 import com.mariamkatamashvlii.gym.dto.TrainingTypeDTO;
@@ -27,11 +27,11 @@ public class TrainerController {
     private final TrainerService trainerService;
 
     @PostMapping("/registration")
-    public ResponseEntity<RegistrationDTO>trainerRegistration(
+    public ResponseEntity<RegistrationResponseDTO>trainerRegistration(
             @RequestParam String firstname,
             @RequestParam String lastname,
             @RequestParam Long specialization){
-        RegistrationDTO registrationDTO = trainerService.registerTrainer(firstname, lastname, specialization);
+        RegistrationResponseDTO registrationDTO = trainerService.registerTrainer(firstname, lastname, specialization);
         return ResponseEntity.ok(registrationDTO);
     }
 

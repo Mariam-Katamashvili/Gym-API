@@ -1,11 +1,10 @@
 package com.mariamkatamashvlii.gym.controller;
 
-import com.mariamkatamashvlii.gym.dto.RegistrationDTO;
+import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.TraineeProfileDTO;
 import com.mariamkatamashvlii.gym.dto.TrainerDTO;
 import com.mariamkatamashvlii.gym.dto.TrainerUsenameDTO;
 import com.mariamkatamashvlii.gym.dto.TrainingDTO;
-import com.mariamkatamashvlii.gym.dto.UpdateTraineeDTO;
 import com.mariamkatamashvlii.gym.entity.TrainingType;
 import com.mariamkatamashvlii.gym.service.TraineeService;
 import lombok.RequiredArgsConstructor;
@@ -31,30 +30,25 @@ public class TraineeController {
     private final TraineeService traineeService;
 
     @PostMapping("/registration")
-    public ResponseEntity<RegistrationDTO> registration(
+    public ResponseEntity<RegistrationResponseDTO> registration(
             @RequestBody TraineeProfileDTO traineeProfileDTO) {
-        RegistrationDTO registrationDTO = traineeService.registerTrainee(traineeProfileDTO);
-        return ResponseEntity.ok(registrationDTO);
+        RegistrationResponseDTO registrationResponseDTO = traineeService.registerTrainee(traineeProfileDTO);
+        return ResponseEntity.ok(registrationResponseDTO);
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<TraineeProfileDTO> getTraineeProfile(
+    public ResponseEntity<TraineeProfileDTO> getProfile(
             @PathVariable String username) {
         TraineeProfileDTO profile = traineeService.getTraineeProfile(username);
         return ResponseEntity.ok(profile);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<UpdateTraineeDTO> updateTrainee(
-            @RequestParam String username,
-            @RequestParam String firstname,
-            @RequestParam String lastname,
-            @RequestParam(required = false) Date birthday,
-            @RequestParam(required = false) String address,
-            @RequestParam Boolean isActive) {
-        UpdateTraineeDTO updateTraineeDTO = traineeService.updateProfile(username, firstname, lastname, birthday, address, isActive);
-        return ResponseEntity.ok(updateTraineeDTO);
-    }
+//    @PutMapping("/update")
+//    public ResponseEntity<UpdateTraineeDTO> updateTrainee(
+//            @RequestBody UpdateTraineeDTO updateTraineeDTO) {
+//        UpdateTraineeDTO response = traineeService.updateProfile(updateTraineeDTO);
+//        return ResponseEntity.ok(response);
+//    }
 
     @DeleteMapping("/{username}/delete")
     public ResponseEntity<Void> deleteTrainee(

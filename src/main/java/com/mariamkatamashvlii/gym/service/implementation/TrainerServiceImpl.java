@@ -1,7 +1,7 @@
 package com.mariamkatamashvlii.gym.service.implementation;
 
 import com.mariamkatamashvlii.gym.auth.Validator;
-import com.mariamkatamashvlii.gym.dto.RegistrationDTO;
+import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.TraineeDTO;
 import com.mariamkatamashvlii.gym.dto.TrainerProfileDTO;
 import com.mariamkatamashvlii.gym.dto.TrainingDTO;
@@ -36,7 +36,7 @@ public class TrainerServiceImpl implements TrainerService {
     private final PasswordGenerator passwordGenerator;
 
     @Override
-    public RegistrationDTO registerTrainer(String firstName, String lastName, Long trainingTypeId) {
+    public RegistrationResponseDTO registerTrainer(String firstName, String lastName, Long trainingTypeId) {
         User user = User.builder()
                 .firstName(firstName)
                 .lastName(lastName)
@@ -44,7 +44,7 @@ public class TrainerServiceImpl implements TrainerService {
                 .password(passwordGenerator.generatePassword())
                 .isActive(true)
                 .build();
-        userRepo.create(user);
+        userRepo.save(user);
         TrainingType type = trainingTypeRepo.select(trainingTypeId);
         Trainer trainer = Trainer.builder()
                 .specialization(type)
@@ -52,7 +52,7 @@ public class TrainerServiceImpl implements TrainerService {
                 .build();
         trainerRepo.create(trainer);
         validation.validateTrainer(trainer, user);
-        return new RegistrationDTO(user.getUsername(), user.getPassword());
+        return new RegistrationResponseDTO(user.getUsername(), user.getPassword());
     }
 
     @Override
@@ -81,14 +81,14 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public UpdateTrainerDTO updateProfile(String username, String firstName, String lastName, TrainingTypeDTO specialization, Boolean isActive) {
-        User user = userRepo.select(username);
+        User user = userRepo.findUserByUsername(username);
         if (user == null) {
             throw new EntityNotFoundException("User not found");
         }
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setIsActive(isActive);
-        userRepo.update(user);
+        userRepo.save(user);
         Trainer trainer = trainerRepo.select(username);
         if (trainer == null) {
             throw new EntityNotFoundException("Trainee not found");
@@ -142,8 +142,8 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     private void toggleActivation(String username, boolean isActive) {
-        User user = userRepo.select(username);
+        User user = userRepo.findUserByUsername(username);
         user.setIsActive(isActive);
-        userRepo.update(user);
+        userRepo.save(user);
     }
 }

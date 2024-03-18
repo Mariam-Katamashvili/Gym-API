@@ -2,20 +2,9 @@ package com.mariamkatamashvlii.gym.repository;
 
 import com.mariamkatamashvlii.gym.entity.User;
 import lombok.Generated;
-
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 @Generated
-public interface UserRepository {
-    User create(User user);
-
-    User update(User user);
-
-    void delete(User user);
-
-    User select(long id);
-
-    User select(String username);
-
-    List<User> findAll();
+public interface UserRepository extends JpaRepository<User, Long> {
+    User findUserByUsername(String username);
 }

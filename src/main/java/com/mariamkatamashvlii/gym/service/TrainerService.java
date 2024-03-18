@@ -1,6 +1,6 @@
 package com.mariamkatamashvlii.gym.service;
 
-import com.mariamkatamashvlii.gym.dto.RegistrationDTO;
+import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.TrainerProfileDTO;
 import com.mariamkatamashvlii.gym.dto.TrainingDTO;
 import com.mariamkatamashvlii.gym.dto.TrainingTypeDTO;
@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface TrainerService {
 
-    RegistrationDTO registerTrainer(String firstName, String lastName, Long trainingTypeId);
+    RegistrationResponseDTO registerTrainer(String firstName, String lastName, Long trainingTypeId);
 
     TrainerProfileDTO trainerProfile(String username);
 

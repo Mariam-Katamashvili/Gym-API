@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RestExceptionHandler {
     @ExceptionHandler(UserNotCreatedException.class)
-    public ResponseEntity<?> userNotCreatedException(UserNotCreatedException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<String> userNotCreatedException(UserNotCreatedException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
+
 }

@@ -1,7 +1,6 @@
-package com.mariamkatamashvlii.gym.serviceImplementation;
+package com.mariamkatamashvlii.gym.service.implementation;
 
 import com.mariamkatamashvlii.gym.repository.TrainingRepository;
-import com.mariamkatamashvlii.gym.service.implementation.TrainingServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

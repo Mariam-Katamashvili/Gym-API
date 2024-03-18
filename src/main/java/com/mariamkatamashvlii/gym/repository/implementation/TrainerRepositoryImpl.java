@@ -42,7 +42,7 @@ public class TrainerRepositoryImpl implements TrainerRepository {
     @Override
     @Transactional
     public Trainer select(String username) {
-        User user = userRepo.select(username);
+        User user = userRepo.findUserByUsername(username);
         log.info("Selecting trainer - {}", username);
         return user.getTrainer();
     }

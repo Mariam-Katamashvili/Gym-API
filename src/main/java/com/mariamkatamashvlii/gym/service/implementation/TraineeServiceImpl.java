@@ -1,6 +1,6 @@
 package com.mariamkatamashvlii.gym.service.implementation;
 
-import com.mariamkatamashvlii.gym.dto.RegistrationDTO;
+import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.TraineeProfileDTO;
 import com.mariamkatamashvlii.gym.dto.TrainerDTO;
 import com.mariamkatamashvlii.gym.dto.TrainerUsenameDTO;
@@ -44,7 +44,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
-    public RegistrationDTO registerTrainee(TraineeProfileDTO traineeProfileDTO) {
+    public RegistrationResponseDTO registerTrainee(TraineeProfileDTO traineeProfileDTO) {
         try {
             String firstName = traineeProfileDTO.getFirstName();
             String lastName = traineeProfileDTO.getLastName();
@@ -55,7 +55,7 @@ public class TraineeServiceImpl implements TraineeService {
                     .password(passwordGenerator.generatePassword())
                     .isActive(true)
                     .build();
-            userRepo.create(user);
+            userRepo.save(user);
 
             Trainee trainee = Trainee.builder()
                     .birthday(traineeProfileDTO.getBirthday())
@@ -64,7 +64,7 @@ public class TraineeServiceImpl implements TraineeService {
                     .build();
             traineeRepo.save(trainee);
             log.info("Registered new trainee with username: {}", user.getUsername());
-            return new RegistrationDTO(user.getUsername(), user.getPassword());
+            return new RegistrationResponseDTO(user.getUsername(), user.getPassword());
         } catch (Exception e) {
             throw new UserNotCreatedException("Could not create trainee");
         }
@@ -72,7 +72,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public TraineeProfileDTO getTraineeProfile(String username) {
-        User user = userRepo.select(username);
+        User user = userRepo.findUserByUsername(username);
         Trainee trainee = traineeRepo.findByUsername(username);
         List<TrainerDTO> trainers = trainee.getTrainers().stream().map(trainer -> {
             TrainerDTO dto = new TrainerDTO();
@@ -99,14 +99,14 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @Transactional
     public UpdateTraineeDTO updateProfile(String username, String firstName, String lastName, Date birthday, String address, Boolean isActive) {
-        User user = userRepo.select(username);
+        User user = userRepo.findUserByUsername(username);
         if (user == null) {
             throw new EntityNotFoundException("User not found");
         }
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setIsActive(isActive);
-        userRepo.update(user);
+        userRepo.save(user);
         Trainee trainee = traineeRepo.findByUsername(username);
         if (trainee == null) {
             throw new EntityNotFoundException("Trainee not found");
@@ -245,8 +245,8 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     private void toggleActivation(String username, Boolean isActive) {
-        User user = userRepo.select(username);
+        User user = userRepo.findUserByUsername(username);
         user.setIsActive(isActive);
-        userRepo.update(user);
+        userRepo.save(user);
     }
 }

@@ -1,15 +1,20 @@
 package com.mariamkatamashvlii.gym.controller;
 
-import com.mariamkatamashvlii.gym.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mariamkatamashvlii.gym.dto.userDto.LoginDTO;
+import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordDTO;
+import com.mariamkatamashvlii.gym.service.implementation.UserServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -17,71 +22,79 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserController.class)
+@ExtendWith(MockitoExtension.class)
 class UserControllerTest {
 
-    @Autowired
+    @Mock
+    private UserServiceImpl userServiceImpl;
+
+    @InjectMocks
+    private UserController userController;
+
     private MockMvc mockMvc;
 
-    @MockBean
-    private UserService userService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+    }
 
     @Test
-    void testLoginSuccess() throws Exception {
-        when(userService.login("user", "pass")).thenReturn(true);
+    void login_Successful() throws Exception {
+        LoginDTO loginDTO = new LoginDTO("user", "password");
+        when(userServiceImpl.login(loginDTO)).thenReturn(true);
 
         mockMvc.perform(get("/users/login")
-                        .param("username", "user")
-                        .param("password", "pass"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginDTO)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Logged in successfully"));
 
-        verify(userService, times(1)).login("user", "pass");
+        verify(userServiceImpl).login(loginDTO);
     }
 
     @Test
-    void testLoginFailure() throws Exception {
-        when(userService.login("user", "wrongpass")).thenReturn(false);
+    void login_Unauthorized() throws Exception {
+        LoginDTO loginDTO = new LoginDTO("user", "wrongPassword");
+        when(userServiceImpl.login(loginDTO)).thenReturn(false);
 
         mockMvc.perform(get("/users/login")
-                        .param("username", "user")
-                        .param("password", "wrongpass"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginDTO)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Invalid username or password"));
 
-        verify(userService, times(1)).login("user", "wrongpass");
+        verify(userServiceImpl).login(loginDTO);
     }
 
     @Test
-    void testPassChangeSuccess() throws Exception {
-        when(userService.login("user", "oldpass")).thenReturn(true);
+    void passChange_AuthorizedAndChanged() throws Exception {
+        NewPasswordDTO newPasswordDTO = new NewPasswordDTO("user", "currentPass", "newPass");
+        LoginDTO loginDTO = LoginDTO.builder().username("user").password("currentPass").build();
+        when(userServiceImpl.login(loginDTO)).thenReturn(true);
 
-        mockMvc.perform(put("/users/passChange")
-                        .param("username", "user")
-                        .param("currPassword", "oldpass")
-                        .param("newPassword", "newpass"))
+        mockMvc.perform(put("/users/updatePassword")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newPasswordDTO)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Password Changed Successfully"));
 
-        verify(userService, times(1)).login("user", "oldpass");
-        verify(userService, times(1)).passChange("user", "oldpass", "newpass");
+        verify(userServiceImpl).changePassword(newPasswordDTO);
     }
 
     @Test
-    void testPassChangeFailure() throws Exception {
-        when(userService.login("user", "oldpass")).thenReturn(false);
+    void passChange_Unauthorized() throws Exception {
+        NewPasswordDTO newPasswordDTO = new NewPasswordDTO("user", "wrongPass", "newPass");
+        LoginDTO loginDTO = LoginDTO.builder().username("user").password("wrongPass").build();
+        when(userServiceImpl.login(loginDTO)).thenReturn(false);
 
-        mockMvc.perform(put("/users/passChange")
-                        .param("username", "user")
-                        .param("currPassword", "oldpass")
-                        .param("newPassword", "newpass"))
+        mockMvc.perform(put("/users/updatePassword")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newPasswordDTO)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Invalid username or password"));
 
-        verify(userService, times(1)).login("user", "oldpass");
-        verify(userService, never()).passChange(anyString(), anyString(), anyString());
+        verify(userServiceImpl, never()).changePassword(newPasswordDTO);
     }
-
-
 }
