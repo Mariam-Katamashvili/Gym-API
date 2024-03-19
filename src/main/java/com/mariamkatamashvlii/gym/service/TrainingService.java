@@ -1,10 +1,8 @@
 package com.mariamkatamashvlii.gym.service;
 
-import com.mariamkatamashvlii.gym.entity.Training;
-
-import java.sql.Date;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingRequest;
 
 public interface TrainingService {
-    Training create(String traineeUsername, String trainerUsername, String trainingName, Date date, Number duration);
+    void create(TrainingRequest trainingRequest);
 
 }

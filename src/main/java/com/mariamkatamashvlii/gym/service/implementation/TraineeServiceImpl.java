@@ -72,7 +72,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public TraineeProfileDTO getTraineeProfile(String username) {
-        User user = userRepo.findUserByUsername(username);
+        User user = userRepo.findByUsername(username);
         Trainee trainee = traineeRepo.findByUsername(username);
         List<TrainerDTO> trainers = trainee.getTrainers().stream().map(trainer -> {
             TrainerDTO dto = new TrainerDTO();
@@ -99,7 +99,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @Transactional
     public UpdateTraineeDTO updateProfile(String username, String firstName, String lastName, Date birthday, String address, Boolean isActive) {
-        User user = userRepo.findUserByUsername(username);
+        User user = userRepo.findByUsername(username);
         if (user == null) {
             throw new EntityNotFoundException("User not found");
         }
@@ -147,7 +147,7 @@ public class TraineeServiceImpl implements TraineeService {
         }
         Set<Training> trainings = trainee.getTrainings();
         for (Training t : trainings) {
-            trainingRepository.delete(t.getId());
+            trainingRepository.delete(t);
         }
         traineeRepo.delete(trainee);
         log.info("Deleted trainee with username {}", username);
@@ -188,13 +188,13 @@ public class TraineeServiceImpl implements TraineeService {
         }
 
         return trainee.getTrainings().stream()
-                .filter(t -> (fromDate == null || !t.getTrainingDate().before(fromDate)) && (toDate == null || !t.getTrainingDate().after(toDate)))
+               // .filter(t -> (fromDate == null || !t.getTrainingDate().before(fromDate)) && (toDate == null || !t.getTrainingDate().after(toDate)))
                 .filter(t -> trainerName == null || t.getTrainer().getUser().getUsername().equalsIgnoreCase(trainerName))
                 .filter(t -> trainingType == null || t.getTrainingType().equals(trainingType))
                 .map(t -> {
                     TrainingDTO dto = new TrainingDTO();
                     dto.setTrainingName(t.getTrainingName());
-                    dto.setDate(t.getTrainingDate());
+                   // dto.setDate(t.getTrainingDate());
                     dto.setTrainingType(t.getTrainingType());
                     dto.setDuration(t.getDuration());
                     dto.setName(t.getTrainer().getUser().getUsername());
@@ -209,7 +209,7 @@ public class TraineeServiceImpl implements TraineeService {
         if (trainee != null) {
             List<Trainer> updatedTrainers = trainers.stream()
                     .map(TrainerUsenameDTO::getUsername)
-                    .map(trainerRepo::select)
+                    .map(trainerRepo::findByUsername)
                     .toList();
             trainee.setTrainers(updatedTrainers);
             traineeRepo.save(trainee);
@@ -245,7 +245,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     private void toggleActivation(String username, Boolean isActive) {
-        User user = userRepo.findUserByUsername(username);
+        User user = userRepo.findByUsername(username);
         user.setIsActive(isActive);
         userRepo.save(user);
     }

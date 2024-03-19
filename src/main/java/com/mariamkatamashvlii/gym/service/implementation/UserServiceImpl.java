@@ -1,7 +1,7 @@
 package com.mariamkatamashvlii.gym.service.implementation;
 
-import com.mariamkatamashvlii.gym.dto.userDto.LoginDTO;
-import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordDTO;
+import com.mariamkatamashvlii.gym.dto.userDto.LoginRequest;
+import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordRequest;
 import com.mariamkatamashvlii.gym.entity.User;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
 import com.mariamkatamashvlii.gym.service.UserService;
@@ -20,15 +20,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public boolean login(LoginDTO loginDTO) {
+    public boolean login(LoginRequest loginRequest) {
         String transactionId = UUID.randomUUID().toString();
         log.info("[{}] Transaction started for login operation", transactionId);
 
-        String username = loginDTO.getUsername();
-        String password = loginDTO.getPassword();
+        String username = loginRequest.getUsername();
+        String password = loginRequest.getPassword();
 
         try {
-            User user = userRepo.findUserByUsername(username);
+            User user = userRepo.findByUsername(username);
             if (user == null) {
                 log.info("[{}] Username {} does not exist", transactionId, username);
                 return false;
@@ -49,22 +49,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changePassword(NewPasswordDTO newPasswordDTO) {
+    public void changePassword(NewPasswordRequest newPasswordRequest) {
         String transactionId = UUID.randomUUID().toString();
-        log.info("[{}] Starting password change operation for user: {}", transactionId, newPasswordDTO.getUsername());
+        log.info("[{}] Starting password change operation for user: {}", transactionId, newPasswordRequest.getUsername());
         try {
-            User user = userRepo.findUserByUsername(newPasswordDTO.getUsername());
+            User user = userRepo.findByUsername(newPasswordRequest.getUsername());
             if (user == null) {
-                log.warn("[{}] No user found with username: {}", transactionId, newPasswordDTO.getUsername());
+                log.warn("[{}] No user found with username: {}", transactionId, newPasswordRequest.getUsername());
                 return;
             }
 
-            user.setPassword(newPasswordDTO.getNewPass());
+            user.setPassword(newPasswordRequest.getNewPass());
             userRepo.save(user);
 
-            log.info("[{}] Password changed successfully for user: {}", transactionId, newPasswordDTO.getUsername());
+            log.info("[{}] Password changed successfully for user: {}", transactionId, newPasswordRequest.getUsername());
         } catch (Exception e) {
-            log.error("[{}] Error changing password for user: {}. Error: {}", transactionId, newPasswordDTO.getUsername(), e.getMessage());
+            log.error("[{}] Error changing password for user: {}. Error: {}", transactionId, newPasswordRequest.getUsername(), e.getMessage());
             throw e;
         }
     }

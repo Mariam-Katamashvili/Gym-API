@@ -1,4 +1,4 @@
-package com.mariamkatamashvlii.gym.dto.userDto;
+package com.mariamkatamashvlii.gym.dto.trainingDto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -8,21 +8,31 @@ import lombok.Data;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Generated
-public class NewPasswordDTO {
+@Builder
+public class TrainingRequest {
     @Valid
     @NotNull
-    private String username;
+    private String traineeUsername;
 
     @Valid
     @NotNull
-    private String currentPass;
+    private String trainerUsername;
 
     @Valid
     @NotNull
-    private String newPass;
+    private String trainingName;
+
+    @Valid
+    @NotNull
+    private LocalDate date;
+
+    @Valid
+    @NotNull
+    private Number duration;
 }

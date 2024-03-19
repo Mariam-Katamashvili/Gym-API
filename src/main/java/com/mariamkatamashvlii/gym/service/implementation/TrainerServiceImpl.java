@@ -50,14 +50,14 @@ public class TrainerServiceImpl implements TrainerService {
                 .specialization(type)
                 .user(user)
                 .build();
-        trainerRepo.create(trainer);
+        trainerRepo.save(trainer);
         validation.validateTrainer(trainer, user);
         return new RegistrationResponseDTO(user.getUsername(), user.getPassword());
     }
 
     @Override
     public TrainerProfileDTO trainerProfile(String username) {
-        Trainer trainer = trainerRepo.select(username);
+        Trainer trainer = trainerRepo.findByUsername(username);
         if (trainer == null) {
             throw new EntityNotFoundException("Trainer not found with username - " + username);
         }
@@ -81,7 +81,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public UpdateTrainerDTO updateProfile(String username, String firstName, String lastName, TrainingTypeDTO specialization, Boolean isActive) {
-        User user = userRepo.findUserByUsername(username);
+        User user = userRepo.findByUsername(username);
         if (user == null) {
             throw new EntityNotFoundException("User not found");
         }
@@ -89,7 +89,7 @@ public class TrainerServiceImpl implements TrainerService {
         user.setLastName(lastName);
         user.setIsActive(isActive);
         userRepo.save(user);
-        Trainer trainer = trainerRepo.select(username);
+        Trainer trainer = trainerRepo.findByUsername(username);
         if (trainer == null) {
             throw new EntityNotFoundException("Trainee not found");
         }
@@ -110,18 +110,18 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public List<TrainingDTO> getTrainings(String username, Date fromDate, Date toDate, String traineeName) {
-        Trainer trainer = trainerRepo.select(username);
+        Trainer trainer = trainerRepo.findByUsername(username);
         if (trainer == null || trainer.getTrainings() == null) {
             log.info("No trainings found or trainer does not exist for username: {}", username);
             return List.of();
         }
         return trainer.getTrainings().stream()
-                .filter(t -> (fromDate == null || !t.getTrainingDate().before(fromDate)) && (toDate == null || !t.getTrainingDate().after(toDate)))
-                .filter(t -> traineeName == null || t.getTrainee().getUser().getUsername().equalsIgnoreCase(traineeName))
+//                .filter(t -> (fromDate == null || !t.getTrainingDate().before(fromDate)) && (toDate == null || !t.getTrainingDate().after(toDate)))
+//                .filter(t -> traineeName == null || t.getTrainee().getUser().getUsername().equalsIgnoreCase(traineeName))
                 .map(t -> {
                     TrainingDTO dto = new TrainingDTO();
                     dto.setTrainingName(t.getTrainingName());
-                    dto.setDate(t.getTrainingDate());
+                    //dto.setDate(t.getTrainingDate());
                     dto.setTrainingType(t.getTrainingType());
                     dto.setDuration(t.getDuration());
                     dto.setName(t.getTrainer().getUser().getUsername());
@@ -142,7 +142,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     private void toggleActivation(String username, boolean isActive) {
-        User user = userRepo.findUserByUsername(username);
+        User user = userRepo.findByUsername(username);
         user.setIsActive(isActive);
         userRepo.save(user);
     }

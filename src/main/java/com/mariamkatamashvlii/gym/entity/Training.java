@@ -16,6 +16,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -46,7 +47,7 @@ public class Training {
     private TrainingType trainingType;
 
     @Column(nullable = false)
-    private Date trainingDate;
+    private LocalDate trainingDate;
 
     @Column(nullable = false)
     private Number duration;

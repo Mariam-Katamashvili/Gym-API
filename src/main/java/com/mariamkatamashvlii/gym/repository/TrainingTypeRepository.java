@@ -5,5 +5,4 @@ import lombok.Generated;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 @Generated
-public interface TrainingTypeRepository extends JpaRepository<TrainingType, Long> {
-}
+public interface TrainingTypeRepository extends JpaRepository<TrainingType, Long> {}

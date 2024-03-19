@@ -1,7 +1,7 @@
 package com.mariamkatamashvlii.gym.controller;
 
-import com.mariamkatamashvlii.gym.dto.userDto.LoginDTO;
-import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordDTO;
+import com.mariamkatamashvlii.gym.dto.userDto.LoginRequest;
+import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordRequest;
 import com.mariamkatamashvlii.gym.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,8 +20,8 @@ public class UserController {
 
     @GetMapping("/login")
     public ResponseEntity<String> login(
-            @RequestBody LoginDTO loginDTO) {
-        boolean isAuthorized = userService.login(loginDTO);
+            @RequestBody LoginRequest loginRequest) {
+        boolean isAuthorized = userService.login(loginRequest);
         if (isAuthorized) {
             return ResponseEntity.ok("Logged in successfully");
         }
@@ -30,12 +30,12 @@ public class UserController {
 
     @PutMapping("/updatePassword")
     public ResponseEntity<String> passChange(
-            @RequestBody NewPasswordDTO newPassword) {
-        LoginDTO loginDTO = LoginDTO.builder()
+            @RequestBody NewPasswordRequest newPassword) {
+        LoginRequest loginRequest = LoginRequest.builder()
                 .username(newPassword.getUsername())
                 .password(newPassword.getCurrentPass())
                 .build();
-        boolean isAuthorized = userService.login(loginDTO);
+        boolean isAuthorized = userService.login(loginRequest);
         if (isAuthorized) {
             userService.changePassword(newPassword);
             return ResponseEntity.ok("Password Changed Successfully");

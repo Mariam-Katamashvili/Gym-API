@@ -1,8 +1,11 @@
 package com.mariamkatamashvlii.gym.service.implementation;
 
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingRequest;
 import com.mariamkatamashvlii.gym.entity.Trainee;
 import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.Training;
+import com.mariamkatamashvlii.gym.exception.TraineeNotFoundException;
+import com.mariamkatamashvlii.gym.exception.TrainerNotFoundException;
 import com.mariamkatamashvlii.gym.repository.TraineeRepository;
 import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingRepository;
@@ -11,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -22,22 +25,33 @@ public class TrainingServiceImpl implements TrainingService {
     private final TrainerRepository trainerRepo;
 
     @Override
-    public Training create(String traineeUsername, String trainerUsername, String trainingName, Date date, Number duration) {
-        Trainee trainee = traineeRepo.findByUsername(traineeUsername);
-        Trainer trainer = trainerRepo.select(trainerUsername);
-        if (trainee == null) {
-            throw new IllegalArgumentException("Trainee with username " + traineeUsername + " does not exist");
+    public void create(TrainingRequest trainingRequest) {
+        String transactionId = UUID.randomUUID().toString();
+        try {
+            log.info("[{}] Creating training", transactionId);
+            String traineeUsername = trainingRequest.getTraineeUsername();
+            String trainerUsername = trainingRequest.getTrainerUsername();
+            Trainee trainee = traineeRepo.findByUsername(traineeUsername);
+            Trainer trainer = trainerRepo.findByUsername(trainerUsername);
+            if (trainee == null) {
+                throw new TraineeNotFoundException("Trainee with username " + traineeUsername + " does not exist");
+            }
+            if (trainer == null) {
+                throw new TrainerNotFoundException("Trainer with username " + trainerUsername + " does not exist");
+            }
+            Training training = new Training();
+            training.setTrainee(trainee);
+            training.setTrainer(trainer);
+            training.setTrainingName(trainingRequest.getTrainingName());
+            training.setTrainingDate(trainingRequest.getDate());
+            training.setDuration(trainingRequest.getDuration());
+            trainingRepo.save(training);
+            log.info("[{}] Training created successfully", transactionId);
+        } catch (Exception e) {
+            log.error("[{}] Error creating training: {}", transactionId, e.getMessage());
+            throw e;
         }
-        if (trainer == null) {
-            throw new IllegalArgumentException("Trainer with username " + trainerUsername + " does not exist");
-        }
-        Training training = new Training();
-        training.setTrainee(trainee);
-        training.setTrainer(trainer);
-        training.setTrainingName(trainingName);
-        training.setTrainingDate(date);
-        training.setDuration(duration);
-        return trainingRepo.create(training);
+
     }
 
 }

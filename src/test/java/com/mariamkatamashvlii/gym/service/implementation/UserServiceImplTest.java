@@ -1,7 +1,7 @@
 package com.mariamkatamashvlii.gym.service.implementation;
 
-import com.mariamkatamashvlii.gym.dto.userDto.LoginDTO;
-import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordDTO;
+import com.mariamkatamashvlii.gym.dto.userDto.LoginRequest;
+import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordRequest;
 import com.mariamkatamashvlii.gym.entity.User;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,10 +35,10 @@ class UserServiceImplTest {
     @Test
     void testLoginUserDoesNotExist() {
         String username = "nonExistingUser";
-        LoginDTO loginDTO = new LoginDTO(username, "password");
-        when(userRepo.findUserByUsername(username)).thenReturn(null);
+        LoginRequest loginRequest = new LoginRequest(username, "password");
+        when(userRepo.findByUsername(username)).thenReturn(null);
 
-        boolean result = userServiceImpl.login(loginDTO);
+        boolean result = userServiceImpl.login(loginRequest);
 
         assertFalse(result);
     }
@@ -47,14 +47,14 @@ class UserServiceImplTest {
     void testLoginIncorrectPassword() {
         String username = "existingUser";
         String password = "wrongPassword";
-        LoginDTO loginDTO = new LoginDTO(username, password);
+        LoginRequest loginRequest = new LoginRequest(username, password);
         User user = User.builder()
                 .username("existingUser")
                 .password("correctPassword")
                 .build();
-        when(userRepo.findUserByUsername(username)).thenReturn(user);
+        when(userRepo.findByUsername(username)).thenReturn(user);
 
-        boolean result = userServiceImpl.login(loginDTO);
+        boolean result = userServiceImpl.login(loginRequest);
 
         assertFalse(result);
     }
@@ -63,38 +63,38 @@ class UserServiceImplTest {
     void testLoginSuccess() {
         String username = "existingUser";
         String password = "correctPassword";
-        LoginDTO loginDTO = new LoginDTO(username, password);
+        LoginRequest loginRequest = new LoginRequest(username, password);
         User user = User.builder()
                 .username(username)
                 .password(password)
                 .build();
-        when(userRepo.findUserByUsername(username)).thenReturn(user);
+        when(userRepo.findByUsername(username)).thenReturn(user);
 
-        boolean result = userServiceImpl.login(loginDTO);
+        boolean result = userServiceImpl.login(loginRequest);
 
         assertTrue(result);
     }
 
     @Test
     void changePassword_UserNotFound() {
-        NewPasswordDTO newPasswordDTO = new NewPasswordDTO("nonExistentUser", "currPassword", "newPassword");
-        when(userRepo.findUserByUsername("nonExistentUser")).thenReturn(null);
+        NewPasswordRequest newPasswordRequest = new NewPasswordRequest("nonExistentUser", "currPassword", "newPassword");
+        when(userRepo.findByUsername("nonExistentUser")).thenReturn(null);
 
-        userServiceImpl.changePassword(newPasswordDTO);
+        userServiceImpl.changePassword(newPasswordRequest);
 
         verify(userRepo, never()).save(any(User.class));
     }
 
     @Test
     void changePassword_Successful() {
-        NewPasswordDTO newPasswordDTO = new NewPasswordDTO("existentUser", "currPassword", "newPassword");
+        NewPasswordRequest newPasswordRequest = new NewPasswordRequest("existentUser", "currPassword", "newPassword");
         User mockUser = new User();
         mockUser.setUsername("existentUser");
         mockUser.setPassword("currPassword");
 
-        when(userRepo.findUserByUsername("existentUser")).thenReturn(mockUser);
+        when(userRepo.findByUsername("existentUser")).thenReturn(mockUser);
 
-        userServiceImpl.changePassword(newPasswordDTO);
+        userServiceImpl.changePassword(newPasswordRequest);
 
         assertEquals("newPassword", mockUser.getPassword());
         verify(userRepo).save(mockUser);
@@ -102,10 +102,10 @@ class UserServiceImplTest {
 
     @Test
     void changePassword_ThrowsException() {
-        NewPasswordDTO newPasswordDTO = new NewPasswordDTO("nonExistentUser", "currPassword", "newPassword");
-        when(userRepo.findUserByUsername(anyString())).thenThrow(RuntimeException.class);
+        NewPasswordRequest newPasswordRequest = new NewPasswordRequest("nonExistentUser", "currPassword", "newPassword");
+        when(userRepo.findByUsername(anyString())).thenThrow(RuntimeException.class);
 
-        assertThrows(RuntimeException.class, () -> userServiceImpl.changePassword(newPasswordDTO));
+        assertThrows(RuntimeException.class, () -> userServiceImpl.changePassword(newPasswordRequest));
 
         verify(userRepo, never()).save(any(User.class));
     }

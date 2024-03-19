@@ -1,8 +1,8 @@
 package com.mariamkatamashvlii.gym.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mariamkatamashvlii.gym.dto.userDto.LoginDTO;
-import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordDTO;
+import com.mariamkatamashvlii.gym.dto.userDto.LoginRequest;
+import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordRequest;
 import com.mariamkatamashvlii.gym.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,59 +42,59 @@ class UserControllerTest {
 
     @Test
     void login_Successful() throws Exception {
-        LoginDTO loginDTO = new LoginDTO("user", "password");
-        when(userService.login(loginDTO)).thenReturn(true);
+        LoginRequest loginRequest = new LoginRequest("user", "password");
+        when(userService.login(loginRequest)).thenReturn(true);
 
         mockMvc.perform(get("/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginDTO)))
+                        .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Logged in successfully"));
 
-        verify(userService).login(loginDTO);
+        verify(userService).login(loginRequest);
     }
 
     @Test
     void login_Unauthorized() throws Exception {
-        LoginDTO loginDTO = new LoginDTO("user", "wrongPassword");
-        when(userService.login(loginDTO)).thenReturn(false);
+        LoginRequest loginRequest = new LoginRequest("user", "wrongPassword");
+        when(userService.login(loginRequest)).thenReturn(false);
 
         mockMvc.perform(get("/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginDTO)))
+                        .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Invalid username or password"));
 
-        verify(userService).login(loginDTO);
+        verify(userService).login(loginRequest);
     }
 
     @Test
     void passChange_AuthorizedAndChanged() throws Exception {
-        NewPasswordDTO newPasswordDTO = new NewPasswordDTO("user", "currentPass", "newPass");
-        LoginDTO loginDTO = LoginDTO.builder().username("user").password("currentPass").build();
-        when(userService.login(loginDTO)).thenReturn(true);
+        NewPasswordRequest newPasswordRequest = new NewPasswordRequest("user", "currentPass", "newPass");
+        LoginRequest loginRequest = LoginRequest.builder().username("user").password("currentPass").build();
+        when(userService.login(loginRequest)).thenReturn(true);
 
         mockMvc.perform(put("/users/updatePassword")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newPasswordDTO)))
+                        .content(objectMapper.writeValueAsString(newPasswordRequest)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Password Changed Successfully"));
 
-        verify(userService).changePassword(newPasswordDTO);
+        verify(userService).changePassword(newPasswordRequest);
     }
 
     @Test
     void passChange_Unauthorized() throws Exception {
-        NewPasswordDTO newPasswordDTO = new NewPasswordDTO("user", "wrongPass", "newPass");
-        LoginDTO loginDTO = LoginDTO.builder().username("user").password("wrongPass").build();
-        when(userService.login(loginDTO)).thenReturn(false);
+        NewPasswordRequest newPasswordRequest = new NewPasswordRequest("user", "wrongPass", "newPass");
+        LoginRequest loginRequest = LoginRequest.builder().username("user").password("wrongPass").build();
+        when(userService.login(loginRequest)).thenReturn(false);
 
         mockMvc.perform(put("/users/updatePassword")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newPasswordDTO)))
+                        .content(objectMapper.writeValueAsString(newPasswordRequest)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Invalid username or password"));
 
-        verify(userService, never()).changePassword(newPasswordDTO);
+        verify(userService, never()).changePassword(newPasswordRequest);
     }
 }

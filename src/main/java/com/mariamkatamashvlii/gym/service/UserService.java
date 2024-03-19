@@ -1,12 +1,12 @@
 package com.mariamkatamashvlii.gym.service;
 
-import com.mariamkatamashvlii.gym.dto.userDto.LoginDTO;
-import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordDTO;
+import com.mariamkatamashvlii.gym.dto.userDto.LoginRequest;
+import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordRequest;
 import lombok.Generated;
 
 @Generated
 public interface UserService {
-    boolean login(LoginDTO loginDTO);
+    boolean login(LoginRequest loginRequest);
 
-    void changePassword(NewPasswordDTO newPasswordDTO);
+    void changePassword(NewPasswordRequest newPasswordRequest);
 }
