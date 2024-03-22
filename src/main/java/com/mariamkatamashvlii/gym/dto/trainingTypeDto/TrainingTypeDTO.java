@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Generated
 @Builder
+@Generated
 public class TrainingTypeDTO {
     @Valid
     private Long trainingTypeId;

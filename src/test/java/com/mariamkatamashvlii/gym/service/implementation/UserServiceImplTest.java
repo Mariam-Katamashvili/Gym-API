@@ -76,6 +76,20 @@ class UserServiceImplTest {
     }
 
     @Test
+    void testLoginThrowsException() {
+        String username = "existingUser";
+        LoginRequest loginRequest = new LoginRequest(username, "password");
+
+        when(userRepo.findByUsername(anyString())).thenThrow(new RuntimeException("Database error"));
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            userServiceImpl.login(loginRequest);
+        });
+
+        assertEquals("Database error", exception.getMessage());
+    }
+
+    @Test
     void changePassword_UserNotFound() {
         NewPasswordRequest newPasswordRequest = new NewPasswordRequest("nonExistentUser", "currPassword", "newPassword");
         when(userRepo.findByUsername("nonExistentUser")).thenReturn(null);

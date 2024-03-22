@@ -3,7 +3,6 @@ package com.mariamkatamashvlii.gym.dto.trainingDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Generated
-@Builder
 public class TrainingRequest {
     @Valid
     @NotNull
