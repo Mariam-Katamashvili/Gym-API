@@ -1,32 +1,32 @@
 package com.mariamkatamashvlii.gym.service;
 
 import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
-import com.mariamkatamashvlii.gym.dto.TraineeProfileDTO;
-import com.mariamkatamashvlii.gym.dto.TrainerDTO;
-import com.mariamkatamashvlii.gym.dto.TrainerUsenameDTO;
-import com.mariamkatamashvlii.gym.dto.TrainingDTO;
-import com.mariamkatamashvlii.gym.dto.UpdateTraineeDTO;
-import com.mariamkatamashvlii.gym.entity.TrainingType;
+import com.mariamkatamashvlii.gym.dto.ToggleActivationDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.ProfileResponseDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.RegistrationRequestDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateRequestDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateResponseDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateTrainersRequestDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.TrainerDTO;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TraineeTrainingsRequestDTO;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingResponseDTO;
 
-import java.sql.Date;
 import java.util.List;
 
 public interface TraineeService {
-    RegistrationResponseDTO registerTrainee(TraineeProfileDTO traineeProfileDTO);
-    TraineeProfileDTO getTraineeProfile(String username);
+    RegistrationResponseDTO registerTrainee(RegistrationRequestDTO registrationRequestDTO);
+    ProfileResponseDTO getTraineeProfile(String username);
 
-    UpdateTraineeDTO updateProfile(String username, String firstName, String lastName, Date birthday, String address, Boolean isActive);
+    UpdateResponseDTO updateProfile(UpdateRequestDTO updateRequestDTO);
 
     void delete(String username);
 
-    List<TrainerDTO> getNotAssignedTrainers(String username);
+    List<TrainerDTO> getUnassignedTrainers(String username);
 
-    List<TrainingDTO> getTrainings(String username, Date fromDate, Date toDate, String trainerName, TrainingType trainingType);
+    List<TrainingResponseDTO> getTrainings(TraineeTrainingsRequestDTO traineeTrainingsRequestDTO);
 
-    List<TrainerDTO> updateTrainers(String username, List<TrainerUsenameDTO> trainers);
+    List<TrainerDTO> updateTrainers(UpdateTrainersRequestDTO updateTrainersRequestDTO);
 
-    void activateTrainee(String username, Boolean isActive);
-
-    void deactivateTrainee(String username, Boolean isActive);
+    void toggleActivation(ToggleActivationDTO toggleActivationDTO);
 
 }

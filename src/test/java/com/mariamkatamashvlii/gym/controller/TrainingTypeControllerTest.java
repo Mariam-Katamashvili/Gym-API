@@ -1,6 +1,5 @@
 package com.mariamkatamashvlii.gym.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
 import com.mariamkatamashvlii.gym.service.TrainingTypeService;
 import org.junit.jupiter.api.BeforeEach;

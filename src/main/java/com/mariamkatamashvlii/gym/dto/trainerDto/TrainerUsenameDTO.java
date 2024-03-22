@@ -1,4 +1,4 @@
-package com.mariamkatamashvlii.gym.dto;
+package com.mariamkatamashvlii.gym.dto.trainerDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -2,7 +2,7 @@
 //
 //import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
 //import com.mariamkatamashvlii.gym.dto.TraineeProfileDTO;
-//import com.mariamkatamashvlii.gym.dto.TrainerDTO;
+//import com.mariamkatamashvlii.gym.dto.trainerDto.TrainerDTO;
 //import com.mariamkatamashvlii.gym.dto.TrainingDTO;
 //import com.mariamkatamashvlii.gym.entity.Trainee;
 //import com.mariamkatamashvlii.gym.entity.Trainer;

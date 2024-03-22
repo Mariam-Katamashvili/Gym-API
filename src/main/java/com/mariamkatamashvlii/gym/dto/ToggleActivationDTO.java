@@ -1,6 +1,7 @@
 package com.mariamkatamashvlii.gym.dto;
 
-import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Generated;
@@ -10,9 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Generated
-public class TrainerDTO {
+public class ToggleActivationDTO {
+    @Valid
+    @NotNull
     private String username;
-    private String firstName;
-    private String lastName;
-    private TrainingTypeDTO specialization;
+
+    @Valid
+    @NotNull
+    private Boolean isActive;
 }

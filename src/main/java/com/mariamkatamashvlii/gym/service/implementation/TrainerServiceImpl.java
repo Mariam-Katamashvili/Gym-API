@@ -2,11 +2,15 @@ package com.mariamkatamashvlii.gym.service.implementation;
 
 import com.mariamkatamashvlii.gym.auth.Validator;
 import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
-import com.mariamkatamashvlii.gym.dto.TraineeDTO;
-import com.mariamkatamashvlii.gym.dto.TrainerProfileDTO;
-import com.mariamkatamashvlii.gym.dto.TrainingDTO;
+import com.mariamkatamashvlii.gym.dto.ToggleActivationDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.TraineeDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.ProfileResponseDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.RegistrationRequestDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.UpdateRequestDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.UpdateResponseDTO;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainerTrainingsRequestDTO;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingResponseDTO;
 import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
-import com.mariamkatamashvlii.gym.dto.UpdateTrainerDTO;
 import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.TrainingType;
 import com.mariamkatamashvlii.gym.entity.User;
@@ -21,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -36,16 +40,16 @@ public class TrainerServiceImpl implements TrainerService {
     private final PasswordGenerator passwordGenerator;
 
     @Override
-    public RegistrationResponseDTO registerTrainer(String firstName, String lastName, Long trainingTypeId) {
+    public RegistrationResponseDTO registerTrainer(RegistrationRequestDTO registrationRequestDTO) {
         User user = User.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .username(usernameGenerator.generateUsername(firstName, lastName))
+                .firstName(registrationRequestDTO.getFirstName())
+                .lastName(registrationRequestDTO.getLastName())
+                .username(usernameGenerator.generateUsername(registrationRequestDTO.getFirstName(), registrationRequestDTO.getLastName()))
                 .password(passwordGenerator.generatePassword())
                 .isActive(true)
                 .build();
         userRepo.save(user);
-        TrainingType type = trainingTypeRepo.findById(trainingTypeId).orElseThrow(() -> new EntityNotFoundException("TrainingType not found for id: " + trainingTypeId));
+        TrainingType type = trainingTypeRepo.findById(registrationRequestDTO.getSpecialization().getTrainingTypeId()).orElseThrow(() -> new EntityNotFoundException("TrainingType not found for id: " + registrationRequestDTO.getSpecialization().getTrainingTypeId()));
         Trainer trainer = Trainer.builder()
                 .specialization(type)
                 .user(user)
@@ -56,7 +60,7 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public TrainerProfileDTO trainerProfile(String username) {
+    public ProfileResponseDTO getTrainerProfile(String username) {
         Trainer trainer = trainerRepo.findByUsername(username);
         if (trainer == null) {
             throw new EntityNotFoundException("Trainer not found with username - " + username);
@@ -70,7 +74,7 @@ public class TrainerServiceImpl implements TrainerService {
                 trainee.getUser().getFirstName(),
                 trainee.getUser().getLastName()
         )).toList();
-        return new TrainerProfileDTO(
+        return new ProfileResponseDTO(
                 trainer.getUser().getFirstName(),
                 trainer.getUser().getLastName(),
                 specialization,
@@ -80,25 +84,30 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public UpdateTrainerDTO updateProfile(String username, String firstName, String lastName, TrainingTypeDTO specialization, Boolean isActive) {
+    public UpdateResponseDTO updateProfile(UpdateRequestDTO updateRequestDTO) {
+        String username = updateRequestDTO.getUsername();
         User user = userRepo.findByUsername(username);
         if (user == null) {
             throw new EntityNotFoundException("User not found");
         }
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setIsActive(isActive);
-        userRepo.save(user);
         Trainer trainer = trainerRepo.findByUsername(username);
         if (trainer == null) {
             throw new EntityNotFoundException("Trainee not found");
         }
+        user.setFirstName(updateRequestDTO.getFirstName());
+        user.setLastName(updateRequestDTO.getLastName());
+        user.setIsActive(updateRequestDTO.getIsActive());
+        userRepo.save(user);
+        TrainingTypeDTO specialization = new TrainingTypeDTO(
+                trainer.getSpecialization().getId(),
+                trainer.getSpecialization().getTrainingTypeName()
+        );
         List<TraineeDTO> trainees = trainer.getTrainees().stream().map(trainee -> new TraineeDTO(
                 trainee.getUser().getUsername(),
                 trainee.getUser().getFirstName(),
                 trainee.getUser().getLastName()
         )).toList();
-        return new UpdateTrainerDTO(
+        return new UpdateResponseDTO(
                 user.getUsername(),
                 user.getFirstName(),
                 user.getLastName(),
@@ -109,19 +118,23 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public List<TrainingDTO> getTrainings(String username, Date fromDate, Date toDate, String traineeName) {
+    public List<TrainingResponseDTO> getTrainings(TrainerTrainingsRequestDTO trainerTrainingsRequestDTO) {
+        String username = trainerTrainingsRequestDTO.getUsername();
+        LocalDate fromDate = trainerTrainingsRequestDTO.getFromDate();
+        LocalDate toDate = trainerTrainingsRequestDTO.getToDate();
+        String traineeName = trainerTrainingsRequestDTO.getTraineeName();
         Trainer trainer = trainerRepo.findByUsername(username);
         if (trainer == null || trainer.getTrainings() == null) {
             log.info("No trainings found or trainer does not exist for username: {}", username);
             return List.of();
         }
         return trainer.getTrainings().stream()
-//                .filter(t -> (fromDate == null || !t.getTrainingDate().before(fromDate)) && (toDate == null || !t.getTrainingDate().after(toDate)))
-//                .filter(t -> traineeName == null || t.getTrainee().getUser().getUsername().equalsIgnoreCase(traineeName))
+                .filter(t -> (fromDate == null || !t.getTrainingDate().isBefore(fromDate)) && (toDate == null || !t.getTrainingDate().isAfter(toDate)))
+                .filter(t -> traineeName == null || t.getTrainee().getUser().getUsername().equalsIgnoreCase(traineeName))
                 .map(t -> {
-                    TrainingDTO dto = new TrainingDTO();
+                    TrainingResponseDTO dto = new TrainingResponseDTO();
                     dto.setTrainingName(t.getTrainingName());
-                    //dto.setDate(t.getTrainingDate());
+                    dto.setDate(t.getTrainingDate());
                     dto.setTrainingType(t.getTrainingType());
                     dto.setDuration(t.getDuration());
                     dto.setName(t.getTrainer().getUser().getUsername());
@@ -130,20 +143,9 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public void activateTrainer(String username, Boolean isActive) {
-        toggleActivation(username, isActive);
-        log.info("Set activation to true for - {}", username);
-    }
-
-    @Override
-    public void deactivateTrainer(String username, Boolean isActive) {
-        toggleActivation(username, isActive);
-        log.info("Set activation to false for - {}", username);
-    }
-
-    private void toggleActivation(String username, boolean isActive) {
-        User user = userRepo.findByUsername(username);
-        user.setIsActive(isActive);
+    public void toggleActivation(ToggleActivationDTO toggleActivationDTO) {
+        User user = userRepo.findByUsername(toggleActivationDTO.getUsername());
+        user.setIsActive(toggleActivationDTO.getIsActive());
         userRepo.save(user);
     }
 }

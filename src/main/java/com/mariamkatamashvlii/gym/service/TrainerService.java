@@ -1,26 +1,26 @@
 package com.mariamkatamashvlii.gym.service;
 
 import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
-import com.mariamkatamashvlii.gym.dto.TrainerProfileDTO;
-import com.mariamkatamashvlii.gym.dto.TrainingDTO;
-import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
-import com.mariamkatamashvlii.gym.dto.UpdateTrainerDTO;
+import com.mariamkatamashvlii.gym.dto.ToggleActivationDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.ProfileResponseDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.RegistrationRequestDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.UpdateRequestDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.UpdateResponseDTO;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainerTrainingsRequestDTO;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingResponseDTO;
 
-import java.sql.Date;
 import java.util.List;
 
 public interface TrainerService {
 
-    RegistrationResponseDTO registerTrainer(String firstName, String lastName, Long trainingTypeId);
+    RegistrationResponseDTO registerTrainer(RegistrationRequestDTO registrationRequestDTO);
 
-    TrainerProfileDTO trainerProfile(String username);
+    ProfileResponseDTO getTrainerProfile(String username);
 
-    UpdateTrainerDTO updateProfile(String username, String firstName, String lastName, TrainingTypeDTO specialization, Boolean isActive);
+    UpdateResponseDTO updateProfile(UpdateRequestDTO updateRequestDTO);
 
-    List<TrainingDTO> getTrainings(String username, Date fromDate, Date toDate, String traineeName);
+    List<TrainingResponseDTO> getTrainings(TrainerTrainingsRequestDTO trainerTrainingsRequestDTO);
 
-    void activateTrainer(String username, Boolean isActive);
-
-    void deactivateTrainer(String username, Boolean isActive);
+    void toggleActivation(ToggleActivationDTO toggleActivationDTO);
 
 }

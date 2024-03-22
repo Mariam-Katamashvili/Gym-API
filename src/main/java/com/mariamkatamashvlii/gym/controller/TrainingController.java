@@ -16,7 +16,7 @@ public class TrainingController {
     private final TrainingService trainingService;
 
     @PostMapping("/add")
-    public ResponseEntity<String> addTraining(
+    public ResponseEntity<String> add(
             @RequestBody TrainingRequest trainingRequest) {
         trainingService.create(trainingRequest);
         return ResponseEntity.ok("Training added successfully");

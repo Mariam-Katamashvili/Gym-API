@@ -1,42 +1,36 @@
-package com.mariamkatamashvlii.gym.dto;
+package com.mariamkatamashvlii.gym.dto.trainerDto;
 
+import com.mariamkatamashvlii.gym.dto.traineeDto.TraineeDTO;
+import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Generated
-public class UpdateTraineeDTO {
+public class UpdateResponseDTO {
     @Valid
-    @NotNull
     private String username;
 
     @Valid
-    @NotNull
     private String firstName;
 
     @Valid
-    @NotNull
     private String lastName;
 
     @Valid
-    private Date birthday;
+    private TrainingTypeDTO specialization;
 
     @Valid
-    private String address;
-
-    @Valid
-    @NotNull
     private Boolean isActive;
 
     @Valid
-    private List<TrainerDTO> trainers;
+    private List<TraineeDTO> trainees;
+
 }

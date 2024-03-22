@@ -1,16 +1,20 @@
 package com.mariamkatamashvlii.gym.service.implementation;
 
 import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
-import com.mariamkatamashvlii.gym.dto.TraineeProfileDTO;
-import com.mariamkatamashvlii.gym.dto.TrainerDTO;
-import com.mariamkatamashvlii.gym.dto.TrainerUsenameDTO;
-import com.mariamkatamashvlii.gym.dto.TrainingDTO;
+import com.mariamkatamashvlii.gym.dto.ToggleActivationDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.ProfileResponseDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.RegistrationRequestDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateRequestDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateResponseDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateTrainersRequestDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.TrainerDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.TrainerUsenameDTO;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TraineeTrainingsRequestDTO;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingResponseDTO;
 import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
-import com.mariamkatamashvlii.gym.dto.UpdateTraineeDTO;
 import com.mariamkatamashvlii.gym.entity.Trainee;
 import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.Training;
-import com.mariamkatamashvlii.gym.entity.TrainingType;
 import com.mariamkatamashvlii.gym.entity.User;
 import com.mariamkatamashvlii.gym.exception.UserNotCreatedException;
 import com.mariamkatamashvlii.gym.generator.PasswordGenerator;
@@ -26,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -44,10 +48,10 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
-    public RegistrationResponseDTO registerTrainee(TraineeProfileDTO traineeProfileDTO) {
+    public RegistrationResponseDTO registerTrainee(RegistrationRequestDTO registrationRequestDTO) {
         try {
-            String firstName = traineeProfileDTO.getFirstName();
-            String lastName = traineeProfileDTO.getLastName();
+            String firstName = registrationRequestDTO.getFirstName();
+            String lastName = registrationRequestDTO.getLastName();
             User user = User.builder()
                     .firstName(firstName)
                     .lastName(lastName)
@@ -58,8 +62,8 @@ public class TraineeServiceImpl implements TraineeService {
             userRepo.save(user);
 
             Trainee trainee = Trainee.builder()
-                    .birthday(traineeProfileDTO.getBirthday())
-                    .address(traineeProfileDTO.getAddress())
+                    .birthday(registrationRequestDTO.getBirthday())
+                    .address(registrationRequestDTO.getAddress())
                     .user(user)
                     .build();
             traineeRepo.save(trainee);
@@ -71,7 +75,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public TraineeProfileDTO getTraineeProfile(String username) {
+    public ProfileResponseDTO getTraineeProfile(String username) {
         User user = userRepo.findByUsername(username);
         Trainee trainee = traineeRepo.findByUsername(username);
         List<TrainerDTO> trainers = trainee.getTrainers().stream().map(trainer -> {
@@ -86,7 +90,7 @@ public class TraineeServiceImpl implements TraineeService {
             dto.setSpecialization(specializationDTO);
             return dto;
         }).toList();
-        return new TraineeProfileDTO(
+        return new ProfileResponseDTO(
                 user.getFirstName(),
                 user.getLastName(),
                 trainee.getBirthday(),
@@ -98,21 +102,21 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
-    public UpdateTraineeDTO updateProfile(String username, String firstName, String lastName, Date birthday, String address, Boolean isActive) {
-        User user = userRepo.findByUsername(username);
+    public UpdateResponseDTO updateProfile(UpdateRequestDTO updateRequestDTO) {
+        User user = userRepo.findByUsername(updateRequestDTO.getUsername());
         if (user == null) {
             throw new EntityNotFoundException("User not found");
         }
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setIsActive(isActive);
+        user.setFirstName(updateRequestDTO.getFirstName());
+        user.setLastName(updateRequestDTO.getLastName());
+        user.setIsActive(updateRequestDTO.getIsActive());
         userRepo.save(user);
-        Trainee trainee = traineeRepo.findByUsername(username);
+        Trainee trainee = traineeRepo.findByUsername(updateRequestDTO.getUsername());
         if (trainee == null) {
             throw new EntityNotFoundException("Trainee not found");
         }
-        trainee.setBirthday(birthday);
-        trainee.setAddress(address);
+        trainee.setBirthday(updateRequestDTO.getBirthday());
+        trainee.setAddress(updateRequestDTO.getAddress());
         traineeRepo.save(trainee);
         List<TrainerDTO> trainers = trainee.getTrainers().stream().map(trainer -> {
             TrainerDTO dto = new TrainerDTO();
@@ -126,7 +130,7 @@ public class TraineeServiceImpl implements TraineeService {
             dto.setSpecialization(specializationDTO);
             return dto;
         }).toList();
-        return new UpdateTraineeDTO(
+        return new UpdateResponseDTO(
                 user.getUsername(),
                 user.getFirstName(),
                 user.getLastName(),
@@ -141,9 +145,9 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public void delete(String username) {
         Trainee trainee = traineeRepo.findByUsername(username);
+        User user = userRepo.findByUsername(username);
         if (trainee == null) {
-            log.info("Trainee does not exist for username: {}", username);
-            return;
+            throw new EntityNotFoundException("trainee does not exist");
         }
         Set<Training> trainings = trainee.getTrainings();
         for (Training t : trainings) {
@@ -151,11 +155,13 @@ public class TraineeServiceImpl implements TraineeService {
         }
         traineeRepo.delete(trainee);
         log.info("Deleted trainee with username {}", username);
+        userRepo.delete(user);
+        log.info("Deleted user with username {}", username);
     }
 
     @Override
-    public List<TrainerDTO> getNotAssignedTrainers(String username) {
-        List<TrainerDTO> notAssignedTrainers = new ArrayList<>();
+    public List<TrainerDTO> getUnassignedTrainers(String username) {
+        List<TrainerDTO> unassignedTrainers = new ArrayList<>();
         Trainee trainee = traineeRepo.findByUsername(username);
         if (trainee != null) {
             List<Trainer> traineeTrainers = trainee.getTrainers();
@@ -171,16 +177,21 @@ public class TraineeServiceImpl implements TraineeService {
                             t.getSpecialization().getTrainingTypeName()
                     );
                     dto.setSpecialization(specializationDTO);
-                    notAssignedTrainers.add(dto);
+                    unassignedTrainers.add(dto);
                 }
             }
         }
         log.info("Returning not assigned trainer list for trainee {}", username);
-        return notAssignedTrainers;
+        return unassignedTrainers;
     }
 
     @Override
-    public List<TrainingDTO> getTrainings(String username, Date fromDate, Date toDate, String trainerName, TrainingType trainingType) {
+    public List<TrainingResponseDTO> getTrainings(TraineeTrainingsRequestDTO traineeTrainingsRequestDTO) {
+        String username = traineeTrainingsRequestDTO.getUsername();
+        String trainerName = traineeTrainingsRequestDTO.getTrainerName();
+        LocalDate fromDate = traineeTrainingsRequestDTO.getFromDate(); // Assuming these fields exist
+        LocalDate toDate = traineeTrainingsRequestDTO.getToDate();
+        TrainingTypeDTO trainingType = traineeTrainingsRequestDTO.getTrainingType();
         Trainee trainee = traineeRepo.findByUsername(username);
         if (trainee == null || trainee.getTrainings() == null) {
             log.info("No trainings found or trainee does not exist for username: {}", username);
@@ -188,13 +199,13 @@ public class TraineeServiceImpl implements TraineeService {
         }
 
         return trainee.getTrainings().stream()
-               // .filter(t -> (fromDate == null || !t.getTrainingDate().before(fromDate)) && (toDate == null || !t.getTrainingDate().after(toDate)))
+                .filter(t -> (fromDate == null || !t.getTrainingDate().isBefore(fromDate)) && (toDate == null || !t.getTrainingDate().isAfter(toDate)))
                 .filter(t -> trainerName == null || t.getTrainer().getUser().getUsername().equalsIgnoreCase(trainerName))
-                .filter(t -> trainingType == null || t.getTrainingType().equals(trainingType))
+                .filter(t -> trainingType == null || t.getTrainingType().getTrainingTypeName().equals(trainingType.getTrainingTypeName()))
                 .map(t -> {
-                    TrainingDTO dto = new TrainingDTO();
+                    TrainingResponseDTO dto = new TrainingResponseDTO();
                     dto.setTrainingName(t.getTrainingName());
-                   // dto.setDate(t.getTrainingDate());
+                    dto.setDate(t.getTrainingDate());
                     dto.setTrainingType(t.getTrainingType());
                     dto.setDuration(t.getDuration());
                     dto.setName(t.getTrainer().getUser().getUsername());
@@ -203,11 +214,12 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public List<TrainerDTO> updateTrainers(String username, List<TrainerUsenameDTO> trainers) {
+    public List<TrainerDTO> updateTrainers(UpdateTrainersRequestDTO updateTrainersRequestDTO) {
+        String username = updateTrainersRequestDTO.getUsername();
         Trainee trainee = traineeRepo.findByUsername(username);
         List<TrainerDTO> newTrainers = new ArrayList<>();
         if (trainee != null) {
-            List<Trainer> updatedTrainers = trainers.stream()
+            List<Trainer> updatedTrainers = updateTrainersRequestDTO.getTrainers().stream()
                     .map(TrainerUsenameDTO::getUsername)
                     .map(trainerRepo::findByUsername)
                     .toList();
@@ -233,20 +245,9 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public void activateTrainee(String username, Boolean isActive) {
-        toggleActivation(username, true);
-        log.info("Set activation to true for - {}", username);
-    }
-
-    @Override
-    public void deactivateTrainee(String username, Boolean isActive) {
-        toggleActivation(username, false);
-        log.info("Set activation to false for - {}", username);
-    }
-
-    private void toggleActivation(String username, Boolean isActive) {
-        User user = userRepo.findByUsername(username);
-        user.setIsActive(isActive);
+    public void toggleActivation(ToggleActivationDTO toggleActivationDTO) {
+        User user = userRepo.findByUsername(toggleActivationDTO.getUsername());
+        user.setIsActive(toggleActivationDTO.getIsActive());
         userRepo.save(user);
     }
 }
