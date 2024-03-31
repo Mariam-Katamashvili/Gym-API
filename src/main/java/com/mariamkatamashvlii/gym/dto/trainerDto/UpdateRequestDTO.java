@@ -30,7 +30,7 @@ public class UpdateRequestDTO {
 
     @Valid
     @NotNull
-    private boolean isActive;
+    private Boolean isActive;
 
     public Boolean getIsActive() {
         return isActive;

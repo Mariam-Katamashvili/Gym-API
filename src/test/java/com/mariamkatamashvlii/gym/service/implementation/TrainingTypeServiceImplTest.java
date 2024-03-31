@@ -6,64 +6,54 @@ import com.mariamkatamashvlii.gym.exception.TrainingTypeFetchException;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
+import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
 class TrainingTypeServiceImplTest {
     @Mock
-    private TrainingTypeRepository trainingTypeRepository;
+    private TrainingTypeRepository trainingTypeRepo;
 
     @InjectMocks
     private TrainingTypeServiceImpl trainingTypeService;
 
-    private TrainingType trainingType;
-    private TrainingTypeDTO trainingTypeDTO;
+    private static final Long TRAINING_TYPE_ID = 1L;
+    private static final String TRAINING_TYPE_NAME = "Gymnastics";
 
     @BeforeEach
     void setUp() {
-        trainingType = TrainingType.builder()
-                .id(1L)
-                .trainingTypeName("Yoga")
-                .build();
-
-        trainingTypeDTO = TrainingTypeDTO.builder()
-                .trainingTypeId(1L)
-                .trainingTypeName("Yoga")
-                .build();
+        MockitoAnnotations.openMocks(this);
     }
-    @Test
-    void findAll_Success() {
-        when(trainingTypeRepository.findAll()).thenReturn(List.of(trainingType));
 
+    @Test
+    void FindAll_Success() {
+        // Given
+        TrainingType trainingType = new TrainingType(TRAINING_TYPE_ID, TRAINING_TYPE_NAME, Collections.emptySet(), Collections.emptySet());
+        given(trainingTypeRepo.findAll()).willReturn(List.of(trainingType));
+
+        // When
         List<TrainingTypeDTO> result = trainingTypeService.findAll();
 
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        assertEquals(1, result.size());
-        assertEquals(trainingTypeDTO.getTrainingTypeId(), result.get(0).getTrainingTypeId());
-        assertEquals(trainingTypeDTO.getTrainingTypeName(), result.get(0).getTrainingTypeName());
-
-        verify(trainingTypeRepository).findAll();
+        // Then
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getTrainingTypeId()).isEqualTo(TRAINING_TYPE_ID);
+        assertThat(result.get(0).getTrainingTypeName()).isEqualTo(TRAINING_TYPE_NAME);
     }
 
     @Test
-    void testFindAllThrowsException() {
-        when(trainingTypeRepository.findAll()).thenThrow(new RuntimeException("Database error"));
+    void FindAll_ThrowException() {
+        // Given
+        given(trainingTypeRepo.findAll()).willThrow(new RuntimeException("Database error"));
 
-        assertThrows(TrainingTypeFetchException.class, () -> trainingTypeService.findAll());
-
-        verify(trainingTypeRepository).findAll();
+        // When & Then
+        Exception exception = assertThrows(TrainingTypeFetchException.class, () -> trainingTypeService.findAll());
+        assertThat(exception.getMessage()).contains("Error retrieving all training types");
     }
 }

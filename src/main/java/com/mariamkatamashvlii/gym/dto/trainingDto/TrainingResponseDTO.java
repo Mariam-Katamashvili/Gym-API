@@ -1,6 +1,6 @@
 package com.mariamkatamashvlii.gym.dto.trainingDto;
 
-import com.mariamkatamashvlii.gym.entity.TrainingType;
+import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,10 +21,10 @@ public class TrainingResponseDTO {
     private LocalDate date;
 
     @Valid
-    private TrainingType trainingType;
+    private TrainingTypeDTO trainingType;
 
     @Valid
-    private Number duration;
+    private Integer duration;
 
     @Valid
     private String name;

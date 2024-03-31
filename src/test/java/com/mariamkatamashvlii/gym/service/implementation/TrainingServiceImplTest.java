@@ -1,6 +1,6 @@
 package com.mariamkatamashvlii.gym.service.implementation;
 
-import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingRequest;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingRequestDTO;
 import com.mariamkatamashvlii.gym.entity.Trainee;
 import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.exception.TraineeNotFoundException;
@@ -8,75 +8,89 @@ import com.mariamkatamashvlii.gym.exception.TrainerNotFoundException;
 import com.mariamkatamashvlii.gym.repository.TraineeRepository;
 import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingRepository;
+import com.mariamkatamashvlii.gym.validator.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 
-import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class TrainingServiceImplTest {
     @Mock
-    private TrainingRepository trainingRepo;
+    private TrainingRepository trainingRepository;
 
     @Mock
-    private TraineeRepository traineeRepo;
+    private TraineeRepository traineeRepository;
 
     @Mock
-    private TrainerRepository trainerRepo;
+    private TrainerRepository trainerRepository;
+
+    @Mock
+    private Validator validator;
 
     @InjectMocks
     private TrainingServiceImpl trainingService;
 
-    private TrainingRequest trainingRequest;
-    private Trainee trainee;
-    private Trainer trainer;
+    private static final String TRAINEE_USERNAME = "testTrainee";
+    private static final String TRAINER_USERNAME = "testTrainer";
+    private static final String TRAINING_NAME = "Strength Training";
+    private static final LocalDate TRAINING_DATE = LocalDate.of(2024, 1, 1);
+    private static final Integer TRAINING_DURATION = 60;
 
     @BeforeEach
-    void setUp() {
-        trainingRequest = new TrainingRequest();
-        trainingRequest.setTraineeUsername("traineeUser");
-        trainingRequest.setTrainerUsername("trainerUser");
-        trainingRequest.setTrainingName("Yoga");
-        LocalDate trainingDate = LocalDate.of(2024, 3, 20);
-        trainingRequest.setDate(trainingDate);
-        trainingRequest.setDuration(60);
-
-        trainee = new Trainee();
-        trainer = new Trainer();
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
     void createTraining_Success() {
-        when(traineeRepo.findByUsername("traineeUser")).thenReturn(trainee);
-        when(trainerRepo.findByUsername("trainerUser")).thenReturn(trainer);
+        // Given
+        TrainingRequestDTO dto = new TrainingRequestDTO(TRAINEE_USERNAME, TRAINER_USERNAME, TRAINING_NAME, TRAINING_DATE, TRAINING_DURATION);
+        Trainee mockTrainee = new Trainee();
+        Trainer mockTrainer = new Trainer();
+        when(traineeRepository.findByUsername(dto.getTraineeUsername())).thenReturn(mockTrainee);
+        when(trainerRepository.findByUsername(dto.getTrainerUsername())).thenReturn(mockTrainer);
+        doNothing().when(validator).validateTraineeExists(dto.getTraineeUsername());
+        doNothing().when(validator).validateTrainerExists(dto.getTrainerUsername());
 
-        trainingService.create(trainingRequest);
+        // When
+        trainingService.create(dto);
 
-        verify(trainingRepo).save(any());
+        // Then
+        verify(trainingRepository, times(1)).save(any());
     }
 
     @Test
-    void createTraining_ThrowsTraineeNotFoundException() {
-        when(traineeRepo.findByUsername("traineeUser")).thenReturn(null);
+    void createTraining_Fail_TraineeNotFound() {
+        // Given
+        TrainingRequestDTO dto = new TrainingRequestDTO(TRAINEE_USERNAME, TRAINER_USERNAME, TRAINING_NAME, TRAINING_DATE, TRAINING_DURATION);
+        doThrow(new TraineeNotFoundException("Trainee not found for username - " + TRAINEE_USERNAME)).when(validator).validateTraineeExists(dto.getTraineeUsername());
 
-        assertThrows(TraineeNotFoundException.class, () -> trainingService.create(trainingRequest));
+        // When & Then
+        Exception exception = assertThrows(TraineeNotFoundException.class, () -> trainingService.create(dto));
+        assertTrue(exception.getMessage().contains("Trainee not found for username - " + TRAINEE_USERNAME));
     }
 
     @Test
-    void createTraining_ThrowsTrainerNotFoundException() {
-        when(traineeRepo.findByUsername("traineeUser")).thenReturn(trainee);
-        when(trainerRepo.findByUsername("trainerUser")).thenReturn(null);
+    void createTraining_Fail_TrainerNotFound() {
+        // Given
+        TrainingRequestDTO dto = new TrainingRequestDTO(TRAINEE_USERNAME, TRAINER_USERNAME, TRAINING_NAME, TRAINING_DATE, TRAINING_DURATION);
+        doNothing().when(validator).validateTraineeExists(dto.getTraineeUsername());
+        doThrow(new TrainerNotFoundException("Trainer not found")).when(validator).validateTrainerExists(dto.getTrainerUsername());
 
-        assertThrows(TrainerNotFoundException.class, () -> trainingService.create(trainingRequest));
+        // When & Then
+        Exception exception = assertThrows(TrainerNotFoundException.class, () -> trainingService.create(dto));
+        assertTrue(exception.getMessage().contains("Trainer not found"));
     }
-
 }

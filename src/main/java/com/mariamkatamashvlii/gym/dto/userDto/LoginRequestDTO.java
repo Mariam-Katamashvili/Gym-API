@@ -1,30 +1,24 @@
-package com.mariamkatamashvlii.gym.dto.trainingDto;
+package com.mariamkatamashvlii.gym.dto.userDto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Generated
-public class TrainerTrainingsRequestDTO {
+public class LoginRequestDTO {
     @Valid
     @NotNull
     private String username;
 
     @Valid
-    private LocalDate fromDate;
-
-    @Valid
-    private LocalDate toDate;
-
-    @Valid
-    private String traineeName;
-
+    @NotNull
+    private String password;
 }

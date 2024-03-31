@@ -1,6 +1,5 @@
 package com.mariamkatamashvlii.gym.dto.trainingDto;
 
-import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -14,20 +13,24 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Generated
-public class TraineeTrainingsRequestDTO {
+public class TrainingRequestDTO {
     @Valid
     @NotNull
-    private String username;
+    private String traineeUsername;
 
     @Valid
-    private LocalDate fromDate;
+    @NotNull
+    private String trainerUsername;
 
     @Valid
-    private LocalDate toDate;
+    @NotNull
+    private String trainingName;
 
     @Valid
-    private String trainerName;
+    @NotNull
+    private LocalDate date;
 
     @Valid
-    private TrainingTypeDTO trainingType;
+    @NotNull
+    private Integer duration;
 }

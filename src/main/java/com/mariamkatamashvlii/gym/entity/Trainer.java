@@ -1,5 +1,6 @@
 package com.mariamkatamashvlii.gym.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -41,7 +42,7 @@ public class Trainer {
     @JoinColumn(name = "specialization", referencedColumnName = "id")
     private TrainingType specialization;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
     private User user;
 

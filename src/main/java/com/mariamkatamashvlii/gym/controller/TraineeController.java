@@ -8,8 +8,8 @@ import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateRequestDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateTrainersRequestDTO;
 import com.mariamkatamashvlii.gym.dto.trainerDto.TrainerDTO;
-import com.mariamkatamashvlii.gym.dto.trainingDto.TraineeTrainingsRequestDTO;
 import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingResponseDTO;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingsRequestDTO;
 import com.mariamkatamashvlii.gym.service.TraineeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,61 +27,61 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/traineeProfile")
+@RequestMapping("/trainees")
 public class TraineeController {
     private final TraineeService traineeService;
 
     @PostMapping("/registration")
     public ResponseEntity<RegistrationResponseDTO> registration(
-            @RequestBody RegistrationRequestDTO registrationRequestDTO) {
-        RegistrationResponseDTO registrationResponseDTO = traineeService.registerTrainee(registrationRequestDTO);
-        return ResponseEntity.ok(registrationResponseDTO);
+            @RequestBody RegistrationRequestDTO registrationRequest) {
+        RegistrationResponseDTO registrationResponse = traineeService.register(registrationRequest);
+        return ResponseEntity.ok(registrationResponse);
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/{username}/profile")
     public ResponseEntity<ProfileResponseDTO> getProfile(
             @PathVariable String username) {
-        ProfileResponseDTO profile = traineeService.getTraineeProfile(username);
+        ProfileResponseDTO profile = traineeService.getProfile(username);
         return ResponseEntity.ok(profile);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/{username}")
     public ResponseEntity<UpdateResponseDTO> update(
-            @RequestBody UpdateRequestDTO updateRequestDTO) {
-        UpdateResponseDTO response = traineeService.updateProfile(updateRequestDTO);
+            @RequestBody UpdateRequestDTO updateRequest) {
+        UpdateResponseDTO response = traineeService.updateProfile(updateRequest);
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{username}/delete")
+    @DeleteMapping("/delete/{username}")
     public ResponseEntity<String> delete(
             @PathVariable String username) {
         traineeService.delete(username);
         return ResponseEntity.ok("Trainee deleted successfully");
     }
 
-    @GetMapping("/{username}/unassigned")
+    @GetMapping("/{username}/unassigned-trainers")
     public ResponseEntity<List<TrainerDTO>> getUnassigned(
             @PathVariable String username) {
-        List<TrainerDTO> trainerDTO = traineeService.getUnassignedTrainers(username);
-        return ResponseEntity.ok(trainerDTO);
+        List<TrainerDTO> trainer = traineeService.getUnassignedTrainers(username);
+        return ResponseEntity.ok(trainer);
     }
-    @PutMapping("/{username}/updateTrainers")
+    @PutMapping("/{username}/trainers/update")
     public ResponseEntity<List<TrainerDTO>> updateTrainers(
-            @RequestBody UpdateTrainersRequestDTO updateTrainersRequestDTO) {
-        List<TrainerDTO> trainerDTO = traineeService.updateTrainers(updateTrainersRequestDTO);
-        return ResponseEntity.ok(trainerDTO);
+            @RequestBody UpdateTrainersRequestDTO updateTrainersRequest) {
+        List<TrainerDTO> trainer = traineeService.updateTrainers(updateTrainersRequest);
+        return ResponseEntity.ok(trainer);
     }
-    @GetMapping("/{username}/getTrainings")
+    @GetMapping("/{username}/trainings")
     public ResponseEntity<List<TrainingResponseDTO>> traineeTrainings(
-            @RequestBody TraineeTrainingsRequestDTO traineeTrainingsRequestDTO) {
-        List<TrainingResponseDTO> trainingResponseDTO = traineeService.getTrainings(traineeTrainingsRequestDTO);
-        return ResponseEntity.ok(trainingResponseDTO);
+            @RequestBody TrainingsRequestDTO traineeTrainingsRequest) {
+        List<TrainingResponseDTO> trainingResponse = traineeService.getTrainings(traineeTrainingsRequest);
+        return ResponseEntity.ok(trainingResponse);
     }
 
     @PatchMapping("/{username}/toggleActivation")
     public ResponseEntity<String> toggleActivation(
-            @RequestBody ToggleActivationDTO toggleActivationDTO) {
-        traineeService.toggleActivation(toggleActivationDTO);
+            @RequestBody ToggleActivationDTO toggleActivation) {
+        traineeService.toggleActivation(toggleActivation);
         return ResponseEntity.ok("Activation status changed");
     }
 }

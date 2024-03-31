@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.Generated;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -23,7 +23,7 @@ public class RegistrationRequestDTO {
     private String lastName;
 
     @Valid
-    private Date birthday;
+    private LocalDate birthday;
 
     @Valid
     private String address;

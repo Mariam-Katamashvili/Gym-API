@@ -1,10 +1,12 @@
 package com.mariamkatamashvlii.gym.service.implementation;
 
-import com.mariamkatamashvlii.gym.dto.userDto.LoginRequest;
-import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordRequest;
+import com.mariamkatamashvlii.gym.dto.userDto.LoginRequestDTO;
+import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordRequestDTO;
 import com.mariamkatamashvlii.gym.entity.User;
+import com.mariamkatamashvlii.gym.exception.AuthenticationException;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
 import com.mariamkatamashvlii.gym.service.UserService;
+import com.mariamkatamashvlii.gym.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,56 +19,43 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepo;
+    private final Validator validator;
 
     @Override
-    @Transactional
-    public boolean login(LoginRequest loginRequest) {
+    public boolean login(LoginRequestDTO loginRequestDTO) {
         String transactionId = UUID.randomUUID().toString();
+
+        String username = loginRequestDTO.getUsername();
+        String password = loginRequestDTO.getPassword();
+        validator.validateUserExists(username);
         log.info("[{}] Transaction started for login operation", transactionId);
 
-        String username = loginRequest.getUsername();
-        String password = loginRequest.getPassword();
-
-        try {
-            User user = userRepo.findByUsername(username);
-            if (user == null) {
-                log.info("[{}] Username {} does not exist", transactionId, username);
-                return false;
-            }
-            if (user.getPassword().equals(password)) {
-                log.info("[{}] User {} logged in successfully", transactionId, username);
-                return true;
-            } else {
-                log.info("[{}] Password for {} is incorrect", transactionId, username);
-                return false;
-            }
-        } catch (Exception e) {
-            log.error("[{}] Error during login for user {}: {}", transactionId, username, e.getMessage());
-            throw e;
-        } finally {
-            log.info("[{}] Transaction ended for login operation", transactionId);
+        User user = userRepo.findByUsername(username);
+        if (!user.getPassword().equals(password)) {
+            log.info("[{}] Password for {} is incorrect", transactionId, username);
+            throw new AuthenticationException("Password is incorrect.");
         }
+        log.info("[{}] User {} logged in successfully", transactionId, username);
+        return true;
+
     }
 
     @Override
-    public void changePassword(NewPasswordRequest newPasswordRequest) {
+    @Transactional
+    public void changePassword(NewPasswordRequestDTO newPasswordRequestDTO) {
         String transactionId = UUID.randomUUID().toString();
-        log.info("[{}] Starting password change operation for user: {}", transactionId, newPasswordRequest.getUsername());
-        try {
-            User user = userRepo.findByUsername(newPasswordRequest.getUsername());
-            if (user == null) {
-                log.warn("[{}] No user found with username: {}", transactionId, newPasswordRequest.getUsername());
-                return;
-            }
+        validator.validateUserExists(newPasswordRequestDTO.getUsername());
+        log.info("[{}] Starting password change operation for user: {}", transactionId, newPasswordRequestDTO.getUsername());
 
-            user.setPassword(newPasswordRequest.getNewPass());
-            userRepo.save(user);
-
-            log.info("[{}] Password changed successfully for user: {}", transactionId, newPasswordRequest.getUsername());
-        } catch (Exception e) {
-            log.error("[{}] Error changing password for user: {}. Error: {}", transactionId, newPasswordRequest.getUsername(), e.getMessage());
-            throw e;
+        User user = userRepo.findByUsername(newPasswordRequestDTO.getUsername());
+        if (!user.getPassword().equals(newPasswordRequestDTO.getCurrentPass())) {
+            log.warn("[{}] Invalid username or password", transactionId);
+            throw new AuthenticationException("Current password is incorrect!");
         }
+        user.setPassword(newPasswordRequestDTO.getNewPass());
+        userRepo.save(user);
+
+        log.info("[{}] Password changed successfully for user: {}", transactionId, newPasswordRequestDTO.getUsername());
     }
 
 }

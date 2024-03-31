@@ -1,6 +1,6 @@
 package com.mariamkatamashvlii.gym.controller;
 
-import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingRequest;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingRequestDTO;
 import com.mariamkatamashvlii.gym.service.TrainingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class TrainingController {
     private final TrainingService trainingService;
 
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<String> add(
-            @RequestBody TrainingRequest trainingRequest) {
-        trainingService.create(trainingRequest);
+            @RequestBody TrainingRequestDTO trainingRequestDTO) {
+        trainingService.create(trainingRequestDTO);
         return ResponseEntity.ok("Training added successfully");
     }
 }

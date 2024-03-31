@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Generated
 public class RegistrationResponseDTO {
-
     @Valid
     private String username;
 

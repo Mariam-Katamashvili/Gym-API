@@ -11,11 +11,11 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/trainingTypes")
+@RequestMapping("/training-types")
 public class TrainingTypeController {
     private final TrainingTypeService trainingTypeService;
 
-    @GetMapping("/getAll")
+    @GetMapping
     public List<TrainingTypeDTO> getAll() {
         return trainingTypeService.findAll();
     }

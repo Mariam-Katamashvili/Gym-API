@@ -8,14 +8,14 @@ import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateRequestDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateTrainersRequestDTO;
 import com.mariamkatamashvlii.gym.dto.trainerDto.TrainerDTO;
-import com.mariamkatamashvlii.gym.dto.trainingDto.TraineeTrainingsRequestDTO;
 import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingResponseDTO;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingsRequestDTO;
 
 import java.util.List;
 
 public interface TraineeService {
-    RegistrationResponseDTO registerTrainee(RegistrationRequestDTO registrationRequestDTO);
-    ProfileResponseDTO getTraineeProfile(String username);
+    RegistrationResponseDTO register(RegistrationRequestDTO registrationRequestDTO);
+    ProfileResponseDTO getProfile(String username);
 
     UpdateResponseDTO updateProfile(UpdateRequestDTO updateRequestDTO);
 
@@ -23,7 +23,7 @@ public interface TraineeService {
 
     List<TrainerDTO> getUnassignedTrainers(String username);
 
-    List<TrainingResponseDTO> getTrainings(TraineeTrainingsRequestDTO traineeTrainingsRequestDTO);
+    List<TrainingResponseDTO> getTrainings(TrainingsRequestDTO trainingsRequestDTO);
 
     List<TrainerDTO> updateTrainers(UpdateTrainersRequestDTO updateTrainersRequestDTO);
 

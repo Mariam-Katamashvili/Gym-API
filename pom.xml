@@ -68,19 +68,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.30</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>3.0.0</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.0.2</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -92,8 +82,6 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>2.9.9</version>
         </dependency>
-
-
     </dependencies>
 
     <build>
@@ -128,6 +116,15 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>com/mariamkatamashvlii/gym/controller/**/*</exclude>
+                        <exclude>com/mariamkatamashvlii/gym/dto/**/*</exclude>
+                        <exclude>com/mariamkatamashvlii/gym/entity/**/*</exclude>
+                        <exclude>com/mariamkatamashvlii/gym/exception/**/*</exclude>
+                        <exclude>com/mariamkatamashvlii/gym/validator/**/*</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>

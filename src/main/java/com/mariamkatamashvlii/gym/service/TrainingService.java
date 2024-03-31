@@ -1,8 +1,8 @@
 package com.mariamkatamashvlii.gym.service;
 
-import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingRequest;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingRequestDTO;
 
 public interface TrainingService {
-    void create(TrainingRequest trainingRequest);
+    void create(TrainingRequestDTO trainingRequestDTO);
 
 }

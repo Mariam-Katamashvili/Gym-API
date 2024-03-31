@@ -1,126 +1,104 @@
 package com.mariamkatamashvlii.gym.service.implementation;
 
-import com.mariamkatamashvlii.gym.dto.userDto.LoginRequest;
-import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordRequest;
+import com.mariamkatamashvlii.gym.dto.userDto.LoginRequestDTO;
+import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordRequestDTO;
 import com.mariamkatamashvlii.gym.entity.User;
+import com.mariamkatamashvlii.gym.exception.AuthenticationException;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
+import com.mariamkatamashvlii.gym.validator.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
     @Mock
-    private UserRepository userRepo;
+    private UserRepository userRepository;
+
+    @Mock
+    private Validator validator;
 
     @InjectMocks
-    private UserServiceImpl userServiceImpl;
+    private UserServiceImpl userService;
+
+    private static final String USERNAME = "existingUser";
+    private static final String PASSWORD = "correctPassword";
+    private static final String NEW_PASSWORD = "newPassword";
+    private static final String WRONG_PASSWORD = "wrongPassword";
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        User user = new User();
+        user.setUsername(USERNAME);
+        user.setPassword(PASSWORD);
     }
 
     @Test
-    void testLoginUserDoesNotExist() {
-        String username = "nonExistingUser";
-        LoginRequest loginRequest = new LoginRequest(username, "password");
-        when(userRepo.findByUsername(username)).thenReturn(null);
+    void loginSuccess() {
+        // Given
+        User user = User.builder().username(USERNAME).password(PASSWORD).build();
+        when(userRepository.findByUsername(USERNAME)).thenReturn(user);
 
-        boolean result = userServiceImpl.login(loginRequest);
+        LoginRequestDTO loginRequestDTO = new LoginRequestDTO(USERNAME, PASSWORD);
 
-        assertFalse(result);
-    }
+        // When
+        boolean result = userService.login(loginRequestDTO);
 
-    @Test
-    void testLoginIncorrectPassword() {
-        String username = "existingUser";
-        String password = "wrongPassword";
-        LoginRequest loginRequest = new LoginRequest(username, password);
-        User user = User.builder()
-                .username("existingUser")
-                .password("correctPassword")
-                .build();
-        when(userRepo.findByUsername(username)).thenReturn(user);
-
-        boolean result = userServiceImpl.login(loginRequest);
-
-        assertFalse(result);
-    }
-
-    @Test
-    void testLoginSuccess() {
-        String username = "existingUser";
-        String password = "correctPassword";
-        LoginRequest loginRequest = new LoginRequest(username, password);
-        User user = User.builder()
-                .username(username)
-                .password(password)
-                .build();
-        when(userRepo.findByUsername(username)).thenReturn(user);
-
-        boolean result = userServiceImpl.login(loginRequest);
-
+        // Then
         assertTrue(result);
+        verify(validator).validateUserExists(USERNAME);
     }
 
     @Test
-    void testLoginThrowsException() {
-        String username = "existingUser";
-        LoginRequest loginRequest = new LoginRequest(username, "password");
+    void loginFailurePasswordMismatch() {
+        // Given
+        User user = User.builder().username(USERNAME).password(WRONG_PASSWORD).build();
+        when(userRepository.findByUsername(USERNAME)).thenReturn(user);
 
-        when(userRepo.findByUsername(anyString())).thenThrow(new RuntimeException("Database error"));
+        LoginRequestDTO loginRequestDTO = new LoginRequestDTO(USERNAME, PASSWORD);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            userServiceImpl.login(loginRequest);
-        });
-
-        assertEquals("Database error", exception.getMessage());
+        // When & Then
+        AuthenticationException thrown = assertThrows(AuthenticationException.class, () -> userService.login(loginRequestDTO));
+        assertEquals("Password is incorrect.", thrown.getMessage());
     }
 
     @Test
-    void changePassword_UserNotFound() {
-        NewPasswordRequest newPasswordRequest = new NewPasswordRequest("nonExistentUser", "currPassword", "newPassword");
-        when(userRepo.findByUsername("nonExistentUser")).thenReturn(null);
+    void changePasswordSuccess() {
+        // Given
+        User user = User.builder().username(USERNAME).password(PASSWORD).build();
+        when(userRepository.findByUsername(USERNAME)).thenReturn(user);
 
-        userServiceImpl.changePassword(newPasswordRequest);
+        NewPasswordRequestDTO newPasswordRequestDTO = new NewPasswordRequestDTO(USERNAME, PASSWORD, NEW_PASSWORD);
 
-        verify(userRepo, never()).save(any(User.class));
+        // When
+        userService.changePassword(newPasswordRequestDTO);
+
+        // Then
+        assertEquals(NEW_PASSWORD, user.getPassword());
+        verify(userRepository).save(user);
+        verify(validator).validateUserExists(USERNAME);
     }
 
     @Test
-    void changePassword_Successful() {
-        NewPasswordRequest newPasswordRequest = new NewPasswordRequest("existentUser", "currPassword", "newPassword");
-        User mockUser = new User();
-        mockUser.setUsername("existentUser");
-        mockUser.setPassword("currPassword");
+    void changePasswordFailureIncorrectCurrentPassword() {
+        // Given
+        User user = User.builder().username(USERNAME).password(WRONG_PASSWORD).build();
+        when(userRepository.findByUsername(USERNAME)).thenReturn(user);
 
-        when(userRepo.findByUsername("existentUser")).thenReturn(mockUser);
+        NewPasswordRequestDTO newPasswordRequestDTO = new NewPasswordRequestDTO(USERNAME, PASSWORD, NEW_PASSWORD);
 
-        userServiceImpl.changePassword(newPasswordRequest);
-
-        assertEquals("newPassword", mockUser.getPassword());
-        verify(userRepo).save(mockUser);
+        // When & Then
+        AuthenticationException thrown = assertThrows(AuthenticationException.class, () -> userService.changePassword(newPasswordRequestDTO));
+        assertEquals("Current password is incorrect!", thrown.getMessage());
     }
 
-    @Test
-    void changePassword_ThrowsException() {
-        NewPasswordRequest newPasswordRequest = new NewPasswordRequest("nonExistentUser", "currPassword", "newPassword");
-        when(userRepo.findByUsername(anyString())).thenThrow(RuntimeException.class);
-
-        assertThrows(RuntimeException.class, () -> userServiceImpl.changePassword(newPasswordRequest));
-
-        verify(userRepo, never()).save(any(User.class));
-    }
 }

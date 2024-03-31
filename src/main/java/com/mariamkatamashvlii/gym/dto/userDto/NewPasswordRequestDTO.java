@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Generated
-public class NewPasswordRequest {
+public class NewPasswordRequestDTO {
     @Valid
     @NotNull
     private String username;

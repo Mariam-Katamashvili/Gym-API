@@ -9,22 +9,24 @@ import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateTrainersRequestDTO;
 import com.mariamkatamashvlii.gym.dto.trainerDto.TrainerDTO;
 import com.mariamkatamashvlii.gym.dto.trainerDto.TrainerUsenameDTO;
-import com.mariamkatamashvlii.gym.dto.trainingDto.TraineeTrainingsRequestDTO;
 import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingResponseDTO;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingsRequestDTO;
 import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
 import com.mariamkatamashvlii.gym.entity.Trainee;
 import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.Training;
 import com.mariamkatamashvlii.gym.entity.User;
+import com.mariamkatamashvlii.gym.exception.TrainingTypeNotFoundException;
 import com.mariamkatamashvlii.gym.exception.UserNotCreatedException;
 import com.mariamkatamashvlii.gym.generator.PasswordGenerator;
 import com.mariamkatamashvlii.gym.generator.UsernameGenerator;
 import com.mariamkatamashvlii.gym.repository.TraineeRepository;
 import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingRepository;
+import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
 import com.mariamkatamashvlii.gym.service.TraineeService;
-import jakarta.persistence.EntityNotFoundException;
+import com.mariamkatamashvlii.gym.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,10 +48,13 @@ public class TraineeServiceImpl implements TraineeService {
     private final TrainingRepository trainingRepository;
     private final UsernameGenerator usernameGenerator;
     private final PasswordGenerator passwordGenerator;
+    private final Validator validator;
+    private final TrainingRepository trainingRepo;
+    private final TrainingTypeRepository trainingTypeRepo;
 
     @Override
     @Transactional
-    public RegistrationResponseDTO registerTrainee(RegistrationRequestDTO registrationRequestDTO) {
+    public RegistrationResponseDTO register(RegistrationRequestDTO registrationRequestDTO) {
         String transactionId = UUID.randomUUID().toString();
         log.info("[{}] Attempting to register a new trainee", transactionId);
         try {
@@ -62,8 +67,6 @@ public class TraineeServiceImpl implements TraineeService {
                     .password(passwordGenerator.generatePassword())
                     .isActive(true)
                     .build();
-            userRepo.save(user);
-
             Trainee trainee = Trainee.builder()
                     .birthday(registrationRequestDTO.getBirthday())
                     .address(registrationRequestDTO.getAddress())
@@ -79,21 +82,14 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public ProfileResponseDTO getTraineeProfile(String username) {
+    public ProfileResponseDTO getProfile(String username) {
         String transactionId = UUID.randomUUID().toString();
+        validator.validateUserExists(username);
+        validator.validateTraineeExists(username);
         log.info("[{}] Fetching profile for trainee: {}", transactionId, username);
 
         User user = userRepo.findByUsername(username);
-        if (user == null) {
-            log.error("[{}] User not found with username: {}", transactionId, username);
-            throw new EntityNotFoundException("User not found with username: " + username);
-        }
-
         Trainee trainee = traineeRepo.findByUsername(username);
-        if (trainee == null) {
-            log.error("[{}] Trainee not found with username: {}", transactionId, username);
-            throw new EntityNotFoundException("Trainee not found with username: " + username);
-        }
 
         List<TrainerDTO> trainers = trainee.getTrainers().stream().map(trainer -> {
             TrainerDTO dto = new TrainerDTO();
@@ -123,23 +119,17 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public UpdateResponseDTO updateProfile(UpdateRequestDTO updateRequestDTO) {
         String transactionId = UUID.randomUUID().toString();
+        validator.validateUserExists(updateRequestDTO.getUsername());
+        validator.validateTraineeExists(updateRequestDTO.getUsername());
         log.info("[{}] Starting profile update for username: {}", transactionId, updateRequestDTO.getUsername());
 
         User user = userRepo.findByUsername(updateRequestDTO.getUsername());
-        if (user == null) {
-            log.error("[{}] User not found with username: {}", transactionId, updateRequestDTO.getUsername());
-            throw new EntityNotFoundException("User not found with username: " + updateRequestDTO.getUsername());
-        }
         user.setFirstName(updateRequestDTO.getFirstName());
         user.setLastName(updateRequestDTO.getLastName());
         user.setIsActive(updateRequestDTO.getIsActive());
         userRepo.save(user);
 
         Trainee trainee = traineeRepo.findByUsername(updateRequestDTO.getUsername());
-        if (trainee == null) {
-            log.error("[{}] Trainee not found with username: {}", transactionId, updateRequestDTO.getUsername());
-            throw new EntityNotFoundException("Trainee not found with username: " + updateRequestDTO.getUsername());
-        }
         trainee.setBirthday(updateRequestDTO.getBirthday());
         trainee.setAddress(updateRequestDTO.getAddress());
         traineeRepo.save(trainee);
@@ -173,26 +163,17 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public void delete(String username) {
         String transactionId = UUID.randomUUID().toString();
+        validator.validateUserExists(username);
+        validator.validateTraineeExists(username);
         log.info("[{}] Initiating deletion for username: {}", transactionId, username);
 
         Trainee trainee = traineeRepo.findByUsername(username);
-        if (trainee == null) {
-            log.error("[{}] Trainee does not exist for username: {}", transactionId, username);
-            throw new EntityNotFoundException("Trainee does not exist for username: " + username);
-        }
-
         User user = userRepo.findByUsername(username);
-        if (user == null) {
-            log.error("[{}] User does not exist for username: {}", transactionId, username);
-            throw new EntityNotFoundException("User does not exist for username: " + username);
-        }
         Set<Training> trainings = trainee.getTrainings();
         for (Training t : trainings) {
             trainingRepository.delete(t);
             log.debug("[{}] Deleted training with ID: {} for username: {}", transactionId, t.getId(), username);
         }
-        traineeRepo.delete(trainee);
-        log.info("[{}] Deleted trainee with username: {}", transactionId, username);
 
         userRepo.delete(user);
         log.info("[{}] Deleted user with username: {}", transactionId, username);
@@ -201,17 +182,14 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public List<TrainerDTO> getUnassignedTrainers(String username) {
         String transactionId = UUID.randomUUID().toString();
+        validator.validateTraineeExists(username);
         log.info("[{}] Fetching unassigned trainers for trainee: {}", transactionId, username);
 
         List<TrainerDTO> unassignedTrainers = new ArrayList<>();
         Trainee trainee = traineeRepo.findByUsername(username);
-        if (trainee == null) {
-            log.warn("[{}] Trainee with username {} not found, returning empty trainer list.", transactionId, username);
-            return unassignedTrainers;
-        }
-
         List<Trainer> traineeTrainers = trainee.getTrainers();
         List<Trainer> allTrainers = trainerRepo.findAll();
+
         for (Trainer t : allTrainers) {
             if (!traineeTrainers.contains(t)) {
                 TrainerDTO dto = new TrainerDTO();
@@ -232,51 +210,46 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    public List<TrainingResponseDTO> getTrainings(TraineeTrainingsRequestDTO traineeTrainingsRequestDTO) {
+    public List<TrainingResponseDTO> getTrainings(TrainingsRequestDTO trainingsRequestDTO) {
         String transactionId = UUID.randomUUID().toString();
-        String username = traineeTrainingsRequestDTO.getUsername();
-        String trainerName = traineeTrainingsRequestDTO.getTrainerName();
-        LocalDate fromDate = traineeTrainingsRequestDTO.getFromDate();
-        LocalDate toDate = traineeTrainingsRequestDTO.getToDate();
-        TrainingTypeDTO trainingType = traineeTrainingsRequestDTO.getTrainingType();
-        log.info("[{}] Fetched trainings for trainee: {} with criteria - TrainerName: {}, FromDate: {}, ToDate: {}, TrainingType: {}",
-                transactionId, username, trainerName, fromDate,
-                toDate, trainingType);
+        String username = trainingsRequestDTO.getUsername();
+        validator.validateTraineeExists(username);
+        String trainerName = trainingsRequestDTO.getName();
+        LocalDate startDate = trainingsRequestDTO.getStartDate();
+        LocalDate endDate = trainingsRequestDTO.getEndDate();
+        TrainingTypeDTO trainingType = trainingsRequestDTO.getTrainingType();
+        log.info("[{}] Fetching trainings for trainee: {}", transactionId, username);
 
-        Trainee trainee = traineeRepo.findByUsername(username);
-        if (trainee == null || trainee.getTrainings() == null) {
-            log.warn("[{}] No trainings found or trainee does not exist for username: {}", transactionId, username);
-            throw new EntityNotFoundException("Trainee does not exist or has no trainings for username: " + username);
-        }
-
-        log.info("[{}] Successfully fetched trainings for trainee: {}", transactionId, username);
-        return trainee.getTrainings().stream()
-                .filter(t -> (fromDate == null || !t.getTrainingDate().isBefore(fromDate)) && (toDate == null || !t.getTrainingDate().isAfter(toDate)))
-                .filter(t -> trainerName == null || t.getTrainer().getUser().getUsername().equalsIgnoreCase(trainerName))
-                .filter(t -> trainingType == null || t.getTrainingType().getTrainingTypeName().equals(trainingType.getTrainingTypeName()))
-                .map(t -> {
-                    TrainingResponseDTO dto = new TrainingResponseDTO();
-                    dto.setTrainingName(t.getTrainingName());
-                    dto.setDate(t.getTrainingDate());
-                    dto.setTrainingType(t.getTrainingType());
-                    dto.setDuration(t.getDuration());
-                    dto.setName(t.getTrainer().getUser().getUsername());
-                    return dto;
-                }).toList();
+        String trainingTypeName = trainingType != null ? trainingType.getTrainingTypeName() : null;
+        List<Training> trainings = trainingRepo.findTraineeTrainingsByCriteria(
+                username,
+                startDate,
+                endDate,
+                trainerName,
+                trainingTypeName
+        );
+        return trainings.stream().map(t -> {
+            TrainingTypeDTO specialization = trainingTypeRepo.findByTrainingTypeName(t.getTrainingType().getTrainingTypeName())
+                    .map(tt -> new TrainingTypeDTO(tt.getId(), tt.getTrainingTypeName()))
+                    .orElseThrow(() -> new TrainingTypeNotFoundException("Training type not found with name: " + t.getTrainingType().getTrainingTypeName()));
+            return new TrainingResponseDTO(
+                    t.getTrainingName(),
+                    t.getTrainingDate(),
+                    specialization,
+                    t.getDuration(),
+                    t.getTrainer().getUser().getUsername());
+        }).toList();
     }
 
     @Override
+    @Transactional
     public List<TrainerDTO> updateTrainers(UpdateTrainersRequestDTO updateTrainersRequestDTO) {
         String transactionId = UUID.randomUUID().toString();
         String username = updateTrainersRequestDTO.getUsername();
+        validator.validateTraineeExists(username);
         log.info("[{}] Starting to update trainers for trainee: {}", transactionId, username);
 
         Trainee trainee = traineeRepo.findByUsername(username);
-        if (trainee == null) {
-            log.error("[{}] Trainee not found with username: {}", transactionId, username);
-            throw new EntityNotFoundException("Trainee not found with username: " + username);
-        }
-
         List<TrainerDTO> newTrainers = new ArrayList<>();
         List<Trainer> updatedTrainers = updateTrainersRequestDTO.getTrainers().stream()
                 .map(TrainerUsenameDTO::getUsername)
@@ -303,17 +276,14 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
+    @Transactional
     public void toggleActivation(ToggleActivationDTO toggleActivationDTO) {
         String transactionId = UUID.randomUUID().toString();
         String username = toggleActivationDTO.getUsername();
+        validator.validateUserExists(username);
         log.info("[{}] Attempting to toggle activation for user: {}", transactionId, username);
 
         User user = userRepo.findByUsername(username);
-        if (user == null) {
-            log.error("[{}] User not found with username: {}", transactionId, username);
-            throw new EntityNotFoundException("User not found with username: " + username);
-        }
-
         user.setIsActive(toggleActivationDTO.getIsActive());
         userRepo.save(user);
         log.info("[{}] Successfully toggled activation for user: {}. Now active: {}", transactionId, username, user.getIsActive());
