@@ -152,6 +152,7 @@
                         <exclude>com/mariamkatamashvlii/gym/exception/**/*</exclude>
                         <exclude>com/mariamkatamashvlii/gym/validator/**/*</exclude>
                         <exclude>com/mariamkatamashvlii/gym/metrics/**/*</exclude>
+                        <exclude>com/mariamkatamashvlii/gym/security/**/*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
