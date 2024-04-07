@@ -27,6 +27,7 @@ import com.mariamkatamashvlii.gym.validator.Validator;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +46,7 @@ public class TrainerServiceImpl implements TrainerService {
     private final PasswordGenerator passwordGenerator;
     private final Validator validator;
     private final TrainingRepository trainingRepo;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -52,11 +54,14 @@ public class TrainerServiceImpl implements TrainerService {
         String transactionId = UUID.randomUUID().toString();
         try {
             log.info("[{}] Registering new trainer", transactionId);
+            String firstName = registrationRequestDTO.getFirstName();
+            String lastName = registrationRequestDTO.getLastName();
+            String password = passwordGenerator.generatePassword();
             User user = User.builder()
-                    .firstName(registrationRequestDTO.getFirstName())
-                    .lastName(registrationRequestDTO.getLastName())
-                    .username(usernameGenerator.generateUsername(registrationRequestDTO.getFirstName(), registrationRequestDTO.getLastName()))
-                    .password(passwordGenerator.generatePassword())
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .username(usernameGenerator.generateUsername(firstName, lastName))
+                    .password(passwordEncoder.encode(password))
                     .isActive(true)
                     .build();
             TrainingType type = trainingTypeRepo.findById(registrationRequestDTO.getSpecialization().getTrainingTypeId()).orElseThrow(() -> new EntityNotFoundException("TrainingType not found for id: " + registrationRequestDTO.getSpecialization().getTrainingTypeId()));
@@ -66,7 +71,7 @@ public class TrainerServiceImpl implements TrainerService {
                     .build();
             trainerRepo.save(trainer);
             log.info("[{}] Registered new trainer with username: {}", transactionId, user.getUsername());
-            return new RegistrationResponseDTO(user.getUsername(), user.getPassword());
+            return new RegistrationResponseDTO(user.getUsername(), password);
         } catch (Exception e) {
             log.error("[{}] Unexpected error during trainer creation: {}", transactionId, e.getMessage());
             throw new UserNotCreatedException("Could not create trainer due to an unexpected error");

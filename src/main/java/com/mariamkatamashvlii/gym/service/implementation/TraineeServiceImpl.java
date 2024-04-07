@@ -29,6 +29,7 @@ import com.mariamkatamashvlii.gym.service.TraineeService;
 import com.mariamkatamashvlii.gym.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +52,7 @@ public class TraineeServiceImpl implements TraineeService {
     private final Validator validator;
     private final TrainingRepository trainingRepo;
     private final TrainingTypeRepository trainingTypeRepo;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -60,11 +62,12 @@ public class TraineeServiceImpl implements TraineeService {
         try {
             String firstName = registrationRequestDTO.getFirstName();
             String lastName = registrationRequestDTO.getLastName();
+            String password = passwordGenerator.generatePassword();
             User user = User.builder()
                     .firstName(firstName)
                     .lastName(lastName)
                     .username(usernameGenerator.generateUsername(firstName, lastName))
-                    .password(passwordGenerator.generatePassword())
+                    .password(passwordEncoder.encode(password))
                     .isActive(true)
                     .build();
             Trainee trainee = Trainee.builder()
@@ -74,7 +77,7 @@ public class TraineeServiceImpl implements TraineeService {
                     .build();
             traineeRepo.save(trainee);
             log.info("[{}] Successfully registered new trainee with username: {}", transactionId, user.getUsername());
-            return new RegistrationResponseDTO(user.getUsername(), user.getPassword());
+            return new RegistrationResponseDTO(user.getUsername(), password);
         } catch (Exception e) {
             log.error("[{}] Failed to register trainee: {}", transactionId, e.getMessage(), e);
             throw new UserNotCreatedException("Could not create trainee due to an error: " + e.getMessage());

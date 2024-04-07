@@ -91,6 +91,15 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
             <version>1.12.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>33.1.0-jre</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -132,7 +141,6 @@
                         <exclude>com/mariamkatamashvlii/gym/entity/**/*</exclude>
                         <exclude>com/mariamkatamashvlii/gym/exception/**/*</exclude>
                         <exclude>com/mariamkatamashvlii/gym/validator/**/*</exclude>
-                        <exclude>com/mariamkatamashvlii/gym/profile/**/*</exclude>
                         <exclude>com/mariamkatamashvlii/gym/metrics/**/*</exclude>
                     </excludes>
                 </configuration>

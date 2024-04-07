@@ -4,6 +4,7 @@ import com.mariamkatamashvlii.gym.generator.PasswordGenerator;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.actuate.health.Status;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 class PasswordGeneratorHealthIndicatorTest {

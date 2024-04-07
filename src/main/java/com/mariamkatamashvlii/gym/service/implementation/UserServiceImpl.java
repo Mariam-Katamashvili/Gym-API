@@ -9,6 +9,7 @@ import com.mariamkatamashvlii.gym.service.UserService;
 import com.mariamkatamashvlii.gym.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepo;
     private final Validator validator;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public boolean login(LoginRequestDTO loginRequestDTO) {
@@ -31,7 +33,7 @@ public class UserServiceImpl implements UserService {
         log.info("[{}] Transaction started for login operation", transactionId);
 
         User user = userRepo.findByUsername(username);
-        if (!user.getPassword().equals(password)) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             log.info("[{}] Password for {} is incorrect", transactionId, username);
             throw new AuthenticationException("Password is incorrect.");
         }
@@ -48,11 +50,11 @@ public class UserServiceImpl implements UserService {
         log.info("[{}] Starting password change operation for user: {}", transactionId, newPasswordRequestDTO.getUsername());
 
         User user = userRepo.findByUsername(newPasswordRequestDTO.getUsername());
-        if (!user.getPassword().equals(newPasswordRequestDTO.getCurrentPass())) {
+        if (!passwordEncoder.matches(newPasswordRequestDTO.getCurrentPass(), user.getPassword())) {
             log.warn("[{}] Invalid username or password", transactionId);
             throw new AuthenticationException("Current password is incorrect!");
         }
-        user.setPassword(newPasswordRequestDTO.getNewPass());
+        user.setPassword(passwordEncoder.encode(newPasswordRequestDTO.getNewPass()));
         userRepo.save(user);
 
         log.info("[{}] Password changed successfully for user: {}", transactionId, newPasswordRequestDTO.getUsername());

@@ -3,6 +3,7 @@ package com.mariamkatamashvlii.gym.health;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.actuate.health.Status;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 
