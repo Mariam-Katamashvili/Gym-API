@@ -16,4 +16,7 @@ public class RegistrationResponseDTO {
 
     @Valid
     private String password;
+
+    @Valid
+    private String token;
 }

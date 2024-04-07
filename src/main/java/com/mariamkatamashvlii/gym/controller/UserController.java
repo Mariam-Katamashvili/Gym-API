@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
@@ -18,10 +21,15 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/login")
-    public ResponseEntity<String> login(
-            @RequestBody LoginRequestDTO loginRequestDTO) {
-        userService.login(loginRequestDTO);
-        return ResponseEntity.ok("Logged in successfully");
+    public ResponseEntity<Map<String, Object>> login(
+            @RequestBody LoginRequestDTO loginRequest) {
+        String token = userService.login(loginRequest);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Logged in successfully");
+        response.put("token", token);
+
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{username}/update-password")

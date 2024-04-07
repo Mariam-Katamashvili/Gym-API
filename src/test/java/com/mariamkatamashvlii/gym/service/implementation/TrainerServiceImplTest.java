@@ -18,6 +18,7 @@ import com.mariamkatamashvlii.gym.generator.UsernameGenerator;
 import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
+import com.mariamkatamashvlii.gym.security.JwtTokenUtil;
 import com.mariamkatamashvlii.gym.validator.Validator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,6 +64,12 @@ class TrainerServiceImplTest {
     private Trainer trainer;
     @Mock
     private TrainingTypeDTO trainingTypeDTO;
+    @Mock
+    private JwtTokenUtil jwtTokenUtil;
+    @Mock
+    private AuthenticationManager authenticationManager;
+    @Mock
+    private PasswordEncoder passwordEncoder;
     @InjectMocks
     private TrainerServiceImpl trainerService;
 
@@ -75,7 +86,7 @@ class TrainerServiceImplTest {
     private static final Boolean NEW_ACTIVE_STATUS = false;
     private static final String USER_NOT_FOUND = "User not found for username: ";
     private static final String TRAINER_NOT_FOUND = "Trainer not found for username: ";
-
+    private static final String TOKEN = "Token";
     @BeforeEach
     void setUp() {
         user = new User();
@@ -111,15 +122,22 @@ class TrainerServiceImplTest {
     }
 
     @Test
-    void testRegister_Success() {
+    void register_Success() {
         // Given
         TrainingType trainingType = new TrainingType();
         trainingType.setId(TRAINING_TYPE_ID);
         trainingType.setTrainingTypeName(TRAINING_TYPE_NAME);
 
+        User dummyUser = new User();
+        dummyUser.setUsername(USERNAME);
+        dummyUser.setPassword(PASSWORD);
+
         when(trainingTypeRepository.findById(TRAINING_TYPE_ID)).thenReturn(Optional.of(trainingType));
         when(usernameGenerator.generateUsername(anyString(), anyString())).thenReturn(USERNAME);
         when(passwordGenerator.generatePassword()).thenReturn(PASSWORD);
+        when(passwordEncoder.encode(PASSWORD)).thenReturn(PASSWORD);
+        when(authenticationManager.authenticate(any())).thenReturn(new TestingAuthenticationToken(dummyUser, null));
+        when(jwtTokenUtil.generateJwtToken(any(Authentication.class))).thenReturn(TOKEN);
 
         RegistrationRequestDTO registrationRequestDTO = new RegistrationRequestDTO();
         registrationRequestDTO.setFirstName(FIRST_NAME);
@@ -130,13 +148,16 @@ class TrainerServiceImplTest {
         RegistrationResponseDTO result = trainerService.register(registrationRequestDTO);
 
         // Then
-        assertEquals(PASSWORD, result.getPassword());
+        Assertions.assertNotNull(result);
         assertEquals(USERNAME, result.getUsername());
+        assertEquals(PASSWORD, result.getPassword());
+        assertEquals(TOKEN, result.getToken());
         verify(usernameGenerator).generateUsername(FIRST_NAME, LAST_NAME);
         verify(passwordGenerator).generatePassword();
         verify(trainingTypeRepository).findById(TRAINING_TYPE_ID);
         verify(trainerRepo).save(any(Trainer.class));
     }
+
 
     @Test
     void getProfile_Success() {

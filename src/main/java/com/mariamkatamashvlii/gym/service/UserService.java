@@ -6,7 +6,7 @@ import lombok.Generated;
 
 @Generated
 public interface UserService {
-    boolean login(LoginRequestDTO loginRequestDTO);
+    String login(LoginRequestDTO loginRequest);
 
-    void changePassword(NewPasswordRequestDTO newPasswordRequestDTO);
+    void changePassword(NewPasswordRequestDTO newPasswordRequest);
 }
