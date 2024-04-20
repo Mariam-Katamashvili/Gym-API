@@ -82,6 +82,15 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>2.9.9</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>1.12.4</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -123,6 +132,8 @@
                         <exclude>com/mariamkatamashvlii/gym/entity/**/*</exclude>
                         <exclude>com/mariamkatamashvlii/gym/exception/**/*</exclude>
                         <exclude>com/mariamkatamashvlii/gym/validator/**/*</exclude>
+                        <exclude>com/mariamkatamashvlii/gym/profile/**/*</exclude>
+                        <exclude>com/mariamkatamashvlii/gym/metrics/**/*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
