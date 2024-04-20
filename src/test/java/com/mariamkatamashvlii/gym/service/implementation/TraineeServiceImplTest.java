@@ -24,6 +24,7 @@ import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
+import com.mariamkatamashvlii.gym.security.JwtTokenUtil;
 import com.mariamkatamashvlii.gym.validator.Validator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -67,6 +72,13 @@ class TraineeServiceImplTest {
     private PasswordGenerator passwordGenerator;
     @Mock
     private Validator validator;
+    @Mock
+    private JwtTokenUtil jwtTokenUtil;
+    @Mock
+    private AuthenticationManager authenticationManager;
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @InjectMocks
     private TraineeServiceImpl traineeService;
 
@@ -95,13 +107,20 @@ class TraineeServiceImplTest {
     private static final String TRAINER_LAST_NAME1 = "One";
     private static final String TRAINER_FIRST_NAME2 = "Trainer";
     private static final String TRAINER_LAST_NAME2 = "Two";
+    private static final String TOKEN = "Token";
 
     @Test
     void register_Success() {
-        // Given
         RegistrationRequestDTO registrationRequestDTO = new RegistrationRequestDTO(FIRST_NAME, LAST_NAME, BIRTHDAY, ADDRESS);
+        User dummyUser = new User();
+        dummyUser.setUsername(USERNAME);
+        dummyUser.setPassword(PASSWORD);
+
         when(usernameGenerator.generateUsername(FIRST_NAME, LAST_NAME)).thenReturn(USERNAME);
         when(passwordGenerator.generatePassword()).thenReturn(PASSWORD);
+        when(passwordEncoder.encode(PASSWORD)).thenReturn(PASSWORD);
+        when(authenticationManager.authenticate(any())).thenReturn(new TestingAuthenticationToken(dummyUser, null));
+        when(jwtTokenUtil.generateJwtToken(any(Authentication.class))).thenReturn(TOKEN);
 
         // When
         RegistrationResponseDTO result = traineeService.register(registrationRequestDTO);
@@ -110,6 +129,7 @@ class TraineeServiceImplTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(USERNAME, result.getUsername());
         Assertions.assertEquals(PASSWORD, result.getPassword());
+        Assertions.assertEquals(TOKEN, result.getToken());
         verify(traineeRepo, times(1)).save(any(Trainee.class));
     }
 

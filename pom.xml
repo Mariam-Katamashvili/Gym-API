@@ -91,6 +91,25 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
             <version>1.12.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>33.1.0-jre</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
+            <version>2.5.2.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.12.5</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -132,8 +151,8 @@
                         <exclude>com/mariamkatamashvlii/gym/entity/**/*</exclude>
                         <exclude>com/mariamkatamashvlii/gym/exception/**/*</exclude>
                         <exclude>com/mariamkatamashvlii/gym/validator/**/*</exclude>
-                        <exclude>com/mariamkatamashvlii/gym/profile/**/*</exclude>
                         <exclude>com/mariamkatamashvlii/gym/metrics/**/*</exclude>
+                        <exclude>com/mariamkatamashvlii/gym/security/**/*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
