@@ -55,5 +55,4 @@ public class Trainee {
     )
     @Builder.Default
     private List<Trainer> trainers = new ArrayList<>();
-
 }

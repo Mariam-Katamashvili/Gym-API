@@ -48,5 +48,4 @@ public class Training {
 
     @Column(nullable = false)
     private Integer duration;
-
 }

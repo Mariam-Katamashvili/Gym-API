@@ -51,5 +51,4 @@ public class Trainer {
     @ManyToMany(mappedBy = "trainers")
     @Builder.Default
     private List<Trainee> trainees = new ArrayList<>();
-
 }

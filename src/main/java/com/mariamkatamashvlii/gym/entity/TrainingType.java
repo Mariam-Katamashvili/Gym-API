@@ -40,5 +40,4 @@ public class TrainingType {
     @OneToMany(mappedBy = "specialization")
     @Builder.Default
     private Set<Trainer> trainers = new HashSet<>();
-
 }
