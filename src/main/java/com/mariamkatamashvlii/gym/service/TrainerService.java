@@ -12,7 +12,6 @@ import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingsRequestDTO;
 import java.util.List;
 
 public interface TrainerService {
-
     RegistrationResponseDTO register(RegistrationRequestDTO registrationRequestDTO);
 
     ProfileResponseDTO getProfile(String username);
@@ -22,5 +21,4 @@ public interface TrainerService {
     List<TrainingResponseDTO> getTrainings(TrainingsRequestDTO trainingsRequestDTO);
 
     void toggleActivation(ToggleActivationDTO toggleActivationDTO);
-
 }

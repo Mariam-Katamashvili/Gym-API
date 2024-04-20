@@ -5,7 +5,6 @@ import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Generated
 public class UpdateResponseDTO {
     @Valid
     private String username;

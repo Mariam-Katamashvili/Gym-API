@@ -23,5 +23,4 @@ public class UsernameGeneratorHealthIndicator implements HealthIndicator {
             return Health.down(e).build();
         }
     }
-
 }

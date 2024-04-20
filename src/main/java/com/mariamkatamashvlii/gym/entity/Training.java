@@ -9,7 +9,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,7 +23,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @ToString
-@Generated
 public class Training {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -235,5 +235,4 @@ class TrainerServiceImplTest {
         verify(userRepo).save(existingUser);
         assert existingUser.getIsActive() == NEW_ACTIVE_STATUS : "The active status should be updated.";
     }
-
 }

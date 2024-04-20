@@ -30,4 +30,3 @@ class PasswordGeneratorTest {
         assertNotEquals(password1, password2, "Two consecutively generated passwords should not be the same.");
     }
 }
-

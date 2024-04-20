@@ -28,5 +28,4 @@ public interface TraineeService {
     List<TrainerDTO> updateTrainers(UpdateTrainersRequestDTO updateTrainersRequestDTO);
 
     void toggleActivation(ToggleActivationDTO toggleActivationDTO);
-
 }

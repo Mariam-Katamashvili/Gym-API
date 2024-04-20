@@ -8,7 +8,7 @@ import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateRequestDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateTrainersRequestDTO;
 import com.mariamkatamashvlii.gym.dto.trainerDto.TrainerDTO;
-import com.mariamkatamashvlii.gym.dto.trainerDto.TrainerUsenameDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.TrainerUsernameDTO;
 import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingResponseDTO;
 import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingsRequestDTO;
 import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
@@ -265,7 +265,7 @@ public class TraineeServiceImpl implements TraineeService {
         Trainee trainee = traineeRepo.findByUsername(username);
         List<TrainerDTO> newTrainers = new ArrayList<>();
         List<Trainer> updatedTrainers = updateTrainersRequestDTO.getTrainers().stream()
-                .map(TrainerUsenameDTO::getUsername)
+                .map(TrainerUsernameDTO::getUsername)
                 .map(trainerRepo::findByUsername)
                 .toList();
         trainee.setTrainers(updatedTrainers);

@@ -56,5 +56,4 @@ public class UserServiceImpl implements UserService {
 
         log.info("[{}] Password changed successfully for user: {}", transactionId, newPasswordRequest.getUsername());
     }
-
 }

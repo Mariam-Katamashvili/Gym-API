@@ -13,7 +13,6 @@ import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
-import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,7 +31,6 @@ import java.util.Set;
 @Builder
 @ToString
 @EqualsAndHashCode
-@Generated
 public class Trainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

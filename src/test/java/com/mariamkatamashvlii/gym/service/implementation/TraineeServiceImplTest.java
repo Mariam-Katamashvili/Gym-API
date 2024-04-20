@@ -7,7 +7,7 @@ import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateRequestDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateTrainersRequestDTO;
 import com.mariamkatamashvlii.gym.dto.trainerDto.TrainerDTO;
-import com.mariamkatamashvlii.gym.dto.trainerDto.TrainerUsenameDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.TrainerUsernameDTO;
 import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingResponseDTO;
 import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingsRequestDTO;
 import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
@@ -327,7 +327,7 @@ class TraineeServiceImplTest {
                 .user(traineeProfile)
                 .build();
         traineeProfile.setTrainee(trainee);
-        UpdateTrainersRequestDTO updateTrainersRequestDTO = new UpdateTrainersRequestDTO(USERNAME, List.of(new TrainerUsenameDTO(TRAINER_USERNAME1), new TrainerUsenameDTO(TRAINER_USERNAME2)));
+        UpdateTrainersRequestDTO updateTrainersRequestDTO = new UpdateTrainersRequestDTO(USERNAME, List.of(new TrainerUsernameDTO(TRAINER_USERNAME1), new TrainerUsernameDTO(TRAINER_USERNAME2)));
 
         when(trainerRepo.findByUsername(TRAINER_USERNAME1)).thenReturn(trainer1);
         when(trainerRepo.findByUsername(TRAINER_USERNAME2)).thenReturn(trainer2);

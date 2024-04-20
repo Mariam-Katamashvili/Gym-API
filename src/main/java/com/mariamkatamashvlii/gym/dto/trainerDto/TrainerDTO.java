@@ -4,13 +4,11 @@ import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Generated
 public class TrainerDTO {
     @Valid
     private String username;
