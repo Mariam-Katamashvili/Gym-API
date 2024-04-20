@@ -1,5 +1,6 @@
 package com.mariamkatamashvlii.gym.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,6 +13,7 @@ import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,23 +32,26 @@ import java.util.Set;
 @Builder
 @ToString
 @EqualsAndHashCode
+@Generated
 public class Trainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long trainerId;
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "specialization", referencedColumnName = "training_typeId")
+    @JoinColumn(name = "specialization", referencedColumnName = "id")
     private TrainingType specialization;
 
-    @OneToOne
-    @JoinColumn(name = "userId", referencedColumnName = "userId", unique = true)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
     private User user;
 
     @OneToMany(mappedBy = "trainer")
+    @Builder.Default
     private Set<Training> trainings = new HashSet<>();
 
     @ManyToMany(mappedBy = "trainers")
+    @Builder.Default
     private List<Trainee> trainees = new ArrayList<>();
 
 }

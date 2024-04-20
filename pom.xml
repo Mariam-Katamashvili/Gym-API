@@ -68,14 +68,19 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.8.11</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.0.2</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.30</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.9.9</version>
         </dependency>
     </dependencies>
 
@@ -111,6 +116,15 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>com/mariamkatamashvlii/gym/controller/**/*</exclude>
+                        <exclude>com/mariamkatamashvlii/gym/dto/**/*</exclude>
+                        <exclude>com/mariamkatamashvlii/gym/entity/**/*</exclude>
+                        <exclude>com/mariamkatamashvlii/gym/exception/**/*</exclude>
+                        <exclude>com/mariamkatamashvlii/gym/validator/**/*</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>

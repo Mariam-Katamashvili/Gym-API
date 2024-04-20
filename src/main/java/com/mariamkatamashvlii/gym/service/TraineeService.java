@@ -1,36 +1,32 @@
 package com.mariamkatamashvlii.gym.service;
 
-import com.mariamkatamashvlii.gym.entity.Trainee;
-import com.mariamkatamashvlii.gym.entity.Trainer;
-import com.mariamkatamashvlii.gym.entity.Training;
-import com.mariamkatamashvlii.gym.entity.TrainingType;
+import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
+import com.mariamkatamashvlii.gym.dto.ToggleActivationDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.ProfileResponseDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.RegistrationRequestDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateRequestDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateResponseDTO;
+import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateTrainersRequestDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.TrainerDTO;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingResponseDTO;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingsRequestDTO;
 
-import java.sql.Date;
 import java.util.List;
 
 public interface TraineeService {
-    Trainee create(Trainee trainee);
+    RegistrationResponseDTO register(RegistrationRequestDTO registrationRequestDTO);
+    ProfileResponseDTO getProfile(String username);
 
-    Trainee update(Trainee trainee);
+    UpdateResponseDTO updateProfile(UpdateRequestDTO updateRequestDTO);
 
     void delete(String username);
 
-    Trainee select(String username);
+    List<TrainerDTO> getUnassignedTrainers(String username);
 
-    boolean changePassword(String username, String currPassword, String newPassword);
+    List<TrainingResponseDTO> getTrainings(TrainingsRequestDTO trainingsRequestDTO);
 
-    void activateTrainee (String username, boolean isActive);
+    List<TrainerDTO> updateTrainers(UpdateTrainersRequestDTO updateTrainersRequestDTO);
 
-    void deactivateTrainee (String username, boolean isActive);
+    void toggleActivation(ToggleActivationDTO toggleActivationDTO);
 
-    void updateTrainers(String username, List<Trainer> trainers);
-
-    Trainee createTraineeProfile(Date dob, String address, long userId);
-
-    List<Training> getTrainings(String username, Date fromDate,
-                                Date toDate, String trainerName, TrainingType trainingType);
-
-    List<Trainer> getNotAssignedTrainers(String username);
-
-    List<Trainee> findAll();
 }

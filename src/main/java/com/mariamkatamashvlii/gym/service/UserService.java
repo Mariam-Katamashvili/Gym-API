@@ -1,19 +1,12 @@
 package com.mariamkatamashvlii.gym.service;
 
-import com.mariamkatamashvlii.gym.entity.User;
+import com.mariamkatamashvlii.gym.dto.userDto.LoginRequestDTO;
+import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordRequestDTO;
+import lombok.Generated;
 
-import java.util.List;
-
+@Generated
 public interface UserService {
-    User create(User user);
+    boolean login(LoginRequestDTO loginRequestDTO);
 
-    User update(User user);
-
-    void delete(User user);
-
-    User select(long id);
-
-    User select(String username);
-
-    List<User> findAll();
+    void changePassword(NewPasswordRequestDTO newPasswordRequestDTO);
 }

@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,10 +23,11 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @ToString
+@Generated
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long id;
 
     @Column(nullable = false)
     private String firstName;
@@ -40,7 +42,7 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    private boolean isActive;
+    private Boolean isActive;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore

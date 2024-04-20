@@ -1,28 +1,26 @@
 package com.mariamkatamashvlii.gym.service;
 
-import com.mariamkatamashvlii.gym.entity.Trainer;
-import com.mariamkatamashvlii.gym.entity.Training;
+import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
+import com.mariamkatamashvlii.gym.dto.ToggleActivationDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.ProfileResponseDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.RegistrationRequestDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.UpdateRequestDTO;
+import com.mariamkatamashvlii.gym.dto.trainerDto.UpdateResponseDTO;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingResponseDTO;
+import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingsRequestDTO;
 
-import java.sql.Date;
 import java.util.List;
 
 public interface TrainerService {
-    Trainer create(Trainer trainer);
 
-    Trainer update(Trainer trainer);
+    RegistrationResponseDTO register(RegistrationRequestDTO registrationRequestDTO);
 
-    Trainer select(String username);
+    ProfileResponseDTO getProfile(String username);
 
-    boolean changePassword(String username, String currPassword, String newPassword);
+    UpdateResponseDTO updateProfile(UpdateRequestDTO updateRequestDTO);
 
-    void activateTrainer (String username, boolean isActive);
+    List<TrainingResponseDTO> getTrainings(TrainingsRequestDTO trainingsRequestDTO);
 
-    void deactivateTrainer (String username, boolean isActive);
+    void toggleActivation(ToggleActivationDTO toggleActivationDTO);
 
-    Trainer createTrainerProfile(long trainingTypeId, long userId);
-
-    List<Training> getTrainings(String username, String password, Date fromDate,
-                                Date toDate, String traineeName);
-
-    List<Trainer> findAll();
 }

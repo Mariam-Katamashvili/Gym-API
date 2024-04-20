@@ -1,11 +1,12 @@
 package com.mariamkatamashvlii.gym.repository;
 
 import com.mariamkatamashvlii.gym.entity.TrainingType;
+import lombok.Generated;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import java.util.Optional;
 
-public interface TrainingTypeRepository {
-    TrainingType select(long id);
-
-    List<TrainingType> findAll();
+@Generated
+public interface TrainingTypeRepository extends JpaRepository<TrainingType, Long> {
+    Optional<TrainingType> findByTrainingTypeName(String trainingTypeName);
 }

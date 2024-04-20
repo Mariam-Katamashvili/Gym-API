@@ -9,12 +9,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -23,30 +24,31 @@ import java.sql.Date;
 @AllArgsConstructor
 @Builder
 @ToString
+@Generated
 public class Training {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "traineeId", referencedColumnName = "traineeId")
+    @JoinColumn(name = "trainee_id", referencedColumnName = "id")
     private Trainee trainee;
 
     @ManyToOne
-    @JoinColumn(name = "trainerId", referencedColumnName = "trainerId")
+    @JoinColumn(name = "trainer_id", referencedColumnName = "id")
     private Trainer trainer;
 
     @Column(nullable = false, unique = true)
     private String trainingName;
 
     @ManyToOne
-    @JoinColumn(name = "training_typeId", referencedColumnName = "training_typeId")
+    @JoinColumn(name = "training_type_id", referencedColumnName = "id")
     private TrainingType trainingType;
 
-    @Column( nullable = false)
-    private Date trainingDate;
+    @Column(nullable = false)
+    private LocalDate trainingDate;
 
     @Column(nullable = false)
-    private Number duration;
+    private Integer duration;
 
 }
