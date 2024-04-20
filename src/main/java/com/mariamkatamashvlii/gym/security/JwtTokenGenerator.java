@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
-public class JwtTokenUtil {
+public class JwtTokenGenerator {
 
     @Value("${jwt.secret}")
     private String jwtSecret;

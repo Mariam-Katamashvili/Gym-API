@@ -1,5 +1,6 @@
-package com.mariamkatamashvlii.gym.security;
+package com.mariamkatamashvlii.gym.config;
 
+import com.mariamkatamashvlii.gym.security.BlockCheckFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,7 @@ public class SecurityConfiguration {
 
     private final BlockCheckFilter blockCheckFilter;
     private final AuthenticationConfiguration authenticationConfiguration;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -38,8 +40,15 @@ public class SecurityConfiguration {
                         .requestMatchers("/user/**").hasRole("USER")
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults())
-                .logout(LogoutConfigurer::permitAll)
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .failureUrl("/login?error")
+                        .permitAll())
+                .logout(logout -> logout
+                        .clearAuthentication(true)
+                        .invalidateHttpSession(true)
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll())
                 .addFilterBefore(blockCheckFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

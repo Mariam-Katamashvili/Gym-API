@@ -25,7 +25,7 @@ import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
-import com.mariamkatamashvlii.gym.security.JwtTokenUtil;
+import com.mariamkatamashvlii.gym.security.JwtTokenGenerator;
 import com.mariamkatamashvlii.gym.service.TraineeService;
 import com.mariamkatamashvlii.gym.validator.Validator;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +57,7 @@ public class TraineeServiceImpl implements TraineeService {
     private final TrainingRepository trainingRepo;
     private final TrainingTypeRepository trainingTypeRepo;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenGenerator jwtTokenGenerator;
     private final AuthenticationManager authenticationManager;
 
     @Override
@@ -85,7 +85,7 @@ public class TraineeServiceImpl implements TraineeService {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getUsername(), password)
             );
-            String token = jwtTokenUtil.generateJwtToken(authentication);
+            String token = jwtTokenGenerator.generateJwtToken(authentication);
             log.info("[{}] Successfully registered new trainee with username: {}", transactionId, user.getUsername());
             return new RegistrationResponseDTO(user.getUsername(), password, token);
         } catch (Exception e) {

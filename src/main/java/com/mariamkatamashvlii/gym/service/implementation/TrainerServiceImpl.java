@@ -22,7 +22,7 @@ import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
-import com.mariamkatamashvlii.gym.security.JwtTokenUtil;
+import com.mariamkatamashvlii.gym.security.JwtTokenGenerator;
 import com.mariamkatamashvlii.gym.service.TrainerService;
 import com.mariamkatamashvlii.gym.validator.Validator;
 import jakarta.persistence.EntityNotFoundException;
@@ -51,7 +51,7 @@ public class TrainerServiceImpl implements TrainerService {
     private final Validator validator;
     private final TrainingRepository trainingRepo;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenGenerator jwtTokenGenerator;
     private final AuthenticationManager authenticationManager;
 
     @Override
@@ -79,7 +79,7 @@ public class TrainerServiceImpl implements TrainerService {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getUsername(), password)
             );
-            String token = jwtTokenUtil.generateJwtToken(authentication);
+            String token = jwtTokenGenerator.generateJwtToken(authentication);
             log.info("[{}] Registered new trainer with username: {}", transactionId, user.getUsername());
             return new RegistrationResponseDTO(user.getUsername(), password, token);
         } catch (Exception e) {

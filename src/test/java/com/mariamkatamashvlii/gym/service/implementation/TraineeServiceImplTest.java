@@ -24,7 +24,7 @@ import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
-import com.mariamkatamashvlii.gym.security.JwtTokenUtil;
+import com.mariamkatamashvlii.gym.security.JwtTokenGenerator;
 import com.mariamkatamashvlii.gym.validator.Validator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -73,7 +73,7 @@ class TraineeServiceImplTest {
     @Mock
     private Validator validator;
     @Mock
-    private JwtTokenUtil jwtTokenUtil;
+    private JwtTokenGenerator jwtTokenGenerator;
     @Mock
     private AuthenticationManager authenticationManager;
     @Mock
@@ -107,10 +107,10 @@ class TraineeServiceImplTest {
     private static final String TRAINER_LAST_NAME1 = "One";
     private static final String TRAINER_FIRST_NAME2 = "Trainer";
     private static final String TRAINER_LAST_NAME2 = "Two";
-    private static final String TOKEN = "Token";
+    private static final String TEST_TOKEN = "Token";
 
     @Test
-    void register_Success() {
+    void register_success() {
         RegistrationRequestDTO registrationRequestDTO = new RegistrationRequestDTO(FIRST_NAME, LAST_NAME, BIRTHDAY, ADDRESS);
         User dummyUser = new User();
         dummyUser.setUsername(USERNAME);
@@ -120,21 +120,21 @@ class TraineeServiceImplTest {
         when(passwordGenerator.generatePassword()).thenReturn(PASSWORD);
         when(passwordEncoder.encode(PASSWORD)).thenReturn(PASSWORD);
         when(authenticationManager.authenticate(any())).thenReturn(new TestingAuthenticationToken(dummyUser, null));
-        when(jwtTokenUtil.generateJwtToken(any(Authentication.class))).thenReturn(TOKEN);
+        when(jwtTokenGenerator.generateJwtToken(any(Authentication.class))).thenReturn(TEST_TOKEN);
 
         // When
-        RegistrationResponseDTO result = traineeService.register(registrationRequestDTO);
+        RegistrationResponseDTO actualResult = traineeService.register(registrationRequestDTO);
 
         // Then
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(USERNAME, result.getUsername());
-        Assertions.assertEquals(PASSWORD, result.getPassword());
-        Assertions.assertEquals(TOKEN, result.getToken());
+        Assertions.assertNotNull(actualResult);
+        Assertions.assertEquals(USERNAME, actualResult.getUsername());
+        Assertions.assertEquals(PASSWORD, actualResult.getPassword());
+        Assertions.assertEquals(TEST_TOKEN, actualResult.getToken());
         verify(traineeRepo, times(1)).save(any(Trainee.class));
     }
 
     @Test
-    void register_Failure() {
+    void register_failure() {
         // Given
         RegistrationRequestDTO registrationRequestDTO = new RegistrationRequestDTO(FIRST_NAME, LAST_NAME, BIRTHDAY, ADDRESS);
         when(usernameGenerator.generateUsername(FIRST_NAME, LAST_NAME)).thenThrow(new RuntimeException("Database error"));
@@ -145,7 +145,7 @@ class TraineeServiceImplTest {
     }
 
     @Test
-    void updateProfile_Success() {
+    void updateProfile_success() {
         // Given
         User user = new User();
         user.setUsername(USERNAME);
@@ -171,23 +171,23 @@ class TraineeServiceImplTest {
         updateRequestDTO.setIsActive(NEW_ACTIVE_STATUS);
 
         // When
-        UpdateResponseDTO result = traineeService.updateProfile(updateRequestDTO);
+        UpdateResponseDTO actualResult = traineeService.updateProfile(updateRequestDTO);
 
         // Then
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(USERNAME, result.getUsername());
-        Assertions.assertEquals(NEW_FIRST_NAME, result.getFirstName());
-        Assertions.assertEquals(NEW_LAST_NAME, result.getLastName());
-        Assertions.assertEquals(NEW_BIRTHDAY, result.getBirthday());
-        Assertions.assertEquals(NEW_ADDRESS, result.getAddress());
-        Assertions.assertFalse(result.getIsActive());
+        Assertions.assertNotNull(actualResult);
+        Assertions.assertEquals(USERNAME, actualResult.getUsername());
+        Assertions.assertEquals(NEW_FIRST_NAME, actualResult.getFirstName());
+        Assertions.assertEquals(NEW_LAST_NAME, actualResult.getLastName());
+        Assertions.assertEquals(NEW_BIRTHDAY, actualResult.getBirthday());
+        Assertions.assertEquals(NEW_ADDRESS, actualResult.getAddress());
+        Assertions.assertFalse(actualResult.getIsActive());
 
         verify(userRepo, times(1)).save(user);
         verify(traineeRepo, times(1)).save(trainee);
     }
 
     @Test
-    void delete_Success() {
+    void delete_success() {
         // Given
         String username = USERNAME;
         User user = new User();
@@ -216,7 +216,7 @@ class TraineeServiceImplTest {
     }
 
     @Test
-    void getUnassignedTrainers_Success() {
+    void getUnassignedTrainers_success() {
         // Given
         Trainee trainee = mock(Trainee.class);
         Trainer assignedTrainer = new Trainer();
@@ -240,18 +240,18 @@ class TraineeServiceImplTest {
         doNothing().when(validator).validateTraineeExists(USERNAME);
 
         // When
-        List<TrainerDTO> result = traineeService.getUnassignedTrainers(USERNAME);
+        List<TrainerDTO> actualResult = traineeService.getUnassignedTrainers(USERNAME);
 
         // Then
-        Assertions.assertEquals(1, result.size());
-        Assertions.assertEquals("unassignedTrainerUsername", result.get(0).getUsername());
+        Assertions.assertEquals(1, actualResult.size());
+        Assertions.assertEquals("unassignedTrainerUsername", actualResult.get(0).getUsername());
         verify(validator, times(1)).validateTraineeExists(USERNAME);
         verify(traineeRepo, times(1)).findByUsername(USERNAME);
         verify(trainerRepo, times(1)).findAll();
     }
 
     @Test
-    void getTrainings_Success() {
+    void getTrainings_success() {
         // Given
         Training training = new Training();
         training.setTrainingName(TRAINING_NAME);
@@ -272,14 +272,14 @@ class TraineeServiceImplTest {
         when(trainingTypeRepo.findByTrainingTypeName(TRAINING_TYPE_NAME))
                 .thenReturn(Optional.of(trainingType));
 
-        TrainingsRequestDTO requestDTO = new TrainingsRequestDTO(USERNAME, START_DATE, END_DATE, null, new TrainingTypeDTO(TRAINING_TYPE_ID, TRAINING_TYPE_NAME));
+        TrainingsRequestDTO request = new TrainingsRequestDTO(USERNAME, START_DATE, END_DATE, null, new TrainingTypeDTO(TRAINING_TYPE_ID, TRAINING_TYPE_NAME));
 
         // When
-        List<TrainingResponseDTO> responseDTOs = traineeService.getTrainings(requestDTO);
+        List<TrainingResponseDTO> actualTrainings = traineeService.getTrainings(request);
 
         // Then
-        Assertions.assertEquals(1, responseDTOs.size());
-        TrainingResponseDTO responseDTO = responseDTOs.get(0);
+        Assertions.assertEquals(1, actualTrainings.size());
+        TrainingResponseDTO responseDTO = actualTrainings.get(0);
         Assertions.assertEquals(TRAINING_NAME, responseDTO.getTrainingName());
         Assertions.assertEquals(LocalDate.of(2023, 1, 15), responseDTO.getDate());
         Assertions.assertEquals(DURATION, responseDTO.getDuration());
@@ -294,7 +294,7 @@ class TraineeServiceImplTest {
 
 
     @Test
-    void updateTrainers_Success() {
+    void updateTrainers_success() {
         // Given
         User trainerProfile1 = new User();
         trainerProfile1.setUsername(TRAINER_USERNAME1);
@@ -334,13 +334,13 @@ class TraineeServiceImplTest {
         when(traineeRepo.findByUsername(USERNAME)).thenReturn(trainee);
 
         // When
-        List<TrainerDTO> updatedTrainers = traineeService.updateTrainers(updateTrainersRequestDTO);
+        List<TrainerDTO> actualUpdatedTrainers = traineeService.updateTrainers(updateTrainersRequestDTO);
 
         // Then
-        Assertions.assertNotNull(updatedTrainers);
-        Assertions.assertEquals(2, updatedTrainers.size());
-        Assertions.assertTrue(updatedTrainers.stream().anyMatch(t -> TRAINER_USERNAME1.equals(t.getUsername())));
-        Assertions.assertTrue(updatedTrainers.stream().anyMatch(t -> TRAINER_USERNAME2.equals(t.getUsername())));
+        Assertions.assertNotNull(actualUpdatedTrainers);
+        Assertions.assertEquals(2, actualUpdatedTrainers.size());
+        Assertions.assertTrue(actualUpdatedTrainers.stream().anyMatch(t -> TRAINER_USERNAME1.equals(t.getUsername())));
+        Assertions.assertTrue(actualUpdatedTrainers.stream().anyMatch(t -> TRAINER_USERNAME2.equals(t.getUsername())));
 
         verify(validator).validateTraineeExists(USERNAME);
         verify(traineeRepo).findByUsername(USERNAME);
@@ -350,7 +350,7 @@ class TraineeServiceImplTest {
     }
 
     @Test
-    void toggleActivation_Success() {
+    void toggleActivation_success() {
         // Given
         String username = USERNAME;
         boolean newIsActiveStatus = NEW_ACTIVE_STATUS;
