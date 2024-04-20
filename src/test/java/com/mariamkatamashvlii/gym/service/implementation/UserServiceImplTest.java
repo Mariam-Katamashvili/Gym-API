@@ -5,8 +5,9 @@ import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordRequestDTO;
 import com.mariamkatamashvlii.gym.entity.User;
 import com.mariamkatamashvlii.gym.exception.AuthenticationException;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
-import com.mariamkatamashvlii.gym.security.JwtTokenUtil;
+import com.mariamkatamashvlii.gym.security.JwtTokenGenerator;
 import com.mariamkatamashvlii.gym.validator.Validator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,9 +29,9 @@ class UserServiceImplTest {
     private static final String VALID_PASSWORD = "pass";
     private static final String NEW_PASSWORD = "newpass";
     private static final String INVALID_PASSWORD = "wrongpass";
-    private static final String TOKEN = "token";
+    private static final String TEST_TOKEN = "token";
     private static final String AUTHENTICATION_FAILED = "Authentication failed";
-
+    private static final String PASSWORD_INCORRECT = "Current password is incorrect!";
     @Mock
     private UserRepository userRepo;
     @Mock
@@ -38,7 +39,7 @@ class UserServiceImplTest {
     @Mock
     private AuthenticationManager authenticationManager;
     @Mock
-    private JwtTokenUtil jwtTokenUtil;
+    private JwtTokenGenerator jwtTokenGenerator;
     @Mock
     private Authentication authentication;
     @Mock
@@ -47,50 +48,54 @@ class UserServiceImplTest {
     @InjectMocks
     private UserServiceImpl userService;
 
-    @Test
-    void loginSuccessTest() {
-        // Given
-        LoginRequestDTO loginRequest = new LoginRequestDTO();
+    private LoginRequestDTO loginRequest;
+    private NewPasswordRequestDTO newPasswordRequest;
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        loginRequest = new LoginRequestDTO();
         loginRequest.setUsername(USERNAME);
+        newPasswordRequest = new NewPasswordRequestDTO();
+        newPasswordRequest.setUsername(USERNAME);
+        newPasswordRequest.setNewPass(NEW_PASSWORD);
+        user = new User();
+        user.setPassword(passwordEncoder.encode(VALID_PASSWORD));
+    }
+    @Test
+    void login_success() {
+        // Given
         loginRequest.setPassword(VALID_PASSWORD);
 
         when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(USERNAME, VALID_PASSWORD)))
                 .thenReturn(authentication);
-        when(jwtTokenUtil.generateJwtToken(authentication)).thenReturn(TOKEN);
+        when(jwtTokenGenerator.generateJwtToken(authentication)).thenReturn(TEST_TOKEN);
 
         // When
         String result = userService.login(loginRequest);
 
         // Then
-        assertEquals(TOKEN, result);
+        assertEquals(TEST_TOKEN, result);
     }
 
     @Test
-    void loginFailureTest() {
+    void login_failure() {
         // Given
-        LoginRequestDTO loginRequest = new LoginRequestDTO();
-        loginRequest.setUsername(USERNAME);
         loginRequest.setPassword(INVALID_PASSWORD);
 
         when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(USERNAME, INVALID_PASSWORD)))
                 .thenThrow(new AuthenticationException(AUTHENTICATION_FAILED));
 
         // When
-        Exception exception = assertThrows(AuthenticationException.class, () -> userService.login(loginRequest));
+        Exception actualException = assertThrows(AuthenticationException.class, () -> userService.login(loginRequest));
 
-        assertEquals(AUTHENTICATION_FAILED, exception.getMessage());
+        assertEquals(AUTHENTICATION_FAILED, actualException.getMessage());
     }
 
     @Test
-    void changePasswordSuccessTest() {
+    void changePassword_success() {
         // Given
-        NewPasswordRequestDTO newPasswordRequest = new NewPasswordRequestDTO();
-        newPasswordRequest.setUsername(USERNAME);
         newPasswordRequest.setCurrentPass(VALID_PASSWORD);
-        newPasswordRequest.setNewPass(NEW_PASSWORD);
-
-        User user = new User();
-        user.setPassword(passwordEncoder.encode(VALID_PASSWORD));
 
         when(userRepo.findByUsername(USERNAME)).thenReturn(user);
         when(passwordEncoder.matches(VALID_PASSWORD, user.getPassword())).thenReturn(true);
@@ -100,23 +105,17 @@ class UserServiceImplTest {
     }
 
     @Test
-    void changePasswordFailureTest() {
+    void changePassword_failure() {
         // Given
-        NewPasswordRequestDTO newPasswordRequest = new NewPasswordRequestDTO();
-        newPasswordRequest.setUsername(USERNAME);
         newPasswordRequest.setCurrentPass(INVALID_PASSWORD);
-        newPasswordRequest.setNewPass(NEW_PASSWORD);
-
-        User user = new User();
-        user.setPassword(passwordEncoder.encode(VALID_PASSWORD));
 
         when(userRepo.findByUsername(USERNAME)).thenReturn(user);
         when(passwordEncoder.matches(INVALID_PASSWORD, user.getPassword())).thenReturn(false);
 
         // When
-        Exception exception = assertThrows(AuthenticationException.class, () -> userService.changePassword(newPasswordRequest));
+        Exception actualException = assertThrows(AuthenticationException.class, () -> userService.changePassword(newPasswordRequest));
 
         // Then
-        assertEquals("Current password is incorrect!", exception.getMessage());
+        assertEquals(PASSWORD_INCORRECT, actualException.getMessage());
     }
 }

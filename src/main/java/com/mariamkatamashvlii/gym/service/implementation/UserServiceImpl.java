@@ -5,7 +5,7 @@ import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordRequestDTO;
 import com.mariamkatamashvlii.gym.entity.User;
 import com.mariamkatamashvlii.gym.exception.AuthenticationException;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
-import com.mariamkatamashvlii.gym.security.JwtTokenUtil;
+import com.mariamkatamashvlii.gym.security.JwtTokenGenerator;
 import com.mariamkatamashvlii.gym.service.UserService;
 import com.mariamkatamashvlii.gym.validator.Validator;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
     private final Validator validator;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenGenerator jwtTokenGenerator;
 
     @Override
     public String login(LoginRequestDTO loginRequest) {
@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return jwtTokenUtil.generateJwtToken(authentication);
+        return jwtTokenGenerator.generateJwtToken(authentication);
     }
 
     @Override

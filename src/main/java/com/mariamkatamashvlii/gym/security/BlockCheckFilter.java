@@ -4,8 +4,11 @@ import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -22,7 +25,7 @@ public class BlockCheckFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String ip = request.getRemoteAddr();
         if (loginAttemptService.isBlocked(ip)) {
-            response.setStatus(429);
+            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.getWriter().write("You are temporarily blocked due to too many failed login attempts.");
             return;
         }

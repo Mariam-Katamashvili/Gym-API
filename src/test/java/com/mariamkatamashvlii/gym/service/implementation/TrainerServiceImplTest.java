@@ -18,7 +18,7 @@ import com.mariamkatamashvlii.gym.generator.UsernameGenerator;
 import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
-import com.mariamkatamashvlii.gym.security.JwtTokenUtil;
+import com.mariamkatamashvlii.gym.security.JwtTokenGenerator;
 import com.mariamkatamashvlii.gym.validator.Validator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,7 +65,7 @@ class TrainerServiceImplTest {
     @Mock
     private TrainingTypeDTO trainingTypeDTO;
     @Mock
-    private JwtTokenUtil jwtTokenUtil;
+    private JwtTokenGenerator jwtTokenGenerator;
     @Mock
     private AuthenticationManager authenticationManager;
     @Mock
@@ -86,7 +86,7 @@ class TrainerServiceImplTest {
     private static final Boolean NEW_ACTIVE_STATUS = false;
     private static final String USER_NOT_FOUND = "User not found for username: ";
     private static final String TRAINER_NOT_FOUND = "Trainer not found for username: ";
-    private static final String TOKEN = "Token";
+    private static final String TEST_TOKEN = "Token";
     @BeforeEach
     void setUp() {
         user = new User();
@@ -122,7 +122,7 @@ class TrainerServiceImplTest {
     }
 
     @Test
-    void register_Success() {
+    void register_success() {
         // Given
         TrainingType trainingType = new TrainingType();
         trainingType.setId(TRAINING_TYPE_ID);
@@ -137,7 +137,7 @@ class TrainerServiceImplTest {
         when(passwordGenerator.generatePassword()).thenReturn(PASSWORD);
         when(passwordEncoder.encode(PASSWORD)).thenReturn(PASSWORD);
         when(authenticationManager.authenticate(any())).thenReturn(new TestingAuthenticationToken(dummyUser, null));
-        when(jwtTokenUtil.generateJwtToken(any(Authentication.class))).thenReturn(TOKEN);
+        when(jwtTokenGenerator.generateJwtToken(any(Authentication.class))).thenReturn(TEST_TOKEN);
 
         RegistrationRequestDTO registrationRequestDTO = new RegistrationRequestDTO();
         registrationRequestDTO.setFirstName(FIRST_NAME);
@@ -145,79 +145,78 @@ class TrainerServiceImplTest {
         registrationRequestDTO.setSpecialization(new TrainingTypeDTO(TRAINING_TYPE_ID, TRAINING_TYPE_NAME));
 
         // When
-        RegistrationResponseDTO result = trainerService.register(registrationRequestDTO);
+        RegistrationResponseDTO actualResult = trainerService.register(registrationRequestDTO);
 
         // Then
-        Assertions.assertNotNull(result);
-        assertEquals(USERNAME, result.getUsername());
-        assertEquals(PASSWORD, result.getPassword());
-        assertEquals(TOKEN, result.getToken());
+        Assertions.assertNotNull(actualResult);
+        assertEquals(USERNAME, actualResult.getUsername());
+        assertEquals(PASSWORD, actualResult.getPassword());
+        assertEquals(TEST_TOKEN, actualResult.getToken());
         verify(usernameGenerator).generateUsername(FIRST_NAME, LAST_NAME);
         verify(passwordGenerator).generatePassword();
         verify(trainingTypeRepository).findById(TRAINING_TYPE_ID);
         verify(trainerRepo).save(any(Trainer.class));
     }
 
-
     @Test
-    void getProfile_Success() {
+    void getProfile_success() {
         // Given
         String username = USERNAME;
 
         // When
-        ProfileResponseDTO profileResponseDTO = trainerService.getProfile(username);
+        ProfileResponseDTO actualProfile = trainerService.getProfile(username);
 
         // Then
         verify(trainerRepo).findByUsername(username);
         verify(validator).validateTrainerExists(username);
-        assertEquals(FIRST_NAME, profileResponseDTO.getFirstName());
-        assertEquals(LAST_NAME, profileResponseDTO.getLastName());
-        assertEquals(ACTIVE_STATUS, profileResponseDTO.getIsActive());
-        assertEquals(1, profileResponseDTO.getTrainees().size());
-        assertEquals(TRAINING_TYPE_NAME, profileResponseDTO.getSpecialization().getTrainingTypeName());
+        assertEquals(FIRST_NAME, actualProfile.getFirstName());
+        assertEquals(LAST_NAME, actualProfile.getLastName());
+        assertEquals(ACTIVE_STATUS, actualProfile.getIsActive());
+        assertEquals(1, actualProfile.getTrainees().size());
+        assertEquals(TRAINING_TYPE_NAME, actualProfile.getSpecialization().getTrainingTypeName());
     }
 
     @Test
-    void updateProfile_Success() {
+    void updateProfile_success() {
         // Given
-        UpdateRequestDTO updateRequestDTO = new UpdateRequestDTO(USERNAME, NEW_FIRST_NAME, LAST_NAME, trainingTypeDTO, ACTIVE_STATUS);
+        UpdateRequestDTO updateRequest = new UpdateRequestDTO(USERNAME, NEW_FIRST_NAME, LAST_NAME, trainingTypeDTO, ACTIVE_STATUS);
         when(userRepo.findByUsername(USERNAME)).thenReturn(user);
         when(trainerRepo.findByUsername(USERNAME)).thenReturn(trainer);
 
         // When
-        UpdateResponseDTO result = trainerService.updateProfile(updateRequestDTO);
+        UpdateResponseDTO actualResult = trainerService.updateProfile(updateRequest);
 
         // Then
-        assertEquals(NEW_FIRST_NAME, result.getFirstName());
-        assertEquals(LAST_NAME, result.getLastName());
-        Assertions.assertTrue(result.getIsActive());
+        assertEquals(NEW_FIRST_NAME, actualResult.getFirstName());
+        assertEquals(LAST_NAME, actualResult.getLastName());
+        Assertions.assertTrue(actualResult.getIsActive());
         verify(userRepo).save(any(User.class));
     }
 
     @Test
-    void updateProfile_UserDoesNotExist() {
+    void updateProfile_userDoesNotExist() {
         // Given
-        UpdateRequestDTO updateRequestDTO = new UpdateRequestDTO(UNKNOWN_USERNAME, FIRST_NAME, LAST_NAME, trainingTypeDTO, ACTIVE_STATUS);
+        UpdateRequestDTO updateRequest = new UpdateRequestDTO(UNKNOWN_USERNAME, FIRST_NAME, LAST_NAME, trainingTypeDTO, ACTIVE_STATUS);
         doThrow(new UserNotFoundException(USER_NOT_FOUND + UNKNOWN_USERNAME)).when(validator).validateUserExists(UNKNOWN_USERNAME);
 
         // When & Then
-        Exception exception = assertThrows(UserNotFoundException.class, () -> trainerService.updateProfile(updateRequestDTO));
-        assertEquals(USER_NOT_FOUND + UNKNOWN_USERNAME, exception.getMessage());
+        Exception actualException = assertThrows(UserNotFoundException.class, () -> trainerService.updateProfile(updateRequest));
+        assertEquals(USER_NOT_FOUND + UNKNOWN_USERNAME, actualException.getMessage());
     }
 
     @Test
-    void updateProfile_TrainerDoesNotExist() {
+    void updateProfile_trainerDoesNotExist() {
         // Given
-        UpdateRequestDTO updateRequestDTO = new UpdateRequestDTO(USERNAME, FIRST_NAME, LAST_NAME, trainingTypeDTO, ACTIVE_STATUS);
+        UpdateRequestDTO updateRequest = new UpdateRequestDTO(USERNAME, FIRST_NAME, LAST_NAME, trainingTypeDTO, ACTIVE_STATUS);
         doThrow(new TrainerNotFoundException(TRAINER_NOT_FOUND + USERNAME)).when(validator).validateTrainerExists(USERNAME);
 
         // When & Then
-        Exception exception = assertThrows(TrainerNotFoundException.class, () -> trainerService.updateProfile(updateRequestDTO));
-        assertEquals(TRAINER_NOT_FOUND + USERNAME, exception.getMessage());
+        Exception actualException = assertThrows(TrainerNotFoundException.class, () -> trainerService.updateProfile(updateRequest));
+        assertEquals(TRAINER_NOT_FOUND + USERNAME, actualException.getMessage());
     }
 
     @Test
-    void toggleActivation_Success() {
+    void toggleActivation_success() {
         // Given
         User existingUser = new User();
         existingUser.setUsername(USERNAME);
@@ -225,10 +224,10 @@ class TrainerServiceImplTest {
 
         when(userRepo.findByUsername(USERNAME)).thenReturn(existingUser);
 
-        ToggleActivationDTO toggleActivationDTO = new ToggleActivationDTO(USERNAME, NEW_ACTIVE_STATUS);
+        ToggleActivationDTO toggleActivation = new ToggleActivationDTO(USERNAME, NEW_ACTIVE_STATUS);
 
         // When
-        trainerService.toggleActivation(toggleActivationDTO);
+        trainerService.toggleActivation(toggleActivation);
 
         // Then
         verify(validator).validateUserExists(USERNAME);
