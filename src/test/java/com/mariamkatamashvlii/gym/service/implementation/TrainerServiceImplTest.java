@@ -11,8 +11,7 @@ import com.mariamkatamashvlii.gym.entity.Trainee;
 import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.TrainingType;
 import com.mariamkatamashvlii.gym.entity.User;
-import com.mariamkatamashvlii.gym.exception.TrainerNotFoundException;
-import com.mariamkatamashvlii.gym.exception.UserNotFoundException;
+import com.mariamkatamashvlii.gym.exception.GymException;
 import com.mariamkatamashvlii.gym.generator.PasswordGenerator;
 import com.mariamkatamashvlii.gym.generator.UsernameGenerator;
 import com.mariamkatamashvlii.gym.repository.TrainerRepository;
@@ -197,10 +196,10 @@ class TrainerServiceImplTest {
     void updateProfile_userDoesNotExist() {
         // Given
         UpdateRequestDTO updateRequest = new UpdateRequestDTO(UNKNOWN_USERNAME, FIRST_NAME, LAST_NAME, trainingTypeDTO, ACTIVE_STATUS);
-        doThrow(new UserNotFoundException(USER_NOT_FOUND + UNKNOWN_USERNAME)).when(validator).validateUserExists(UNKNOWN_USERNAME);
+        doThrow(new GymException(USER_NOT_FOUND + UNKNOWN_USERNAME)).when(validator).validateUserExists(UNKNOWN_USERNAME);
 
         // When & Then
-        Exception actualException = assertThrows(UserNotFoundException.class, () -> trainerService.updateProfile(updateRequest));
+        Exception actualException = assertThrows(GymException.class, () -> trainerService.updateProfile(updateRequest));
         assertEquals(USER_NOT_FOUND + UNKNOWN_USERNAME, actualException.getMessage());
     }
 
@@ -208,10 +207,10 @@ class TrainerServiceImplTest {
     void updateProfile_trainerDoesNotExist() {
         // Given
         UpdateRequestDTO updateRequest = new UpdateRequestDTO(USERNAME, FIRST_NAME, LAST_NAME, trainingTypeDTO, ACTIVE_STATUS);
-        doThrow(new TrainerNotFoundException(TRAINER_NOT_FOUND + USERNAME)).when(validator).validateTrainerExists(USERNAME);
+        doThrow(new GymException(TRAINER_NOT_FOUND + USERNAME)).when(validator).validateTrainerExists(USERNAME);
 
         // When & Then
-        Exception actualException = assertThrows(TrainerNotFoundException.class, () -> trainerService.updateProfile(updateRequest));
+        Exception actualException = assertThrows(GymException.class, () -> trainerService.updateProfile(updateRequest));
         assertEquals(TRAINER_NOT_FOUND + USERNAME, actualException.getMessage());
     }
 

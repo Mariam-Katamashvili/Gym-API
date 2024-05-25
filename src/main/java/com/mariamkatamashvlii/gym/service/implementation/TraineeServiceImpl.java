@@ -1,7 +1,10 @@
 package com.mariamkatamashvlii.gym.service.implementation;
 
+import com.mariamkatamashvlii.gym.client.WorkloadServiceClient;
+import com.mariamkatamashvlii.gym.dto.ActionType;
 import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.ToggleActivationDTO;
+import com.mariamkatamashvlii.gym.dto.WorkloadDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.ProfileResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.RegistrationRequestDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateRequestDTO;
@@ -16,8 +19,7 @@ import com.mariamkatamashvlii.gym.entity.Trainee;
 import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.Training;
 import com.mariamkatamashvlii.gym.entity.User;
-import com.mariamkatamashvlii.gym.exception.TrainingTypeNotFoundException;
-import com.mariamkatamashvlii.gym.exception.UserNotCreatedException;
+import com.mariamkatamashvlii.gym.exception.GymException;
 import com.mariamkatamashvlii.gym.generator.PasswordGenerator;
 import com.mariamkatamashvlii.gym.generator.UsernameGenerator;
 import com.mariamkatamashvlii.gym.repository.TraineeRepository;
@@ -28,22 +30,23 @@ import com.mariamkatamashvlii.gym.repository.UserRepository;
 import com.mariamkatamashvlii.gym.security.JwtTokenGenerator;
 import com.mariamkatamashvlii.gym.service.TraineeService;
 import com.mariamkatamashvlii.gym.validator.Validator;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class TraineeServiceImpl implements TraineeService {
@@ -59,12 +62,11 @@ public class TraineeServiceImpl implements TraineeService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenGenerator jwtTokenGenerator;
     private final AuthenticationManager authenticationManager;
+    private final WorkloadServiceClient workloadServiceClient;
 
     @Override
     @Transactional
     public RegistrationResponseDTO register(RegistrationRequestDTO registrationRequestDTO) {
-        String transactionId = UUID.randomUUID().toString();
-        log.info("[{}] Attempting to register a new trainee", transactionId);
         try {
             String firstName = registrationRequestDTO.getFirstName();
             String lastName = registrationRequestDTO.getLastName();
@@ -86,20 +88,16 @@ public class TraineeServiceImpl implements TraineeService {
                     new UsernamePasswordAuthenticationToken(user.getUsername(), password)
             );
             String token = jwtTokenGenerator.generateJwtToken(authentication);
-            log.info("[{}] Successfully registered new trainee with username: {}", transactionId, user.getUsername());
             return new RegistrationResponseDTO(user.getUsername(), password, token);
         } catch (Exception e) {
-            log.error("[{}] Failed to register trainee: {}", transactionId, e.getMessage(), e);
-            throw new UserNotCreatedException("Could not create trainee due to an error: " + e.getMessage());
+            throw new GymException("Could not create trainee due to an error: " + e.getMessage());
         }
     }
 
     @Override
     public ProfileResponseDTO getProfile(String username) {
-        String transactionId = UUID.randomUUID().toString();
         validator.validateUserExists(username);
         validator.validateTraineeExists(username);
-        log.info("[{}] Fetching profile for trainee: {}", transactionId, username);
 
         User user = userRepo.findByUsername(username);
         Trainee trainee = traineeRepo.findByUsername(username);
@@ -117,7 +115,6 @@ public class TraineeServiceImpl implements TraineeService {
             return dto;
         }).toList();
 
-        log.info("[{}] Successfully fetched profile for trainee: {}", transactionId, username);
         return new ProfileResponseDTO(
                 user.getFirstName(),
                 user.getLastName(),
@@ -131,10 +128,8 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @Transactional
     public UpdateResponseDTO updateProfile(UpdateRequestDTO updateRequestDTO) {
-        String transactionId = UUID.randomUUID().toString();
         validator.validateUserExists(updateRequestDTO.getUsername());
         validator.validateTraineeExists(updateRequestDTO.getUsername());
-        log.info("[{}] Starting profile update for username: {}", transactionId, updateRequestDTO.getUsername());
 
         User user = userRepo.findByUsername(updateRequestDTO.getUsername());
         user.setFirstName(updateRequestDTO.getFirstName());
@@ -160,7 +155,6 @@ public class TraineeServiceImpl implements TraineeService {
             return dto;
         }).toList();
 
-        log.info("[{}] Profile successfully updated for username: {}", transactionId, user.getUsername());
         return new UpdateResponseDTO(
                 user.getUsername(),
                 user.getFirstName(),
@@ -175,28 +169,29 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @Transactional
     public void delete(String username) {
-        String transactionId = UUID.randomUUID().toString();
         validator.validateUserExists(username);
         validator.validateTraineeExists(username);
-        log.info("[{}] Initiating deletion for username: {}", transactionId, username);
 
+        removeTrainings(username);
+
+        LocalDate now = LocalDate.now();
         Trainee trainee = traineeRepo.findByUsername(username);
         User user = userRepo.findByUsername(username);
         Set<Training> trainings = trainee.getTrainings();
-        for (Training t : trainings) {
-            trainingRepository.delete(t);
-            log.debug("[{}] Deleted training with ID: {} for username: {}", transactionId, t.getId(), username);
+
+        Set<Training> futureTrainings = trainings.stream()
+                .filter(training -> training.getTrainingDate().isAfter(now))
+                .collect(Collectors.toSet());
+        for (Training training : futureTrainings) {
+            trainingRepo.delete(training);
         }
 
         userRepo.delete(user);
-        log.info("[{}] Deleted user with username: {}", transactionId, username);
     }
 
     @Override
     public List<TrainerDTO> getUnassignedTrainers(String username) {
-        String transactionId = UUID.randomUUID().toString();
         validator.validateTraineeExists(username);
-        log.info("[{}] Fetching unassigned trainers for trainee: {}", transactionId, username);
 
         List<TrainerDTO> unassignedTrainers = new ArrayList<>();
         Trainee trainee = traineeRepo.findByUsername(username);
@@ -218,20 +213,17 @@ public class TraineeServiceImpl implements TraineeService {
             }
         }
 
-        log.info("[{}] Successfully fetched unassigned trainers for trainee: {}. Number of trainers found: {}", transactionId, username, unassignedTrainers.size());
         return unassignedTrainers;
     }
 
     @Override
     public List<TrainingResponseDTO> getTrainings(TrainingsRequestDTO trainingsRequestDTO) {
-        String transactionId = UUID.randomUUID().toString();
         String username = trainingsRequestDTO.getUsername();
         validator.validateTraineeExists(username);
         String trainerName = trainingsRequestDTO.getName();
         LocalDate startDate = trainingsRequestDTO.getStartDate();
         LocalDate endDate = trainingsRequestDTO.getEndDate();
         TrainingTypeDTO trainingType = trainingsRequestDTO.getTrainingType();
-        log.info("[{}] Fetching trainings for trainee: {}", transactionId, username);
 
         String trainingTypeName = trainingType != null ? trainingType.getTrainingTypeName() : null;
         List<Training> trainings = trainingRepo.findTraineeTrainingsByCriteria(
@@ -244,7 +236,7 @@ public class TraineeServiceImpl implements TraineeService {
         return trainings.stream().map(t -> {
             TrainingTypeDTO specialization = trainingTypeRepo.findByTrainingTypeName(t.getTrainingType().getTrainingTypeName())
                     .map(tt -> new TrainingTypeDTO(tt.getId(), tt.getTrainingTypeName()))
-                    .orElseThrow(() -> new TrainingTypeNotFoundException("Training type not found with name: " + t.getTrainingType().getTrainingTypeName()));
+                    .orElseThrow(() -> new GymException("Training type not found with name: " + t.getTrainingType().getTrainingTypeName()));
             return new TrainingResponseDTO(
                     t.getTrainingName(),
                     t.getTrainingDate(),
@@ -257,10 +249,8 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @Transactional
     public List<TrainerDTO> updateTrainers(UpdateTrainersRequestDTO updateTrainersRequestDTO) {
-        String transactionId = UUID.randomUUID().toString();
         String username = updateTrainersRequestDTO.getUsername();
         validator.validateTraineeExists(username);
-        log.info("[{}] Starting to update trainers for trainee: {}", transactionId, username);
 
         Trainee trainee = traineeRepo.findByUsername(username);
         List<TrainerDTO> newTrainers = new ArrayList<>();
@@ -270,7 +260,6 @@ public class TraineeServiceImpl implements TraineeService {
                 .toList();
         trainee.setTrainers(updatedTrainers);
         traineeRepo.save(trainee);
-        log.info("Updated trainer list for trainee - {}", username);
         updatedTrainers.forEach(trainer -> {
             TrainerDTO dto = new TrainerDTO();
             dto.setUsername(trainer.getUser().getUsername());
@@ -284,21 +273,40 @@ public class TraineeServiceImpl implements TraineeService {
             newTrainers.add(dto);
         });
 
-        log.info("[{}] Successfully updated trainer list for trainee: {}", transactionId, username);
         return newTrainers;
     }
 
     @Override
     @Transactional
     public void toggleActivation(ToggleActivationDTO toggleActivationDTO) {
-        String transactionId = UUID.randomUUID().toString();
         String username = toggleActivationDTO.getUsername();
         validator.validateUserExists(username);
-        log.info("[{}] Attempting to toggle activation for user: {}", transactionId, username);
 
         User user = userRepo.findByUsername(username);
         user.setIsActive(toggleActivationDTO.getIsActive());
         userRepo.save(user);
-        log.info("[{}] Successfully toggled activation for user: {}. Now active: {}", transactionId, username, user.getIsActive());
+    }
+
+    private void removeTrainings(String username) {
+        LocalDate now = LocalDate.now();
+        Trainee trainee = traineeRepo.findByUsername(username);
+        Set<Training> trainings = trainee.getTrainings();
+
+        Set<Training> futureTrainings = trainings.stream()
+                .filter(training -> training.getTrainingDate().isAfter(now))
+                .collect(Collectors.toSet());
+        for (Training training : futureTrainings) {
+            Trainer trainer = training.getTrainer();
+            WorkloadDTO workload = WorkloadDTO.builder()
+                    .username(trainer.getUser().getUsername())
+                    .firstName(trainer.getUser().getFirstName())
+                    .lastName(trainer.getUser().getLastName())
+                    .isActive(trainer.getUser().getIsActive())
+                    .date(training.getTrainingDate())
+                    .duration(training.getDuration())
+                    .actionType(ActionType.DELETE)
+                    .build();
+            workloadServiceClient.sendWorkload(workload);
+        }
     }
 }

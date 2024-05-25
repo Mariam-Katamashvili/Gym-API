@@ -16,7 +16,7 @@ import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.Training;
 import com.mariamkatamashvlii.gym.entity.TrainingType;
 import com.mariamkatamashvlii.gym.entity.User;
-import com.mariamkatamashvlii.gym.exception.UserNotCreatedException;
+import com.mariamkatamashvlii.gym.exception.GymException;
 import com.mariamkatamashvlii.gym.generator.PasswordGenerator;
 import com.mariamkatamashvlii.gym.generator.UsernameGenerator;
 import com.mariamkatamashvlii.gym.repository.TraineeRepository;
@@ -140,7 +140,7 @@ class TraineeServiceImplTest {
         when(usernameGenerator.generateUsername(FIRST_NAME, LAST_NAME)).thenThrow(new RuntimeException("Database error"));
 
         // When & Then
-        assertThrows(UserNotCreatedException.class, () -> traineeService.register(registrationRequestDTO));
+        assertThrows(GymException.class, () -> traineeService.register(registrationRequestDTO));
         verify(traineeRepo, never()).save(any(Trainee.class));
     }
 

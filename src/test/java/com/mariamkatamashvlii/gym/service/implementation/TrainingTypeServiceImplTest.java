@@ -2,7 +2,7 @@ package com.mariamkatamashvlii.gym.service.implementation;
 
 import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
 import com.mariamkatamashvlii.gym.entity.TrainingType;
-import com.mariamkatamashvlii.gym.exception.TrainingTypeFetchException;
+import com.mariamkatamashvlii.gym.exception.GymException;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,7 +51,7 @@ class TrainingTypeServiceImplTest {
 
         // When & Then
         assertThatThrownBy(() -> trainingTypeService.findAll())
-                .isInstanceOf(TrainingTypeFetchException.class)
+                .isInstanceOf(GymException.class)
                 .hasMessageContaining("Error retrieving all training types");
     }
 }

@@ -3,8 +3,7 @@ package com.mariamkatamashvlii.gym.service.implementation;
 import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingRequestDTO;
 import com.mariamkatamashvlii.gym.entity.Trainee;
 import com.mariamkatamashvlii.gym.entity.Trainer;
-import com.mariamkatamashvlii.gym.exception.TraineeNotFoundException;
-import com.mariamkatamashvlii.gym.exception.TrainerNotFoundException;
+import com.mariamkatamashvlii.gym.exception.GymException;
 import com.mariamkatamashvlii.gym.repository.TraineeRepository;
 import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingRepository;
@@ -67,11 +66,11 @@ class TrainingServiceImplTest {
     void whenCreateTrainingAndTraineeNotFound_thenThrowsException() {
         // Given
         TrainingRequestDTO requestDTO = new TrainingRequestDTO(TRAINEE_USERNAME, TRAINER_USERNAME, TRAINING_NAME, TRAINING_DATE, TRAINING_DURATION);
-        doThrow(new TraineeNotFoundException("Trainee not found for username - " + TRAINEE_USERNAME)).when(validator).validateTraineeExists(requestDTO.getTraineeUsername());
+        doThrow(new GymException("Trainee not found for username - " + TRAINEE_USERNAME)).when(validator).validateTraineeExists(requestDTO.getTraineeUsername());
 
         // When & Then
         assertThatThrownBy(() -> trainingService.create(requestDTO))
-                .isInstanceOf(TraineeNotFoundException.class)
+                .isInstanceOf(GymException.class)
                 .hasMessageContaining("Trainee not found for username - " + TRAINEE_USERNAME);
     }
 
@@ -80,11 +79,11 @@ class TrainingServiceImplTest {
         // Given
         TrainingRequestDTO requestDTO = new TrainingRequestDTO(TRAINEE_USERNAME, TRAINER_USERNAME, TRAINING_NAME, TRAINING_DATE, TRAINING_DURATION);
         doNothing().when(validator).validateTraineeExists(requestDTO.getTraineeUsername());
-        doThrow(new TrainerNotFoundException("Trainer not found")).when(validator).validateTrainerExists(requestDTO.getTrainerUsername());
+        doThrow(new GymException("Trainer not found")).when(validator).validateTrainerExists(requestDTO.getTrainerUsername());
 
         // When & Then
         assertThatThrownBy(() -> trainingService.create(requestDTO))
-                .isInstanceOf(TrainerNotFoundException.class)
+                .isInstanceOf(GymException.class)
                 .hasMessageContaining("Trainer not found");
     }
 }

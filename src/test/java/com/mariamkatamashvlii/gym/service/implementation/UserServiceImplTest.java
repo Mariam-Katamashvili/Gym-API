@@ -3,7 +3,7 @@ package com.mariamkatamashvlii.gym.service.implementation;
 import com.mariamkatamashvlii.gym.dto.userDto.LoginRequestDTO;
 import com.mariamkatamashvlii.gym.dto.userDto.NewPasswordRequestDTO;
 import com.mariamkatamashvlii.gym.entity.User;
-import com.mariamkatamashvlii.gym.exception.AuthenticationException;
+import com.mariamkatamashvlii.gym.exception.GymException;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
 import com.mariamkatamashvlii.gym.security.JwtTokenGenerator;
 import com.mariamkatamashvlii.gym.validator.Validator;
@@ -84,10 +84,10 @@ class UserServiceImplTest {
         loginRequest.setPassword(INVALID_PASSWORD);
 
         when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(USERNAME, INVALID_PASSWORD)))
-                .thenThrow(new AuthenticationException(AUTHENTICATION_FAILED));
+                .thenThrow(new GymException(AUTHENTICATION_FAILED));
 
         // When
-        Exception actualException = assertThrows(AuthenticationException.class, () -> userService.login(loginRequest));
+        Exception actualException = assertThrows(GymException.class, () -> userService.login(loginRequest));
 
         assertEquals(AUTHENTICATION_FAILED, actualException.getMessage());
     }
@@ -113,7 +113,7 @@ class UserServiceImplTest {
         when(passwordEncoder.matches(INVALID_PASSWORD, user.getPassword())).thenReturn(false);
 
         // When
-        Exception actualException = assertThrows(AuthenticationException.class, () -> userService.changePassword(newPasswordRequest));
+        Exception actualException = assertThrows(GymException.class, () -> userService.changePassword(newPasswordRequest));
 
         // Then
         assertEquals(PASSWORD_INCORRECT, actualException.getMessage());
