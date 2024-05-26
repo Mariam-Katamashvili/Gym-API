@@ -1,7 +1,7 @@
 package com.mariamkatamashvlii.gym.controller;
 
-import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.ToggleActivationDTO;
+import com.mariamkatamashvlii.gym.dto.securityDto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.trainerDto.ProfileResponseDTO;
 import com.mariamkatamashvlii.gym.dto.trainerDto.RegistrationRequestDTO;
 import com.mariamkatamashvlii.gym.dto.trainerDto.UpdateRequestDTO;

@@ -33,7 +33,8 @@ public class Validator {
     }
 
     public void validateUserExists(String username) {
-        User user = userRepo.findByUsername(username);
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new GymException("User not found"));
         if (user == null) {
             throw new GymException("User not found for username: " + username);
         }

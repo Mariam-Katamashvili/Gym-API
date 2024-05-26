@@ -2,9 +2,9 @@ package com.mariamkatamashvlii.gym.service.implementation;
 
 import com.mariamkatamashvlii.gym.client.WorkloadServiceClient;
 import com.mariamkatamashvlii.gym.dto.ActionType;
-import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.ToggleActivationDTO;
 import com.mariamkatamashvlii.gym.dto.WorkloadDTO;
+import com.mariamkatamashvlii.gym.dto.securityDto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.ProfileResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.RegistrationRequestDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateRequestDTO;
@@ -27,13 +27,13 @@ import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
+import com.mariamkatamashvlii.gym.security.GymUserDetails;
 import com.mariamkatamashvlii.gym.security.JwtTokenGenerator;
+import com.mariamkatamashvlii.gym.service.TokenService;
 import com.mariamkatamashvlii.gym.service.TraineeService;
 import com.mariamkatamashvlii.gym.validator.Validator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,8 +58,10 @@ public class TraineeServiceImpl implements TraineeService {
     private final TrainingTypeRepository trainingTypeRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenGenerator jwtTokenGenerator;
-    private final AuthenticationManager authenticationManager;
     private final WorkloadServiceClient workloadServiceClient;
+    private final TokenService tokenService;
+
+    private static final String USER_NOT_FOUND = "User not found";
 
     @Override
     @Transactional
@@ -67,11 +69,12 @@ public class TraineeServiceImpl implements TraineeService {
         try {
             String firstName = registrationRequestDTO.getFirstName();
             String lastName = registrationRequestDTO.getLastName();
+            String username = usernameGenerator.generateUsername(firstName, lastName);
             String password = passwordGenerator.generatePassword();
             User user = User.builder()
                     .firstName(firstName)
                     .lastName(lastName)
-                    .username(usernameGenerator.generateUsername(firstName, lastName))
+                    .username(username)
                     .password(passwordEncoder.encode(password))
                     .isActive(true)
                     .build();
@@ -81,22 +84,21 @@ public class TraineeServiceImpl implements TraineeService {
                     .user(user)
                     .build();
             traineeRepo.save(trainee);
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(user.getUsername(), password)
-            );
-            String token = jwtTokenGenerator.generateJwtToken(authentication);
-            return new RegistrationResponseDTO(user.getUsername(), password, token);
+            GymUserDetails userDetails = new GymUserDetails(user);
+            return tokenService.register(userDetails, username, password);
         } catch (Exception e) {
             throw new GymException("Could not create trainee due to an error: " + e.getMessage());
         }
     }
 
     @Override
+    @PreAuthorize("#username == authentication.principal.username")
     public ProfileResponseDTO getProfile(String username) {
         validator.validateUserExists(username);
         validator.validateTraineeExists(username);
 
-        User user = userRepo.findByUsername(username);
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new GymException(USER_NOT_FOUND));
         Trainee trainee = traineeRepo.findByUsername(username);
 
         List<TrainerDTO> trainers = trainee.getTrainers().stream().map(trainer -> {
@@ -124,11 +126,13 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
+    @PreAuthorize("#updateRequestDTO.username == authentication.principal.username")
     public UpdateResponseDTO updateProfile(UpdateRequestDTO updateRequestDTO) {
         validator.validateUserExists(updateRequestDTO.getUsername());
         validator.validateTraineeExists(updateRequestDTO.getUsername());
 
-        User user = userRepo.findByUsername(updateRequestDTO.getUsername());
+        User user = userRepo.findByUsername(updateRequestDTO.getUsername())
+                .orElseThrow(() -> new GymException(USER_NOT_FOUND));
         user.setFirstName(updateRequestDTO.getFirstName());
         user.setLastName(updateRequestDTO.getLastName());
         user.setIsActive(updateRequestDTO.getIsActive());
@@ -165,6 +169,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
+    @PreAuthorize("#username == authentication.principal.username")
     public void delete(String username) {
         validator.validateUserExists(username);
         validator.validateTraineeExists(username);
@@ -173,7 +178,8 @@ public class TraineeServiceImpl implements TraineeService {
 
         LocalDate now = LocalDate.now();
         Trainee trainee = traineeRepo.findByUsername(username);
-        User user = userRepo.findByUsername(username);
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new GymException(USER_NOT_FOUND));
         Set<Training> trainings = trainee.getTrainings();
 
         Set<Training> futureTrainings = trainings.stream()
@@ -187,6 +193,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
+    @PreAuthorize("#username == authentication.principal.username")
     public List<TrainerDTO> getUnassignedTrainers(String username) {
         validator.validateTraineeExists(username);
 
@@ -214,6 +221,7 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
+    @PreAuthorize("#trainingsRequestDTO.username == authentication.principal.username")
     public List<TrainingResponseDTO> getTrainings(TrainingsRequestDTO trainingsRequestDTO) {
         String username = trainingsRequestDTO.getUsername();
         validator.validateTraineeExists(username);
@@ -245,6 +253,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
+    @PreAuthorize("#updateTrainersRequestDTO.username == authentication.principal.username")
     public List<TrainerDTO> updateTrainers(UpdateTrainersRequestDTO updateTrainersRequestDTO) {
         String username = updateTrainersRequestDTO.getUsername();
         validator.validateTraineeExists(username);
@@ -275,11 +284,13 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
+    @PreAuthorize("#toggleActivationDTO.username == authentication.principal.username")
     public void toggleActivation(ToggleActivationDTO toggleActivationDTO) {
         String username = toggleActivationDTO.getUsername();
         validator.validateUserExists(username);
 
-        User user = userRepo.findByUsername(username);
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new GymException(USER_NOT_FOUND));
         user.setIsActive(toggleActivationDTO.getIsActive());
         userRepo.save(user);
     }

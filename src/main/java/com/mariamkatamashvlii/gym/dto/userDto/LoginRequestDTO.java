@@ -1,7 +1,7 @@
 package com.mariamkatamashvlii.gym.dto.userDto;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,10 +13,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class LoginRequestDTO {
     @Valid
-    @NotNull
+    @NotBlank
     private String username;
 
     @Valid
-    @NotNull
+    @NotBlank
     private String password;
 }

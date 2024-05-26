@@ -13,6 +13,7 @@ import com.mariamkatamashvlii.gym.repository.TrainingRepository;
 import com.mariamkatamashvlii.gym.service.TrainingService;
 import com.mariamkatamashvlii.gym.validator.Validator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ public class TrainingServiceImpl implements TrainingService {
 
     @Override
     @Transactional
+    @PreAuthorize("#trainingRequest.traineeUsername == authentication.principal.username")
     public void create(TrainingRequestDTO trainingRequest) {
         validator.validateTraineeExists(trainingRequest.getTraineeUsername());
         validator.validateTrainerExists(trainingRequest.getTrainerUsername());

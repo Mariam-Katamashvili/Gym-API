@@ -17,12 +17,11 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
     @Override
     public List<TrainingTypeDTO> findAll() {
         try {
-            List<TrainingTypeDTO> result = trainingTypeRepo.findAll().stream()
+            return trainingTypeRepo.findAll().stream()
                     .map(trainingType -> new TrainingTypeDTO(
                             trainingType.getId(),
                             trainingType.getTrainingTypeName()))
                     .toList();
-            return result;
         } catch (Exception e) {
             throw new GymException("Error retrieving all training types" + e.getMessage());
         }
