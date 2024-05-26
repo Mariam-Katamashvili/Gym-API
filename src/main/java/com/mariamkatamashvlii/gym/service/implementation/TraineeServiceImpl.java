@@ -62,6 +62,7 @@ public class TraineeServiceImpl implements TraineeService {
     private final TokenService tokenService;
 
     private static final String USER_NOT_FOUND = "User not found";
+    private static final String TRAINEE_NOT_FOUND = "Trainee not found";
 
     @Override
     @Transactional
@@ -100,6 +101,9 @@ public class TraineeServiceImpl implements TraineeService {
         User user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new GymException(USER_NOT_FOUND));
         Trainee trainee = traineeRepo.findByUsername(username);
+        if (trainee == null) {
+            throw new GymException(TRAINEE_NOT_FOUND);
+        }
 
         List<TrainerDTO> trainers = trainee.getTrainers().stream().map(trainer -> {
             TrainerDTO dto = new TrainerDTO();
@@ -139,6 +143,9 @@ public class TraineeServiceImpl implements TraineeService {
         userRepo.save(user);
 
         Trainee trainee = traineeRepo.findByUsername(updateRequestDTO.getUsername());
+        if (trainee == null) {
+            throw new GymException(TRAINEE_NOT_FOUND);
+        }
         trainee.setBirthday(updateRequestDTO.getBirthday());
         trainee.setAddress(updateRequestDTO.getAddress());
         traineeRepo.save(trainee);
@@ -178,6 +185,10 @@ public class TraineeServiceImpl implements TraineeService {
 
         LocalDate now = LocalDate.now();
         Trainee trainee = traineeRepo.findByUsername(username);
+        if (trainee == null) {
+            throw new GymException(TRAINEE_NOT_FOUND);
+        }
+
         User user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new GymException(USER_NOT_FOUND));
         Set<Training> trainings = trainee.getTrainings();
@@ -298,6 +309,10 @@ public class TraineeServiceImpl implements TraineeService {
     private void removeTrainings(String username) {
         LocalDate now = LocalDate.now();
         Trainee trainee = traineeRepo.findByUsername(username);
+        if (trainee == null) {
+            throw new GymException(TRAINEE_NOT_FOUND);
+        }
+
         Set<Training> trainings = trainee.getTrainings();
 
         Set<Training> futureTrainings = trainings.stream()

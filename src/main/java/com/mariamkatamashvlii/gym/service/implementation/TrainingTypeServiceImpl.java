@@ -23,7 +23,7 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
                             trainingType.getTrainingTypeName()))
                     .toList();
         } catch (Exception e) {
-            throw new GymException("Error retrieving all training types" + e.getMessage());
+            throw new GymException("Error retrieving all training types: " + e.getMessage());
         }
     }
 }

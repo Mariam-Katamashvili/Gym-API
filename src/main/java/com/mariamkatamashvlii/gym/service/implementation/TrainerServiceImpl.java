@@ -50,6 +50,8 @@ public class TrainerServiceImpl implements TrainerService {
     private final JwtTokenGenerator jwtTokenGenerator;
     private final TokenService tokenService;
 
+    private static final String USER_NOT_FOUND = "User not found";
+
     @Override
     @Transactional
     public RegistrationResponseDTO register(RegistrationRequestDTO registrationRequestDTO) {
@@ -111,7 +113,7 @@ public class TrainerServiceImpl implements TrainerService {
         String username = updateRequestDTO.getUsername();
 
         User user = userRepo.findByUsername(username)
-                .orElseThrow(() -> new GymException("User not found"));
+                .orElseThrow(() -> new GymException(USER_NOT_FOUND));
         validator.validateUserExists(username);
         Trainer trainer = trainerRepo.findByUsername(username);
         validator.validateTrainerExists(username);
@@ -176,7 +178,7 @@ public class TrainerServiceImpl implements TrainerService {
         validator.validateUserExists(toggleActivationDTO.getUsername());
 
         User user = userRepo.findByUsername(username)
-                .orElseThrow(() -> new GymException("User not found"));
+                .orElseThrow(() -> new GymException(USER_NOT_FOUND));
         user.setIsActive(toggleActivationDTO.getIsActive());
         userRepo.save(user);
     }

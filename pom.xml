@@ -195,6 +195,8 @@
                 </executions>
                 <configuration>
                     <excludes>
+                        <exclude>com/mariamkatamashvlii/gym/config/**/*</exclude>
+                        <exclude>com/mariamkatamashvlii/gym/client/**/*</exclude>
                         <exclude>com/mariamkatamashvlii/gym/controller/**/*</exclude>
                         <exclude>com/mariamkatamashvlii/gym/dto/**/*</exclude>
                         <exclude>com/mariamkatamashvlii/gym/entity/**/*</exclude>
