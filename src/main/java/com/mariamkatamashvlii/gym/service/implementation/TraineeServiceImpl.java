@@ -1,9 +1,7 @@
 package com.mariamkatamashvlii.gym.service.implementation;
 
 import com.mariamkatamashvlii.gym.client.WorkloadServiceClient;
-import com.mariamkatamashvlii.gym.dto.ActionType;
 import com.mariamkatamashvlii.gym.dto.ToggleActivationDTO;
-import com.mariamkatamashvlii.gym.dto.WorkloadDTO;
 import com.mariamkatamashvlii.gym.dto.securityDto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.ProfileResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.RegistrationRequestDTO;
@@ -31,6 +29,7 @@ import com.mariamkatamashvlii.gym.security.GymUserDetails;
 import com.mariamkatamashvlii.gym.security.JwtTokenGenerator;
 import com.mariamkatamashvlii.gym.service.TokenService;
 import com.mariamkatamashvlii.gym.service.TraineeService;
+import com.mariamkatamashvlii.gym.service.TrainingService;
 import com.mariamkatamashvlii.gym.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,8 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -60,6 +57,7 @@ public class TraineeServiceImpl implements TraineeService {
     private final JwtTokenGenerator jwtTokenGenerator;
     private final WorkloadServiceClient workloadServiceClient;
     private final TokenService tokenService;
+    private final TrainingService trainingService;
 
     private static final String USER_NOT_FOUND = "User not found";
     private static final String TRAINEE_NOT_FOUND = "Trainee not found";
@@ -181,9 +179,8 @@ public class TraineeServiceImpl implements TraineeService {
         validator.validateUserExists(username);
         validator.validateTraineeExists(username);
 
-        removeTrainings(username);
+        trainingService.removeTrainings(username);
 
-        LocalDate now = LocalDate.now();
         Trainee trainee = traineeRepo.findByUsername(username);
         if (trainee == null) {
             throw new GymException(TRAINEE_NOT_FOUND);
@@ -191,14 +188,6 @@ public class TraineeServiceImpl implements TraineeService {
 
         User user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new GymException(USER_NOT_FOUND));
-        Set<Training> trainings = trainee.getTrainings();
-
-        Set<Training> futureTrainings = trainings.stream()
-                .filter(training -> training.getTrainingDate().isAfter(now))
-                .collect(Collectors.toSet());
-        for (Training training : futureTrainings) {
-            trainingRepo.delete(training);
-        }
 
         userRepo.delete(user);
     }
@@ -304,32 +293,5 @@ public class TraineeServiceImpl implements TraineeService {
                 .orElseThrow(() -> new GymException(USER_NOT_FOUND));
         user.setIsActive(toggleActivationDTO.getIsActive());
         userRepo.save(user);
-    }
-
-    private void removeTrainings(String username) {
-        LocalDate now = LocalDate.now();
-        Trainee trainee = traineeRepo.findByUsername(username);
-        if (trainee == null) {
-            throw new GymException(TRAINEE_NOT_FOUND);
-        }
-
-        Set<Training> trainings = trainee.getTrainings();
-
-        Set<Training> futureTrainings = trainings.stream()
-                .filter(training -> training.getTrainingDate().isAfter(now))
-                .collect(Collectors.toSet());
-        for (Training training : futureTrainings) {
-            Trainer trainer = training.getTrainer();
-            WorkloadDTO workload = WorkloadDTO.builder()
-                    .username(trainer.getUser().getUsername())
-                    .firstName(trainer.getUser().getFirstName())
-                    .lastName(trainer.getUser().getLastName())
-                    .isActive(trainer.getUser().getIsActive())
-                    .date(training.getTrainingDate())
-                    .duration(training.getDuration())
-                    .actionType(ActionType.DELETE)
-                    .build();
-            workloadServiceClient.sendWorkload(workload);
-        }
     }
 }

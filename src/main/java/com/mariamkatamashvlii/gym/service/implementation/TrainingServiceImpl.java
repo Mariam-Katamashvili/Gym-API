@@ -7,6 +7,7 @@ import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingRequestDTO;
 import com.mariamkatamashvlii.gym.entity.Trainee;
 import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.Training;
+import com.mariamkatamashvlii.gym.exception.GymException;
 import com.mariamkatamashvlii.gym.repository.TraineeRepository;
 import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingRepository;
@@ -17,6 +18,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Service
 public class TrainingServiceImpl implements TrainingService {
@@ -25,6 +30,8 @@ public class TrainingServiceImpl implements TrainingService {
     private final TrainerRepository trainerRepo;
     private final Validator validator;
     private final WorkloadServiceClient workloadServiceClient;
+
+    private static final String TRAINEE_NOT_FOUND = "Trainee not found";
 
     @Override
     @Transactional
@@ -58,5 +65,34 @@ public class TrainingServiceImpl implements TrainingService {
                 .actionType(ActionType.ADD)
                 .build();
         workloadServiceClient.sendWorkload(workload);
+    }
+
+    @Override
+    @Transactional
+    public void removeTrainings(String username) {
+        LocalDate now = LocalDate.now();
+        Trainee trainee = traineeRepo.findByUsername(username);
+        if (trainee == null) {
+            throw new GymException(TRAINEE_NOT_FOUND);
+        }
+
+        Set<Training> trainings = trainee.getTrainings();
+
+        Set<Training> futureTrainings = trainings.stream()
+                .filter(training -> training.getTrainingDate().isAfter(now))
+                .collect(Collectors.toSet());
+        for (Training training : futureTrainings) {
+            Trainer trainer = training.getTrainer();
+            WorkloadDTO workload = WorkloadDTO.builder()
+                    .username(trainer.getUser().getUsername())
+                    .firstName(trainer.getUser().getFirstName())
+                    .lastName(trainer.getUser().getLastName())
+                    .isActive(trainer.getUser().getIsActive())
+                    .date(training.getTrainingDate())
+                    .duration(training.getDuration())
+                    .actionType(ActionType.DELETE)
+                    .build();
+            workloadServiceClient.sendWorkload(workload);
+        }
     }
 }

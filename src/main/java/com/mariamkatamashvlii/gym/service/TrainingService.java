@@ -4,4 +4,6 @@ import com.mariamkatamashvlii.gym.dto.trainingDto.TrainingRequestDTO;
 
 public interface TrainingService {
     void create(TrainingRequestDTO trainingRequestDTO);
+
+    void removeTrainings(String username);
 }
