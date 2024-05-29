@@ -8,17 +8,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

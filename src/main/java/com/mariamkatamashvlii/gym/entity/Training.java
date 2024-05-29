@@ -9,20 +9,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDate;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
 public class Training {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

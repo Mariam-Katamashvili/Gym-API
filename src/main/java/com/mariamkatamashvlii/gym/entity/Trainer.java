@@ -12,11 +12,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,13 +21,10 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
-@EqualsAndHashCode
 public class Trainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

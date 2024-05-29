@@ -9,22 +9,18 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Table(name = "training_type")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
 public class TrainingType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
