@@ -1,7 +1,7 @@
 package com.mariamkatamashvlii.gym.service;
 
-import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.ToggleActivationDTO;
+import com.mariamkatamashvlii.gym.dto.securityDto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.ProfileResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.RegistrationRequestDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateRequestDTO;
@@ -15,6 +15,7 @@ import java.util.List;
 
 public interface TraineeService {
     RegistrationResponseDTO register(RegistrationRequestDTO registrationRequestDTO);
+
     ProfileResponseDTO getProfile(String username);
 
     UpdateResponseDTO updateProfile(UpdateRequestDTO updateRequestDTO);

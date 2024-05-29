@@ -36,7 +36,7 @@ public class Training {
     @JoinColumn(name = "trainer_id", referencedColumnName = "id")
     private Trainer trainer;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String trainingName;
 
     @ManyToOne

@@ -1,7 +1,7 @@
 package com.mariamkatamashvlii.gym.service.implementation;
 
-import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.ToggleActivationDTO;
+import com.mariamkatamashvlii.gym.dto.securityDto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.TraineeDTO;
 import com.mariamkatamashvlii.gym.dto.trainerDto.ProfileResponseDTO;
 import com.mariamkatamashvlii.gym.dto.trainerDto.RegistrationRequestDTO;
@@ -14,32 +14,28 @@ import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.Training;
 import com.mariamkatamashvlii.gym.entity.TrainingType;
 import com.mariamkatamashvlii.gym.entity.User;
-import com.mariamkatamashvlii.gym.exception.TrainingTypeNotFoundException;
-import com.mariamkatamashvlii.gym.exception.UserNotCreatedException;
+import com.mariamkatamashvlii.gym.exception.GymException;
 import com.mariamkatamashvlii.gym.generator.PasswordGenerator;
 import com.mariamkatamashvlii.gym.generator.UsernameGenerator;
 import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
+import com.mariamkatamashvlii.gym.security.GymUserDetails;
 import com.mariamkatamashvlii.gym.security.JwtTokenGenerator;
+import com.mariamkatamashvlii.gym.service.TokenService;
 import com.mariamkatamashvlii.gym.service.TrainerService;
 import com.mariamkatamashvlii.gym.validator.Validator;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class TrainerServiceImpl implements TrainerService {
@@ -52,21 +48,22 @@ public class TrainerServiceImpl implements TrainerService {
     private final TrainingRepository trainingRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenGenerator jwtTokenGenerator;
-    private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
+
+    private static final String USER_NOT_FOUND = "User not found";
 
     @Override
     @Transactional
     public RegistrationResponseDTO register(RegistrationRequestDTO registrationRequestDTO) {
-        String transactionId = UUID.randomUUID().toString();
         try {
-            log.info("[{}] Registering new trainer", transactionId);
             String firstName = registrationRequestDTO.getFirstName();
             String lastName = registrationRequestDTO.getLastName();
+            String username = usernameGenerator.generateUsername(firstName, lastName);
             String password = passwordGenerator.generatePassword();
             User user = User.builder()
                     .firstName(firstName)
                     .lastName(lastName)
-                    .username(usernameGenerator.generateUsername(firstName, lastName))
+                    .username(username)
                     .password(passwordEncoder.encode(password))
                     .isActive(true)
                     .build();
@@ -76,23 +73,17 @@ public class TrainerServiceImpl implements TrainerService {
                     .user(user)
                     .build();
             trainerRepo.save(trainer);
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(user.getUsername(), password)
-            );
-            String token = jwtTokenGenerator.generateJwtToken(authentication);
-            log.info("[{}] Registered new trainer with username: {}", transactionId, user.getUsername());
-            return new RegistrationResponseDTO(user.getUsername(), password, token);
+            GymUserDetails userDetails = new GymUserDetails(user);
+            return tokenService.register(userDetails, username, password);
         } catch (Exception e) {
-            log.error("[{}] Unexpected error during trainer creation: {}", transactionId, e.getMessage());
-            throw new UserNotCreatedException("Could not create trainer due to an unexpected error");
+            throw new GymException("Could not create trainer due to an unexpected error");
         }
     }
 
     @Override
+    @PreAuthorize("#username == authentication.principal.username")
     public ProfileResponseDTO getProfile(String username) {
-        String transactionId = UUID.randomUUID().toString();
         validator.validateTrainerExists(username);
-        log.info("[{}] Fetching profile for username: {}", transactionId, username);
 
         Trainer trainer = trainerRepo.findByUsername(username);
         TrainingTypeDTO specialization = new TrainingTypeDTO(
@@ -106,7 +97,6 @@ public class TrainerServiceImpl implements TrainerService {
                 trainee.getUser().getLastName()
         )).toList();
 
-        log.info("[{}] Successfully fetched profile for username: {}", transactionId, username);
         return new ProfileResponseDTO(
                 trainer.getUser().getFirstName(),
                 trainer.getUser().getLastName(),
@@ -118,15 +108,15 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
+    @PreAuthorize("#updateRequestDTO.username == authentication.principal.username")
     public UpdateResponseDTO updateProfile(UpdateRequestDTO updateRequestDTO) {
-        String transactionId = UUID.randomUUID().toString();
         String username = updateRequestDTO.getUsername();
 
-        User user = userRepo.findByUsername(username);
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new GymException(USER_NOT_FOUND));
         validator.validateUserExists(username);
         Trainer trainer = trainerRepo.findByUsername(username);
         validator.validateTrainerExists(username);
-        log.info("[{}] Attempting to update profile for username: {}", transactionId, username);
 
         user.setFirstName(updateRequestDTO.getFirstName());
         user.setLastName(updateRequestDTO.getLastName());
@@ -142,7 +132,6 @@ public class TrainerServiceImpl implements TrainerService {
                 trainee.getUser().getLastName()
         )).toList();
 
-        log.info("[{}] Profile updated successfully for username: {}", transactionId, username);
         return new UpdateResponseDTO(
                 user.getUsername(),
                 user.getFirstName(),
@@ -154,14 +143,13 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
+    @PreAuthorize("#trainingsRequestDTO.username == authentication.principal.username")
     public List<TrainingResponseDTO> getTrainings(TrainingsRequestDTO trainingsRequestDTO) {
-        String transactionId = UUID.randomUUID().toString();
         String username = trainingsRequestDTO.getUsername();
         validator.validateTrainerExists(username);
         LocalDate startDate = trainingsRequestDTO.getStartDate();
         LocalDate endDate = trainingsRequestDTO.getEndDate();
         String traineeName = trainingsRequestDTO.getName();
-        log.info("[{}] Fetching trainings for trainer: {}", transactionId, username);
 
         List<Training> trainings = trainingRepo.findTrainerTrainingsByCriteria(
                 username,
@@ -172,7 +160,7 @@ public class TrainerServiceImpl implements TrainerService {
         return trainings.stream().map(t -> {
             TrainingTypeDTO specialization = trainingTypeRepo.findByTrainingTypeName(t.getTrainingType().getTrainingTypeName())
                     .map(tt -> new TrainingTypeDTO(tt.getId(), tt.getTrainingTypeName()))
-                    .orElseThrow(() -> new TrainingTypeNotFoundException("Training type not found with name: " + t.getTrainingType().getTrainingTypeName()));
+                    .orElseThrow(() -> new GymException("Training type not found with name: " + t.getTrainingType().getTrainingTypeName()));
             return new TrainingResponseDTO(
                     t.getTrainingName(),
                     t.getTrainingDate(),
@@ -184,15 +172,14 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
+    @PreAuthorize("#toggleActivationDTO.username == authentication.principal.username")
     public void toggleActivation(ToggleActivationDTO toggleActivationDTO) {
-        String transactionId = UUID.randomUUID().toString();
         String username = toggleActivationDTO.getUsername();
         validator.validateUserExists(toggleActivationDTO.getUsername());
-        log.info("[{}] Attempting to toggle activation for user: {}", transactionId, username);
 
-        User user = userRepo.findByUsername(username);
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new GymException(USER_NOT_FOUND));
         user.setIsActive(toggleActivationDTO.getIsActive());
         userRepo.save(user);
-        log.info("[{}] Successfully toggled activation for user: {}. Now active: {}", transactionId, username, user.getIsActive());
     }
 }

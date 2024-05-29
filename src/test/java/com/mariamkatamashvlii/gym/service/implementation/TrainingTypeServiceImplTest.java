@@ -2,56 +2,71 @@ package com.mariamkatamashvlii.gym.service.implementation;
 
 import com.mariamkatamashvlii.gym.dto.trainingTypeDto.TrainingTypeDTO;
 import com.mariamkatamashvlii.gym.entity.TrainingType;
-import com.mariamkatamashvlii.gym.exception.TrainingTypeFetchException;
+import com.mariamkatamashvlii.gym.exception.GymException;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.tuple;
-import static org.mockito.BDDMockito.given;
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TrainingTypeServiceImplTest {
+    private static final Long ID = 1L;
+    private static final String TRAINING_TYPE_NAME = "Yoga";
+    private static final String ERROR_MESSAGE = "Error retrieving all training types: ";
+    private static final String DATABASE_ERROR = "Database error";
+
     @Mock
-    private TrainingTypeRepository trainingTypeRepo;
+    private TrainingTypeRepository trainingTypeRepository;
 
     @InjectMocks
     private TrainingTypeServiceImpl trainingTypeService;
 
-    private static final Long EXPECTED_TRAINING_TYPE_ID = 1L;
-    private static final String EXPECTED_TRAINING_TYPE_NAME = "Gymnastics";
-
     @Test
-    void whenFindAll_thenReturnTrainingTypes() {
-        // Given
-        TrainingType trainingType = new TrainingType(EXPECTED_TRAINING_TYPE_ID, EXPECTED_TRAINING_TYPE_NAME, Collections.emptySet(), Collections.emptySet());
-        given(trainingTypeRepo.findAll()).willReturn(List.of(trainingType));
+    void testFindAll_WhenTrainingTypesExist_ThenReturnTrainingTypeDTOList() {
+        // given
+        TrainingType trainingType1 = TrainingType.builder().id(ID).trainingTypeName(TRAINING_TYPE_NAME).build();
+        TrainingType trainingType2 = TrainingType.builder().id(ID + 1).trainingTypeName("Pilates").build();
+        when(trainingTypeRepository.findAll()).thenReturn(List.of(trainingType1, trainingType2));
 
-        // When
-        List<TrainingTypeDTO> actualResults = trainingTypeService.findAll();
+        // when
+        List<TrainingTypeDTO> dtos = trainingTypeService.findAll();
 
-        // Then
-        assertThat(actualResults).hasSize(1)
-                .extracting(TrainingTypeDTO::getTrainingTypeId, TrainingTypeDTO::getTrainingTypeName)
-                .contains(tuple(EXPECTED_TRAINING_TYPE_ID, EXPECTED_TRAINING_TYPE_NAME));
+        // then
+        assertNotNull(dtos);
+        assertFalse(dtos.isEmpty());
+        Assertions.assertEquals(2, dtos.size());
+
+        verify(trainingTypeRepository, times(1)).findAll();
     }
 
     @Test
-    void whenFindAll_thenThrowTrainingTypeFetchException() {
-        // Given
-        given(trainingTypeRepo.findAll()).willThrow(new RuntimeException("Database error"));
+    void testFindAll_WhenExceptionThrown_ThenThrowGymException() {
+        // given
+        RuntimeException runtimeException = new RuntimeException(DATABASE_ERROR);
+        when(trainingTypeRepository.findAll()).thenThrow(runtimeException);
 
-        // When & Then
-        assertThatThrownBy(() -> trainingTypeService.findAll())
-                .isInstanceOf(TrainingTypeFetchException.class)
-                .hasMessageContaining("Error retrieving all training types");
+        // when
+        GymException exception = assertThrows(
+                GymException.class,
+                () -> trainingTypeService.findAll()
+        );
+
+        // then
+        assertNotNull(exception);
+        Assertions.assertEquals(ERROR_MESSAGE + DATABASE_ERROR, exception.getMessage());
+
+        verify(trainingTypeRepository, times(1)).findAll();
     }
 }

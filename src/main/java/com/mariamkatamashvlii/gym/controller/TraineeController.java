@@ -1,7 +1,7 @@
 package com.mariamkatamashvlii.gym.controller;
 
-import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.ToggleActivationDTO;
+import com.mariamkatamashvlii.gym.dto.securityDto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.ProfileResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.RegistrationRequestDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateRequestDTO;
@@ -65,12 +65,14 @@ public class TraineeController {
         List<TrainerDTO> trainer = traineeService.getUnassignedTrainers(username);
         return ResponseEntity.ok(trainer);
     }
+
     @PutMapping("/{username}/trainers/update")
     public ResponseEntity<List<TrainerDTO>> updateTrainers(
             @RequestBody UpdateTrainersRequestDTO updateTrainersRequest) {
         List<TrainerDTO> trainer = traineeService.updateTrainers(updateTrainersRequest);
         return ResponseEntity.ok(trainer);
     }
+
     @GetMapping("/{username}/trainings")
     public ResponseEntity<List<TrainingResponseDTO>> traineeTrainings(
             @RequestBody TrainingsRequestDTO traineeTrainingsRequest) {

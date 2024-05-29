@@ -1,7 +1,8 @@
 package com.mariamkatamashvlii.gym.service.implementation;
 
-import com.mariamkatamashvlii.gym.dto.RegistrationResponseDTO;
+import com.mariamkatamashvlii.gym.client.WorkloadServiceClient;
 import com.mariamkatamashvlii.gym.dto.ToggleActivationDTO;
+import com.mariamkatamashvlii.gym.dto.securityDto.RegistrationResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.ProfileResponseDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.RegistrationRequestDTO;
 import com.mariamkatamashvlii.gym.dto.traineeDto.UpdateRequestDTO;
@@ -16,8 +17,7 @@ import com.mariamkatamashvlii.gym.entity.Trainee;
 import com.mariamkatamashvlii.gym.entity.Trainer;
 import com.mariamkatamashvlii.gym.entity.Training;
 import com.mariamkatamashvlii.gym.entity.User;
-import com.mariamkatamashvlii.gym.exception.TrainingTypeNotFoundException;
-import com.mariamkatamashvlii.gym.exception.UserNotCreatedException;
+import com.mariamkatamashvlii.gym.exception.GymException;
 import com.mariamkatamashvlii.gym.generator.PasswordGenerator;
 import com.mariamkatamashvlii.gym.generator.UsernameGenerator;
 import com.mariamkatamashvlii.gym.repository.TraineeRepository;
@@ -25,14 +25,14 @@ import com.mariamkatamashvlii.gym.repository.TrainerRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingRepository;
 import com.mariamkatamashvlii.gym.repository.TrainingTypeRepository;
 import com.mariamkatamashvlii.gym.repository.UserRepository;
+import com.mariamkatamashvlii.gym.security.GymUserDetails;
 import com.mariamkatamashvlii.gym.security.JwtTokenGenerator;
+import com.mariamkatamashvlii.gym.service.TokenService;
 import com.mariamkatamashvlii.gym.service.TraineeService;
+import com.mariamkatamashvlii.gym.service.TrainingService;
 import com.mariamkatamashvlii.gym.validator.Validator;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,10 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class TraineeServiceImpl implements TraineeService {
@@ -58,21 +55,25 @@ public class TraineeServiceImpl implements TraineeService {
     private final TrainingTypeRepository trainingTypeRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenGenerator jwtTokenGenerator;
-    private final AuthenticationManager authenticationManager;
+    private final WorkloadServiceClient workloadServiceClient;
+    private final TokenService tokenService;
+    private final TrainingService trainingService;
+
+    private static final String USER_NOT_FOUND = "User not found";
+    private static final String TRAINEE_NOT_FOUND = "Trainee not found";
 
     @Override
     @Transactional
     public RegistrationResponseDTO register(RegistrationRequestDTO registrationRequestDTO) {
-        String transactionId = UUID.randomUUID().toString();
-        log.info("[{}] Attempting to register a new trainee", transactionId);
         try {
             String firstName = registrationRequestDTO.getFirstName();
             String lastName = registrationRequestDTO.getLastName();
+            String username = usernameGenerator.generateUsername(firstName, lastName);
             String password = passwordGenerator.generatePassword();
             User user = User.builder()
                     .firstName(firstName)
                     .lastName(lastName)
-                    .username(usernameGenerator.generateUsername(firstName, lastName))
+                    .username(username)
                     .password(passwordEncoder.encode(password))
                     .isActive(true)
                     .build();
@@ -82,27 +83,25 @@ public class TraineeServiceImpl implements TraineeService {
                     .user(user)
                     .build();
             traineeRepo.save(trainee);
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(user.getUsername(), password)
-            );
-            String token = jwtTokenGenerator.generateJwtToken(authentication);
-            log.info("[{}] Successfully registered new trainee with username: {}", transactionId, user.getUsername());
-            return new RegistrationResponseDTO(user.getUsername(), password, token);
+            GymUserDetails userDetails = new GymUserDetails(user);
+            return tokenService.register(userDetails, username, password);
         } catch (Exception e) {
-            log.error("[{}] Failed to register trainee: {}", transactionId, e.getMessage(), e);
-            throw new UserNotCreatedException("Could not create trainee due to an error: " + e.getMessage());
+            throw new GymException("Could not create trainee due to an error: " + e.getMessage());
         }
     }
 
     @Override
+    @PreAuthorize("#username == authentication.principal.username")
     public ProfileResponseDTO getProfile(String username) {
-        String transactionId = UUID.randomUUID().toString();
         validator.validateUserExists(username);
         validator.validateTraineeExists(username);
-        log.info("[{}] Fetching profile for trainee: {}", transactionId, username);
 
-        User user = userRepo.findByUsername(username);
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new GymException(USER_NOT_FOUND));
         Trainee trainee = traineeRepo.findByUsername(username);
+        if (trainee == null) {
+            throw new GymException(TRAINEE_NOT_FOUND);
+        }
 
         List<TrainerDTO> trainers = trainee.getTrainers().stream().map(trainer -> {
             TrainerDTO dto = new TrainerDTO();
@@ -117,7 +116,6 @@ public class TraineeServiceImpl implements TraineeService {
             return dto;
         }).toList();
 
-        log.info("[{}] Successfully fetched profile for trainee: {}", transactionId, username);
         return new ProfileResponseDTO(
                 user.getFirstName(),
                 user.getLastName(),
@@ -130,19 +128,22 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
+    @PreAuthorize("#updateRequestDTO.username == authentication.principal.username")
     public UpdateResponseDTO updateProfile(UpdateRequestDTO updateRequestDTO) {
-        String transactionId = UUID.randomUUID().toString();
         validator.validateUserExists(updateRequestDTO.getUsername());
         validator.validateTraineeExists(updateRequestDTO.getUsername());
-        log.info("[{}] Starting profile update for username: {}", transactionId, updateRequestDTO.getUsername());
 
-        User user = userRepo.findByUsername(updateRequestDTO.getUsername());
+        User user = userRepo.findByUsername(updateRequestDTO.getUsername())
+                .orElseThrow(() -> new GymException(USER_NOT_FOUND));
         user.setFirstName(updateRequestDTO.getFirstName());
         user.setLastName(updateRequestDTO.getLastName());
         user.setIsActive(updateRequestDTO.getIsActive());
         userRepo.save(user);
 
         Trainee trainee = traineeRepo.findByUsername(updateRequestDTO.getUsername());
+        if (trainee == null) {
+            throw new GymException(TRAINEE_NOT_FOUND);
+        }
         trainee.setBirthday(updateRequestDTO.getBirthday());
         trainee.setAddress(updateRequestDTO.getAddress());
         traineeRepo.save(trainee);
@@ -160,7 +161,6 @@ public class TraineeServiceImpl implements TraineeService {
             return dto;
         }).toList();
 
-        log.info("[{}] Profile successfully updated for username: {}", transactionId, user.getUsername());
         return new UpdateResponseDTO(
                 user.getUsername(),
                 user.getFirstName(),
@@ -174,29 +174,28 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
+    @PreAuthorize("#username == authentication.principal.username")
     public void delete(String username) {
-        String transactionId = UUID.randomUUID().toString();
         validator.validateUserExists(username);
         validator.validateTraineeExists(username);
-        log.info("[{}] Initiating deletion for username: {}", transactionId, username);
+
+        trainingService.removeTrainings(username);
 
         Trainee trainee = traineeRepo.findByUsername(username);
-        User user = userRepo.findByUsername(username);
-        Set<Training> trainings = trainee.getTrainings();
-        for (Training t : trainings) {
-            trainingRepository.delete(t);
-            log.debug("[{}] Deleted training with ID: {} for username: {}", transactionId, t.getId(), username);
+        if (trainee == null) {
+            throw new GymException(TRAINEE_NOT_FOUND);
         }
 
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new GymException(USER_NOT_FOUND));
+
         userRepo.delete(user);
-        log.info("[{}] Deleted user with username: {}", transactionId, username);
     }
 
     @Override
+    @PreAuthorize("#username == authentication.principal.username")
     public List<TrainerDTO> getUnassignedTrainers(String username) {
-        String transactionId = UUID.randomUUID().toString();
         validator.validateTraineeExists(username);
-        log.info("[{}] Fetching unassigned trainers for trainee: {}", transactionId, username);
 
         List<TrainerDTO> unassignedTrainers = new ArrayList<>();
         Trainee trainee = traineeRepo.findByUsername(username);
@@ -218,20 +217,18 @@ public class TraineeServiceImpl implements TraineeService {
             }
         }
 
-        log.info("[{}] Successfully fetched unassigned trainers for trainee: {}. Number of trainers found: {}", transactionId, username, unassignedTrainers.size());
         return unassignedTrainers;
     }
 
     @Override
+    @PreAuthorize("#trainingsRequestDTO.username == authentication.principal.username")
     public List<TrainingResponseDTO> getTrainings(TrainingsRequestDTO trainingsRequestDTO) {
-        String transactionId = UUID.randomUUID().toString();
         String username = trainingsRequestDTO.getUsername();
         validator.validateTraineeExists(username);
         String trainerName = trainingsRequestDTO.getName();
         LocalDate startDate = trainingsRequestDTO.getStartDate();
         LocalDate endDate = trainingsRequestDTO.getEndDate();
         TrainingTypeDTO trainingType = trainingsRequestDTO.getTrainingType();
-        log.info("[{}] Fetching trainings for trainee: {}", transactionId, username);
 
         String trainingTypeName = trainingType != null ? trainingType.getTrainingTypeName() : null;
         List<Training> trainings = trainingRepo.findTraineeTrainingsByCriteria(
@@ -244,7 +241,7 @@ public class TraineeServiceImpl implements TraineeService {
         return trainings.stream().map(t -> {
             TrainingTypeDTO specialization = trainingTypeRepo.findByTrainingTypeName(t.getTrainingType().getTrainingTypeName())
                     .map(tt -> new TrainingTypeDTO(tt.getId(), tt.getTrainingTypeName()))
-                    .orElseThrow(() -> new TrainingTypeNotFoundException("Training type not found with name: " + t.getTrainingType().getTrainingTypeName()));
+                    .orElseThrow(() -> new GymException("Training type not found with name: " + t.getTrainingType().getTrainingTypeName()));
             return new TrainingResponseDTO(
                     t.getTrainingName(),
                     t.getTrainingDate(),
@@ -256,11 +253,10 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     @Transactional
+    @PreAuthorize("#updateTrainersRequestDTO.username == authentication.principal.username")
     public List<TrainerDTO> updateTrainers(UpdateTrainersRequestDTO updateTrainersRequestDTO) {
-        String transactionId = UUID.randomUUID().toString();
         String username = updateTrainersRequestDTO.getUsername();
         validator.validateTraineeExists(username);
-        log.info("[{}] Starting to update trainers for trainee: {}", transactionId, username);
 
         Trainee trainee = traineeRepo.findByUsername(username);
         List<TrainerDTO> newTrainers = new ArrayList<>();
@@ -270,7 +266,6 @@ public class TraineeServiceImpl implements TraineeService {
                 .toList();
         trainee.setTrainers(updatedTrainers);
         traineeRepo.save(trainee);
-        log.info("Updated trainer list for trainee - {}", username);
         updatedTrainers.forEach(trainer -> {
             TrainerDTO dto = new TrainerDTO();
             dto.setUsername(trainer.getUser().getUsername());
@@ -284,21 +279,19 @@ public class TraineeServiceImpl implements TraineeService {
             newTrainers.add(dto);
         });
 
-        log.info("[{}] Successfully updated trainer list for trainee: {}", transactionId, username);
         return newTrainers;
     }
 
     @Override
     @Transactional
+    @PreAuthorize("#toggleActivationDTO.username == authentication.principal.username")
     public void toggleActivation(ToggleActivationDTO toggleActivationDTO) {
-        String transactionId = UUID.randomUUID().toString();
         String username = toggleActivationDTO.getUsername();
         validator.validateUserExists(username);
-        log.info("[{}] Attempting to toggle activation for user: {}", transactionId, username);
 
-        User user = userRepo.findByUsername(username);
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new GymException(USER_NOT_FOUND));
         user.setIsActive(toggleActivationDTO.getIsActive());
         userRepo.save(user);
-        log.info("[{}] Successfully toggled activation for user: {}. Now active: {}", transactionId, username, user.getIsActive());
     }
 }

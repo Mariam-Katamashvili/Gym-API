@@ -1,4 +1,4 @@
-# Gym Management API
+# Gym Management Applicaiton API
 
 ## Description
 A Spring Boot-based REST API designed for managing gym operations. This application supports functionalities such as user registration and login, password management, training enrollment, and user profile management. Built using Spring Data JPA with Hibernate for efficient data management, it incorporates Spring Security for secure access and protects user data with token-based authentication and password hashing.
