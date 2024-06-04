@@ -13,7 +13,7 @@ import com.mariamkatamashvili.gym.repository.TraineeRepository;
 import com.mariamkatamashvili.gym.repository.TrainerRepository;
 import com.mariamkatamashvili.gym.repository.TrainingRepository;
 import com.mariamkatamashvili.gym.validator.Validator;
-import com.mariamkatamashvili.gym.messaging.MessageSender;
+import com.mariamkatamashvili.gym.messaging.MessageProducer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -54,7 +53,7 @@ class TrainingServiceImplTest {
     @Mock
     private Validator validator;
     @Mock
-    private MessageSender messageSender;
+    private MessageProducer messageProducer;
 
     @InjectMocks
     private TrainingServiceImpl trainingService;
@@ -103,7 +102,7 @@ class TrainingServiceImplTest {
         Assertions.assertSame(trainer, capturedTraining.getTrainer());
 
         ArgumentCaptor<WorkloadDTO> workloadCaptor = ArgumentCaptor.forClass(WorkloadDTO.class);
-        verify(messageSender).sendMessage(workloadCaptor.capture());
+        verify(messageProducer).sendMessage(workloadCaptor.capture());
 
         WorkloadDTO capturedWorkload = workloadCaptor.getValue();
         Assertions.assertEquals(TRAINER_USERNAME, capturedWorkload.getUsername());
@@ -172,7 +171,7 @@ class TrainingServiceImplTest {
 
         // then
         ArgumentCaptor<WorkloadDTO> workloadCaptor = ArgumentCaptor.forClass(WorkloadDTO.class);
-        verify(messageSender).sendMessage(workloadCaptor.capture());
+        verify(messageProducer).sendMessage(workloadCaptor.capture());
 
         WorkloadDTO capturedWorkload = workloadCaptor.getValue();
         Assertions.assertEquals(TRAINER_USERNAME, capturedWorkload.getUsername());

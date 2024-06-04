@@ -8,7 +8,7 @@ import com.mariamkatamashvili.gym.entity.Training;
 import com.mariamkatamashvili.gym.exception.GymException;
 import com.mariamkatamashvili.gym.service.TrainingService;
 import com.mariamkatamashvili.gym.dto.ActionType;
-import com.mariamkatamashvili.gym.messaging.MessageSender;
+import com.mariamkatamashvili.gym.messaging.MessageProducer;
 import com.mariamkatamashvili.gym.repository.TraineeRepository;
 import com.mariamkatamashvili.gym.repository.TrainerRepository;
 import com.mariamkatamashvili.gym.repository.TrainingRepository;
@@ -29,7 +29,7 @@ public class TrainingServiceImpl implements TrainingService {
     private final TraineeRepository traineeRepo;
     private final TrainerRepository trainerRepo;
     private final Validator validator;
-    private final MessageSender messageSender;
+    private final MessageProducer messageProducer;
 
     private static final String TRAINEE_NOT_FOUND = "Trainee not found";
 
@@ -64,7 +64,7 @@ public class TrainingServiceImpl implements TrainingService {
                 .duration(training.getDuration())
                 .actionType(ActionType.ADD)
                 .build();
-        messageSender.sendMessage(workload);
+        messageProducer.sendMessage(workload);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class TrainingServiceImpl implements TrainingService {
                     .duration(training.getDuration())
                     .actionType(ActionType.DELETE)
                     .build();
-            messageSender.sendMessage(workload);
+            messageProducer.sendMessage(workload);
         }
     }
 }
